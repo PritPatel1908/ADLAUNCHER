@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Company extends Model
 {
@@ -82,5 +83,13 @@ class Company extends Model
     public function notes(): HasMany
     {
         return $this->hasMany(CompanyNote::class);
+    }
+
+    /**
+     * Get the areas associated with this company.
+     */
+    public function areas(): BelongsToMany
+    {
+        return $this->belongsToMany(Area::class, 'area_companies');
     }
 }

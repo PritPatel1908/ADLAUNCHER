@@ -54,5 +54,11 @@ class DatabaseSeeder extends Seeder
             'created_by' => 1,
             'updated_by' => 1,
         ]);
+
+        // Seed companies and areas
+        $this->call([
+            CompanySeeder::class,
+            AreaSeeder::class,
+        ]);
     }
 }

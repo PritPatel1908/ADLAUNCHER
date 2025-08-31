@@ -106,17 +106,20 @@
                         </li> --}}
                     </ul>
                 </li>
-                <li class="menu-title"><span>CRM</span></li>
+                <li class="menu-title"><span>Masters</span></li>
                 <li>
                     <ul>
                         <li>
-                            <a href="{{ route('location.index') }}"><i class="ti ti-map-pin-pin"></i><span>Locations</span></a>
+                            <a href="{{ route('location.index') }}"><i
+                                    class="ti ti-map-pin-pin"></i><span>Locations</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('company.index') }}"><i class="ti ti-building-community"></i><span>Companies</span></a>
+                            <a href="{{ route('company.index') }}"><i
+                                    class="ti ti-building-community"></i><span>Companies</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-medal"></i><span>Deals</span></a>
+                            <a href="{{ route('area.index') }}"><i
+                                    class="ti ti-building-factory"></i><span>Areas</span></a>
                         </li>
                         <li>
                             <a href="{{ route('dashboard') }}"><i class="ti ti-chart-arcs"></i><span>Leads</span></a>
@@ -126,7 +129,8 @@
                                     class="ti ti-timeline-event-exclamation"></i><span>Pipeline</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-brand-campaignmonitor"></i><span>Campaign</span></a>
+                            <a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-brand-campaignmonitor"></i><span>Campaign</span></a>
                         </li>
                         <li>
                             <a href="{{ route('dashboard') }}"><i class="ti ti-atom-2"></i><span>Projects</span></a>
@@ -135,25 +139,32 @@
                             <a href="{{ route('dashboard') }}"><i class="ti ti-list-check"></i><span>Tasks</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-file-star"></i><span>Proposals</span></a>
+                            <a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-file-star"></i><span>Proposals</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-file-check"></i><span>Contracts</span></a>
+                            <a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-file-check"></i><span>Contracts</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-file-report"></i><span>Estimations</span></a>
+                            <a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-file-report"></i><span>Estimations</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-file-invoice"></i><span>Invoices</span></a>
+                            <a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-file-invoice"></i><span>Invoices</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-report-money"></i><span>Payments</span></a>
+                            <a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-report-money"></i><span>Payments</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-chart-bar"></i><span>Analytics</span></a>
+                            <a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-chart-bar"></i><span>Analytics</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-bounce-right"></i><span>Activities</span></a>
+                            <a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-bounce-right"></i><span>Activities</span></a>
                         </li>
                     </ul>
                 </li>
@@ -179,13 +190,16 @@
                 <li class="menu-title"><span>CRM Settings</span></li>
                 <li>
                     <ul>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-artboard"></i><span>Sources</span></a></li>
+                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-artboard"></i><span>Sources</span></a>
+                        </li>
                         <li><a href="{{ route('dashboard') }}"><i class="ti ti-message-exclamation"></i><span>Lost
                                     Reason</span></a></li>
                         <li><a href="{{ route('dashboard') }}"><i class="ti ti-steam"></i><span>Contact
                                     Stage</span></a></li>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-building-factory"></i><span>Industry</span></a></li>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-phone-check"></i><span>Calls</span></a></li>
+                        <li><a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-building-factory"></i><span>Industry</span></a></li>
+                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-phone-check"></i><span>Calls</span></a>
+                        </li>
                     </ul>
                 </li>
                 <li class="menu-title"><span>User Management</span></li>
@@ -218,7 +232,8 @@
                 <li class="menu-title"><span>Content</span></li>
                 <li>
                     <ul>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-page-break"></i><span>Pages</span></a></li>
+                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-page-break"></i><span>Pages</span></a>
+                        </li>
                         <li class="submenu">
                             <a href="javascript:void(0);">
                                 <i class="ti ti-brand-blogger"></i><span>Blog</span><span class="menu-arrow"></span>
@@ -240,9 +255,11 @@
                                 <li><a href="{{ route('dashboard') }}">Cities</a></li>
                             </ul>
                         </li>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-quote"></i><span>Testimonials</span></a>
+                        <li><a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-quote"></i><span>Testimonials</span></a>
                         </li>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-question-mark"></i><span>FAQ</span></a></li>
+                        <li><a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-question-mark"></i><span>FAQ</span></a></li>
                     </ul>
                 </li>
                 <li class="menu-title"><span>Support</span></li>
@@ -250,7 +267,8 @@
                     <ul>
                         <li><a href="{{ route('dashboard') }}"><i class="ti ti-message-check"></i><span>Contact
                                     Messages</span></a></li>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-ticket"></i><span>Tickets</span></a></li>
+                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-ticket"></i><span>Tickets</span></a>
+                        </li>
                     </ul>
                 </li>
                 <li class="menu-title"><span>Settings</span></li>
@@ -353,15 +371,18 @@
                         </li>
                         <li class="submenu">
                             <a href="javascript:void(0);">
-                                <i class="ti ti-error-404"></i><span>Error Pages</span><span class="menu-arrow"></span>
+                                <i class="ti ti-error-404"></i><span>Error Pages</span><span
+                                    class="menu-arrow"></span>
                             </a>
                             <ul>
                                 <li><a href="{{ route('dashboard') }}">404 Error</a></li>
                                 <li><a href="{{ route('dashboard') }}">500 Error</a></li>
                             </ul>
                         </li>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-file"></i><span>Blank Page</span></a></li>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-inner-shadow-top-right"></i><span>Coming
+                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-file"></i><span>Blank Page</span></a>
+                        </li>
+                        <li><a href="{{ route('dashboard') }}"><i
+                                    class="ti ti-inner-shadow-top-right"></i><span>Coming
                                     Soon</span></a></li>
                         <li><a href="{{ route('dashboard') }}"><i class="ti ti-info-triangle"></i><span>Under
                                     Maintenance</span></a></li>
@@ -513,7 +534,8 @@
                 <li class="menu-title"><span>Help</span></li>
                 <li>
                     <ul>
-                        <li><a href="javascript:void(0);"><i class="ti ti-file-stack"></i><span>Documentation</span></a>
+                        <li><a href="javascript:void(0);"><i
+                                    class="ti ti-file-stack"></i><span>Documentation</span></a>
                         </li>
                         <li><a href="javascript:void(0);"><i class="ti ti-arrow-capsule"></i><span>Changelog
                                     v2.2.7</span></a></li>
