@@ -51,7 +51,7 @@ class CompanyController extends Controller
             'location_ids' => 'nullable|array',
             'location_ids.*' => 'exists:locations,id',
             'addresses' => 'nullable|array',
-            'addresses.*.type' => 'nullable|string|max:50',
+            'addresses.*.type' => 'required|string|max:50',
             'addresses.*.address' => 'nullable|string|max:255',
             'addresses.*.city' => 'nullable|string|max:100',
             'addresses.*.state' => 'nullable|string|max:100',
@@ -83,7 +83,7 @@ class CompanyController extends Controller
         // Handle addresses
         if (isset($validated['addresses'])) {
             foreach ($validated['addresses'] as $addressData) {
-                if (!empty($addressData['address'])) {
+                if (!empty($addressData['address']) && !empty($addressData['type'])) {
                     $company->addresses()->create($addressData);
                 }
             }
@@ -189,7 +189,7 @@ class CompanyController extends Controller
             'location_ids' => 'nullable|array',
             'location_ids.*' => 'exists:locations,id',
             'addresses' => 'nullable|array',
-            'addresses.*.type' => 'nullable|string|max:50',
+            'addresses.*.type' => 'required|string|max:50',
             'addresses.*.address' => 'nullable|string|max:255',
             'addresses.*.city' => 'nullable|string|max:100',
             'addresses.*.state' => 'nullable|string|max:100',
@@ -222,7 +222,7 @@ class CompanyController extends Controller
         if (isset($validated['addresses'])) {
             $company->addresses()->delete(); // Remove existing addresses
             foreach ($validated['addresses'] as $addressData) {
-                if (!empty($addressData['address'])) {
+                if (!empty($addressData['address']) && !empty($addressData['type'])) {
                     $company->addresses()->create($addressData);
                 }
             }
@@ -255,8 +255,13 @@ class CompanyController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Company updated successfully',
-                'company' => $company->load(['locations', 'addresses', 'contacts', 'notes'])
+                'company' => $company->load(['locations', 'addresses', 'contacts', 'notes', 'createdByUser', 'updatedByUser'])
             ]);
+        }
+
+        // Check if request came from show page
+        if ($request->has('from_show') || strpos($request->header('referer'), '/company/') !== false) {
+            return redirect()->route('company.show', $company->id)->with('success', 'Company updated successfully');
         }
 
         return redirect()->route('company.index')->with('success', 'Company updated successfully');

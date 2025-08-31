@@ -784,7 +784,7 @@ $(document).ready(function () {
         newAddress.innerHTML = `
             <div class="row">
                 <div class="col-md-3">
-                    <select class="form-select" name="addresses[${addressCounter}][type]">
+                    <select class="form-select" name="addresses[${addressCounter}][type]" required>
                         <option value="">Select Type</option>
                         <option value="Head Office">Head Office</option>
                         <option value="Branch">Branch</option>

@@ -657,7 +657,8 @@
                                                         <div class="address-item border rounded p-3 mb-2">
                                                             <div class="row">
                                                                 <div class="col-md-3">
-                                                                    <select class="form-select" name="addresses[0][type]">
+                                                                    <select class="form-select" name="addresses[0][type]"
+                                                                        required>
                                                                         <option value="">Select Type</option>
                                                                         <option value="Head Office">Head Office</option>
                                                                         <option value="Branch">Branch</option>
@@ -841,6 +842,7 @@
                     <form id="edit-company-form" method="POST">
                         @csrf
                         @method('PUT')
+                        <input type="hidden" name="from_index" value="1">
                         <div class="accordion accordion-bordered" id="main_accordion">
                             <!-- Basic Info -->
                             <div class="accordion-item rounded mb-3">
@@ -895,8 +897,8 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status" id="edit-status">
-                                                        <option value="1">Active</option>
-                                                        <option value="0">Inactive</option>
+                                                        <option value="active">Active</option>
+                                                        <option value="inactive">Inactive</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -967,13 +969,13 @@
                                 </div>
                             </div>
 
-                            {{-- Notes --}}
+                            {{-- Contacts --}}
                             <div class="accordion-item border-top rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
                                         data-bs-toggle="collapse" data-bs-target="#contacts">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-note"></i></span>
-                                        Contact Info
+                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-user-plus"></i></span>
+                                        Contacts Info
                                     </a>
                                 </div>
                                 <div class="accordion-collapse collapse" id="contacts" data-bs-parent="#main_accordion">
@@ -1036,7 +1038,7 @@
                             <div class="d-flex align-items-center justify-content-end">
                                 <button type="button" data-bs-dismiss="offcanvas"
                                     class="btn btn-sm btn-light me-2">Cancel</button>
-                                <button type="submit" class="btn btn-sm btn-primary">Update Location</button>
+                                <button type="submit" class="btn btn-sm btn-primary">Update Company</button>
                             </div>
                         </div>
                     </form>

@@ -11,219 +11,124 @@
 @section('content')
     <!-- Start Content -->
     <div class="content pb-0">
-        <!-- Page Header -->
-        <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
-            <div>
-                <h4 class="mb-1">Company Details</h4>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0 p-0">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('company.index') }}">Companies</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Company Details</li>
-                    </ol>
-                </nav>
-            </div>
-            <div class="gap-2 d-flex align-items-center flex-wrap">
-                <div class="dropdown">
-                    <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
-                        data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
-                    <div class="dropdown-menu dropdown-menu-end">
-                        <ul>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item"><i
-                                        class="ti ti-file-type-pdf me-1"></i>Export as PDF</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item"><i
-                                        class="ti ti-file-type-xls me-1"></i>Export as Excel</a>
-                            </li>
-                        </ul>
+        <div class="container-fluid">
+            <!-- Success Message -->
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <!-- Page Header -->
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+                <div>
+                    <h4 class="mb-1">Company Details</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 p-0">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('company.index') }}">Companies</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Company Details</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="gap-2 d-flex align-items-center flex-wrap">
+                    <div class="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
+                            data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <ul>
+                                <li>
+                                    <a href="javascript:void(0);" class="dropdown-item"><i
+                                            class="ti ti-file-type-pdf me-1"></i>Export as PDF</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);" class="dropdown-item"><i
+                                            class="ti ti-file-type-xls me-1"></i>Export as Excel</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
+                    <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
+                        data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
+                            class="ti ti-refresh"></i></a>
+                    <a href="javascript:void(0);" class="btn btn-icon btn-outline-warning shadow" data-bs-toggle="tooltip"
+                        data-bs-placement="top" aria-label="Collapse" data-bs-original-title="Collapse"
+                        id="collapse-header"><i class="ti ti-transition-top"></i></a>
                 </div>
-                <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
-                    data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
-                        class="ti ti-refresh"></i></a>
-                <a href="javascript:void(0);" class="btn btn-icon btn-outline-warning shadow" data-bs-toggle="tooltip"
-                    data-bs-placement="top" aria-label="Collapse" data-bs-original-title="Collapse" id="collapse-header"><i
-                        class="ti ti-transition-top"></i></a>
             </div>
-        </div>
-        <!-- End Page Header -->
+            <!-- End Page Header -->
 
-        <div class="row">
-            <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <a href="{{ route('company.index') }}"><i class="ti ti-arrow-narrow-left me-1"></i>Back to
+                            Companies</a>
+                    </div>
 
-                <div class="mb-3">
-                    <a href="{{ route('company.index') }}"><i class="ti ti-arrow-narrow-left me-1"></i>Back to Companies</a>
-                </div>
-
-                <div class="card">
-                    <div class="card-body pb-2">
-                        <div class="d-flex align-items-center justify-content-between flex-wrap">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="avatar avatar-xxl avatar-rounded me-3 flex-shrink-0 bg-primary">
-                                    <span class="avatar-text">{{ substr($company->name, 0, 1) }}</span>
-                                    <span class="status {{ $company->status ? 'online' : 'offline' }}"></span>
-                                </div>
-                                <div>
-                                    <h5 class="mb-1">{{ $company->name }}</h5>
-                                    <p class="mb-2">{{ $company->industry }}</p>
-                                    <div class="d-flex align-items-center flex-wrap gap-2">
+                    <!-- Company Header Card -->
+                    <div class="card">
+                        <div class="card-body pb-2">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="avatar avatar-xxl avatar-rounded me-3 flex-shrink-0 bg-primary">
+                                        <span class="avatar-text">{{ substr($company->name, 0, 1) }}</span>
                                         <span
-                                            class="badge {{ $company->status == 1 ? 'badge-soft-success' : 'badge-soft-danger' }} border-0 me-2">
-                                            <i class="ti {{ $company->status == 1 ? 'ti-check' : 'ti-lock' }} me-1"></i>
-                                            {{ $company->status == 1 ? 'Active' : 'Inactive' }}
-                                        </span>
-                                        @if ($company->website)
-                                            <p class="d-inline-flex align-items-center mb-0 me-3">
-                                                <i class="ti ti-world text-warning me-1"></i> {{ $company->website }}
-                                            </p>
-                                        @endif
-                                        @if ($company->email)
-                                            <p class="d-inline-flex align-items-center mb-0 me-3">
-                                                <i class="ti ti-mail text-info me-1"></i> {{ $company->email }}
-                                            </p>
-                                        @endif
-                                        @if ($company->phone)
-                                            <p class="d-inline-flex align-items-center mb-0">
-                                                <i class="ti ti-phone text-success me-1"></i> {{ $company->phone }}
-                                            </p>
-                                        @endif
+                                            class="status {{ $company->status == 'active' ? 'online' : 'offline' }}"></span>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1">{{ $company->name }}</h5>
+                                        <p class="mb-2">{{ $company->industry }}</p>
+                                        <div class="d-flex align-items-center flex-wrap gap-2">
+                                            <span
+                                                class="badge {{ $company->status == 'active' ? 'badge-soft-success' : 'badge-soft-danger' }} border-0 me-2">
+                                                <i
+                                                    class="ti {{ $company->status == 'active' ? 'ti-check' : 'ti-lock' }} me-1"></i>
+                                                {{ $company->status == 'active' ? 'Active' : 'Inactive' }}
+                                            </span>
+                                            @if ($company->website)
+                                                <p class="d-inline-flex align-items-center mb-0 me-3">
+                                                    <i class="ti ti-world text-warning me-1"></i> {{ $company->website }}
+                                                </p>
+                                            @endif
+                                            @if ($company->email)
+                                                <p class="d-inline-flex align-items-center mb-0 me-3">
+                                                    <i class="ti ti-mail text-info me-1"></i> {{ $company->email }}
+                                                </p>
+                                            @endif
+                                            @if ($company->phone)
+                                                <p class="d-inline-flex align-items-center mb-0">
+                                                    <i class="ti ti-phone text-success me-1"></i> {{ $company->phone }}
+                                                </p>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="d-flex align-items-center flex-wrap gap-2">
-                                <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                                    data-bs-target="#offcanvas_edit">
-                                    <i class="ti ti-edit me-1"></i>Edit Company
-                                </a>
-                                <form action="{{ route('company.destroy', $company->id) }}" method="POST"
-                                    class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger"
-                                        onclick="return confirm('Are you sure you want to delete this company?')">
-                                        <i class="ti ti-trash me-1"></i>Delete
-                                    </button>
-                                </form>
+                                <div class="d-flex align-items-center flex-wrap gap-2">
+                                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                                        data-bs-target="#offcanvas_edit">
+                                        <i class="ti ti-edit me-1"></i>Edit Company
+                                    </a>
+                                    <form action="{{ route('company.destroy', $company->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this company?')">
+                                            <i class="ti ti-trash me-1"></i>Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- /Company User -->
-
             </div>
 
-            <!-- Company Sidebar -->
-            <div class="col-xl-3">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <h6 class="mb-3 fw-semibold">Company Information</h6>
-                        <div class="border-bottom mb-3 pb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="avatar avatar-xs bg-primary p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                    <i class="ti ti-mail fs-14"></i>
-                                </span>
-                                <p class="mb-0">
-                                    <a href="mailto:{{ $company->email }}">{{ $company->email }}</a>
-                                </p>
-                            </div>
-
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="avatar avatar-xs bg-warning p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                    <i class="ti ti-map-pin fs-14"></i>
-                                </span>
-                                <p class="mb-0">{{ $company->website }}</p>
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="avatar avatar-xs bg-success p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                    <i class="ti ti-building fs-14"></i>
-                                </span>
-                                <p class="mb-0">{{ $company->industry }}</p>
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="avatar avatar-xs bg-danger p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                    <i class="ti ti-phone fs-14"></i>
-                                </span>
-                                <p class="mb-0">{{ $company->phone }}</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <span class="avatar avatar-xs bg-dark p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                <i class="ti ti-calendar-exclamation fs-14"></i>
-                            </span>
-                            <p class="mb-0">Created: {{ $company->created_at->format('d M Y, h:i A') }}</p>
-                        </div>
-                    </div>
-                    <h6 class="mb-3 fw-semibold">Status Information</h6>
-                    <ul class="border-bottom mb-3 pb-3">
-                        <li class="row mb-2">
-                            <span class="col-6">Status</span>
-                            <span class="col-6 text-dark">
-                                <span
-                                    class="badge {{ $company->status == 1 ? 'badge-soft-success' : 'badge-soft-danger' }} border-0">
-                                    {{ $company->status == 1 ? 'Active' : 'Inactive' }}
-                                </span>
-                            </span>
-                        </li>
-                        @if ($company->updated_at)
-                            <li class="row mb-2">
-                                <span class="col-6">Last Modified</span>
-                                <span class="col-6 text-dark">{{ $company->updated_at->format('d M Y, h:i A') }}</span>
-                            </li>
-                        @endif
-                        @if ($company->created_by)
-                            <li class="row mb-2">
-                                <span class="col-6">Created By</span>
-                                <span class="col-6 text-dark">{{ $company->createdByUser->name ?? 'N/A' }}</span>
-                            </li>
-                        @endif
-                        @if ($company->updated_by)
-                            <li class="row mb-2">
-                                <span class="col-6">Last Updated By</span>
-                                <span class="col-6 text-dark">{{ $company->updatedByUser->name ?? 'N/A' }}</span>
-                            </li>
-                        @endif
-                        <li class="row mb-2">
-                            <span class="col-6">Last Update</span>
-                            <span
-                                class="col-6 text-dark">{{ $company->updated_at ? $company->updated_at->diffForHumans() : 'N/A' }}</span>
-                        </li>
-                    </ul>
-                    <h6 class="mb-3 fw-semibold">Actions</h6>
-                    <div class="mb-0">
-                        <a href="javascript:void(0);" class="d-block mb-2" data-bs-toggle="offcanvas"
-                            data-bs-target="#offcanvas_edit">
-                            <span class="avatar avatar-xs bg-primary p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                <i class="ti ti-edit"></i>
-                            </span>Edit Company
-                        </a>
-                        <form action="{{ route('company.destroy', $company->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <a href="javascript:void(0);" class="d-block mb-0"
-                                onclick="if(confirm('Are you sure you want to delete this company?')) { this.closest('form').submit(); }">
-                                <span class="avatar avatar-xs bg-danger p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                    <i class="ti ti-trash-x"></i>
-                                </span>Delete Company
-                            </a>
-                        </form>
-                        <a href="{{ route('company.index') }}" class="d-block mt-2">
-                            <span class="avatar avatar-xs bg-info p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                <i class="ti ti-list"></i>
-                            </span>View All Companies
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /Company Sidebar -->
-
-        <!-- Company Content -->
-        <div class="col-xl-9">
+            <!-- Company Information Cards -->
             <div class="row">
                 <!-- Company Overview -->
-                <div class="col-md-12 mb-4">
+                <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-header">
                             <h5 class="card-title mb-0">Company Overview</h5>
@@ -253,12 +158,63 @@
                                         <h6 class="fw-semibold">Phone</h6>
                                         <p>{{ $company->phone }}</p>
                                     </div>
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Status</h6>
+                                        <p><span
+                                                class="badge {{ $company->status == 'active' ? 'badge-soft-success' : 'badge-soft-danger' }}">
+                                                {{ $company->status == 'active' ? 'Active' : 'Inactive' }}
+                                            </span></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Company Statistics -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Company Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Locations</h6>
+                                        <p class="h4 text-primary">{{ $company->locations->count() }}</p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Addresses</h6>
+                                        <p class="h4 text-success">{{ $company->addresses->count() }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Contacts</h6>
+                                        <p class="h4 text-warning">{{ $company->contacts->count() }}</p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold">Notes</h6>
+                                        <p class="h4 text-info">{{ $company->notes->count() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <h6 class="fw-semibold">Created</h6>
+                                <p class="text-muted">{{ $company->created_at->format('d M Y, h:i A') }}</p>
+                                @if ($company->updated_at)
+                                    <h6 class="fw-semibold">Last Updated</h6>
+                                    <p class="text-muted">{{ $company->updated_at->format('d M Y, h:i A') }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Details Sections -->
+            <div class="row">
                 <!-- Locations -->
                 @if ($company->locations->count() > 0)
                     <div class="col-md-12 mb-4">
@@ -367,7 +323,7 @@
                                             <div class="border rounded p-3">
                                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                                     <span
-                                                        class="badge {{ $note->status == 1 ? 'badge-soft-success' : 'badge-soft-danger' }}">{{ $note->status == 1 ? 'Active' : 'Inactive' }}</span>
+                                                        class="badge {{ $note->status == 'active' ? 'badge-soft-success' : 'badge-soft-danger' }}">{{ $note->status == 'active' ? 'Active' : 'Inactive' }}</span>
                                                     <small
                                                         class="text-muted">{{ $note->created_at->format('d M Y, h:i A') }}</small>
                                                 </div>
@@ -382,35 +338,35 @@
                 @endif
             </div>
         </div>
-        <!-- /Company Content -->
-    </div>
     </div>
     <!-- End Content -->
 
     <!-- Edit Company Offcanvas -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas_edit" aria-labelledby="offcanvas_edit_label">
+    <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_edit"
+        aria-labelledby="offcanvas_edit_label">
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title" id="offcanvas_edit_label">Edit Company</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <div class="row">
-                <div class="col-12">
-                    <form id="edit-company-form" method="POST">
+            <div class="card">
+                <div class="card-body">
+                    <form id="edit-company-form" method="POST" action="{{ route('company.update', $company->id) }}">
                         @csrf
                         @method('PUT')
-                        <div class="accordion accordion-bordered" id="main_accordion2">
+                        <input type="hidden" name="from_show" value="1">
+                        <div class="accordion accordion-bordered" id="main_accordion">
                             <!-- Basic Info -->
                             <div class="accordion-item rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#basic2">
+                                        data-bs-toggle="collapse" data-bs-target="#basic">
                                         <span class="avatar avatar-md rounded me-1"><i class="ti ti-user-plus"></i></span>
                                         Basic Info
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse show" id="basic2"
-                                    data-bs-parent="#main_accordion2">
+                                <div class="accordion-collapse collapse show" id="basic"
+                                    data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
                                             <div class="col-md-6">
@@ -418,238 +374,555 @@
                                                     <label class="form-label">Company Name <span
                                                             class="text-danger">*</span></label>
                                                     <input type="text" class="form-control" name="name"
-                                                        id="edit-name" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input type="email" class="form-control" name="email"
-                                                        id="edit-email">
+                                                        id="edit-name" value="{{ $company->name }}" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Industry</label>
                                                     <input type="text" class="form-control" name="industry"
-                                                        id="edit-industry">
+                                                        id="edit-industry" value="{{ $company->industry }}">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Website</label>
-                                                    <input type="text" class="form-control" name="city"
-                                                        id="edit-city">
+                                                    <input type="url" class="form-control" name="website"
+                                                        id="edit-website" value="{{ $company->website }}">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">State</label>
-                                                    <input type="text" class="form-control" name="state"
-                                                        id="edit-state">
+                                                    <label class="form-label">Email</label>
+                                                    <input type="email" class="form-control" name="email"
+                                                        id="edit-email" value="{{ $company->email }}">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Country</label>
-                                                    <input type="text" class="form-control" name="country"
-                                                        id="edit-country">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Zip Code</label>
-                                                    <input type="text" class="form-control" name="zip_code"
-                                                        id="edit-zip_code">
+                                                    <label class="form-label">Phone</label>
+                                                    <input type="text" class="form-control" name="phone"
+                                                        id="edit-phone" value="{{ $company->phone }}">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status" id="edit-status">
-                                                        <option value="1">Active</option>
-                                                        <option value="0">Inactive</option>
+                                                        <option value="active"
+                                                            {{ $company->status == 'active' ? 'selected' : '' }}>Active
+                                                        </option>
+                                                        <option value="inactive"
+                                                            {{ $company->status == 'inactive' ? 'selected' : '' }}>Inactive
+                                                        </option>
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div id="edit-form-alert" class="col-12" style="display: none;">
-                                                <div class="alert alert-success alert-dismissible fade show"
-                                                    role="alert">
-                                                    Location updated successfully!
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-end">
-                                            <button type="button" data-bs-dismiss="offcanvas"
-                                                class="btn btn-sm btn-light me-2">Cancel</button>
-                                            <button type="submit" class="btn btn-sm btn-primary">Update Location</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            {{-- Location --}}
+                            <div class="accordion-item border-top rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded"
+                                        data-bs-toggle="collapse" data-bs-target="#location">
+                                        <span class="avatar avatar-md rounded me-1"><i
+                                                class="ti ti-map-pin-cog"></i></span>
+                                        Location Info
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="location" data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Locations</label>
+                                                    <select class="select2 form-control select2-multiple"
+                                                        name="location_ids[]" id="edit-location_ids"
+                                                        data-toggle="select2" multiple="multiple"
+                                                        data-placeholder="Choose locations...">
+                                                        @foreach (\App\Models\Location::where('status', 1)->get() as $location)
+                                                            <option value="{{ $location->id }}"
+                                                                {{ $company->locations->contains($location->id) ? 'selected' : '' }}>
+                                                                {{ $location->name }} - {{ $location->city }},
+                                                                {{ $location->country }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Address --}}
+                            <div class="accordion-item border-top rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded"
+                                        data-bs-toggle="collapse" data-bs-target="#address">
+                                        <span class="avatar avatar-md rounded me-1"><i
+                                                class="ti ti-map-pin-cog"></i></span>
+                                        Address Info
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="address" data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Addresses</label>
+                                                    <div id="edit-addresses-container">
+                                                        @foreach ($company->addresses as $index => $address)
+                                                            <div class="address-item border rounded p-3 mb-2">
+                                                                <div class="row">
+                                                                    <div class="col-md-3">
+                                                                        <select class="form-select"
+                                                                            name="addresses[{{ $index }}][type]">
+                                                                            <option value="">Select Type</option>
+                                                                            <option value="Head Office"
+                                                                                {{ $address->type == 'Head Office' ? 'selected' : '' }}>
+                                                                                Head Office</option>
+                                                                            <option value="Branch"
+                                                                                {{ $address->type == 'Branch' ? 'selected' : '' }}>
+                                                                                Branch</option>
+                                                                            <option value="Office"
+                                                                                {{ $address->type == 'Office' ? 'selected' : '' }}>
+                                                                                Office</option>
+                                                                            <option value="Warehouse"
+                                                                                {{ $address->type == 'Warehouse' ? 'selected' : '' }}>
+                                                                                Warehouse</option>
+                                                                            <option value="Factory"
+                                                                                {{ $address->type == 'Factory' ? 'selected' : '' }}>
+                                                                                Factory</option>
+                                                                            <option value="Store"
+                                                                                {{ $address->type == 'Store' ? 'selected' : '' }}>
+                                                                                Store</option>
+                                                                            <option value="Billing"
+                                                                                {{ $address->type == 'Billing' ? 'selected' : '' }}>
+                                                                                Billing</option>
+                                                                            <option value="Shipping"
+                                                                                {{ $address->type == 'Shipping' ? 'selected' : '' }}>
+                                                                                Shipping</option>
+                                                                            <option value="Other"
+                                                                                {{ $address->type == 'Other' ? 'selected' : '' }}>
+                                                                                Other</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-md-9">
+                                                                        <input type="text" class="form-control"
+                                                                            name="addresses[{{ $index }}][address]"
+                                                                            value="{{ $address->address }}"
+                                                                            placeholder="Address">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-2">
+                                                                    <div class="col-md-3">
+                                                                        <input type="text" class="form-control"
+                                                                            name="addresses[{{ $index }}][city]"
+                                                                            value="{{ $address->city }}"
+                                                                            placeholder="City">
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <input type="text" class="form-control"
+                                                                            name="addresses[{{ $index }}][state]"
+                                                                            value="{{ $address->state }}"
+                                                                            placeholder="State">
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <input type="text" class="form-control"
+                                                                            name="addresses[{{ $index }}][country]"
+                                                                            value="{{ $address->country }}"
+                                                                            placeholder="Country">
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <input type="text" class="form-control"
+                                                                            name="addresses[{{ $index }}][zip_code]"
+                                                                            value="{{ $address->zip_code }}"
+                                                                            placeholder="Zip Code">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        onclick="addEditAddress()">
+                                                        <i class="ti ti-plus me-1"></i>Add Address
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Contacts --}}
+                            <div class="accordion-item border-top rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded"
+                                        data-bs-toggle="collapse" data-bs-target="#contacts">
+                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-user-plus"></i></span>
+                                        Contacts Info
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="contacts" data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Contacts</label>
+                                                    <div id="edit-contacts-container">
+                                                        @foreach ($company->contacts as $index => $contact)
+                                                            <div class="contact-item border rounded p-3 mb-2">
+                                                                <div class="row">
+                                                                    <div class="col-md-4">
+                                                                        <input type="text" class="form-control"
+                                                                            name="contacts[{{ $index }}][name]"
+                                                                            value="{{ $contact->name }}"
+                                                                            placeholder="Contact Name">
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <input type="email" class="form-control"
+                                                                            name="contacts[{{ $index }}][email]"
+                                                                            value="{{ $contact->email }}"
+                                                                            placeholder="Email">
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <input type="text" class="form-control"
+                                                                            name="contacts[{{ $index }}][phone]"
+                                                                            value="{{ $contact->phone }}"
+                                                                            placeholder="Phone">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-2">
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" class="form-control"
+                                                                            name="contacts[{{ $index }}][designation]"
+                                                                            value="{{ $contact->designation }}"
+                                                                            placeholder="Designation">
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox"
+                                                                                name="contacts[{{ $index }}][is_primary]"
+                                                                                value="1"
+                                                                                {{ $contact->is_primary ? 'checked' : '' }}>
+                                                                            <label class="form-check-label">Primary
+                                                                                Contact</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        onclick="addEditContact()">
+                                                        <i class="ti ti-plus me-1"></i>Add Contact
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Notes --}}
+                            <div class="accordion-item border-top rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded"
+                                        data-bs-toggle="collapse" data-bs-target="#notes">
+                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-note"></i></span>
+                                        Notes Info
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="notes" data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Notes</label>
+                                                    <div id="edit-notes-container">
+                                                        @foreach ($company->notes as $index => $note)
+                                                            <div class="note-item border rounded p-3 mb-2">
+                                                                <div class="row">
+                                                                    <div class="col-md-9">
+                                                                        <textarea class="form-control" name="notes[{{ $index }}][note]" rows="3" placeholder="Note content">{{ $note->note }}</textarea>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <select class="form-select"
+                                                                            name="notes[{{ $index }}][status]">
+                                                                            <option value="active"
+                                                                                {{ $note->status == 'active' ? 'selected' : '' }}>
+                                                                                Active</option>
+                                                                            <option value="inactive"
+                                                                                {{ $note->status == 'inactive' ? 'selected' : '' }}>
+                                                                                Inactive</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        onclick="addEditNote()">
+                                                        <i class="ti ti-plus me-1"></i>Add Note
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="edit-form-alert" class="col-12" style="display: none;">
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    Company updated successfully!
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-end">
+                            <button type="button" data-bs-dismiss="offcanvas"
+                                class="btn btn-sm btn-light me-2">Cancel</button>
+                            <button type="submit" class="btn btn-sm btn-primary">Update Company</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    <!-- End Edit Location Offcanvas -->
 @endsection
 
 @push('js')
+    <!-- Select2 CSS and JS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+
+    <!-- Company Show JS -->
+    <script src="{{ asset('assets/js/datatable/company-show.js') }}" type="text/javascript"></script>
+
+    <style>
+        /* Select2 Custom Styles - Perfect Design Match */
+        .select2-container {
+            width: 100% !important;
+            font-family: inherit !important;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #d1d3e2 !important;
+            border-radius: 0.375rem !important;
+            min-height: 38px !important;
+            padding: 0.375rem 0.75rem !important;
+            background-color: #fff !important;
+            box-sizing: border-box !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            line-height: normal !important;
+            align-items: center !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            position: relative !important;
+            background-color: #f8f9fa !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 0.25rem !important;
+            padding: 0.25rem 0.5rem !important;
+            margin: 0 !important;
+            font-size: 0.875rem !important;
+            line-height: 1.5 !important;
+            color: #495057 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            font-weight: 400 !important;
+        }
+
+        /* Fix for duplicate cross symbols - hide default Select2 remove button */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            position: relative !important;
+            right: auto !important;
+            top: auto !important;
+            transform: none !important;
+            color: #6c757d !important;
+            font-weight: bold !important;
+            font-size: 0 !important;
+            /* Hide the default text */
+            line-height: 0 !important;
+            cursor: pointer !important;
+            border: none !important;
+            background: none !important;
+            padding: 0 !important;
+            margin: 0 0 0 0.25rem !important;
+            width: 16px !important;
+            height: 16px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            float: none !important;
+            text-decoration: none !important;
+            font-family: inherit !important;
+            overflow: hidden !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #dc3545 !important;
+        }
+
+        /* Show only our custom × symbol */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:before {
+            content: "×" !important;
+            font-size: 1.125rem !important;
+            line-height: 1 !important;
+            color: #6c757d !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+        }
+
+        /* Hide any other potential × symbols or text */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:after,
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove span,
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove i {
+            display: none !important;
+            content: "" !important;
+        }
+
+        .select2-container--default .select2-search--inline {
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: 1 !important;
+            min-width: 120px !important;
+        }
+
+        .select2-container--default .select2-search--inline .select2-search__field {
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            font-size: 0.875rem !important;
+            line-height: 1.5 !important;
+            width: 100% !important;
+            background: transparent !important;
+            color: #495057 !important;
+        }
+
+        .select2-container--default .select2-dropdown {
+            border: 1px solid #d1d3e2 !important;
+            border-radius: 0.375rem !important;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+            background-color: #fff !important;
+            z-index: 9999 !important;
+            margin-top: 2px !important;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.875rem !important;
+            line-height: 1.5 !important;
+            color: #495057 !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #0d6efd !important;
+            color: white !important;
+        }
+
+        .select2-container--default .select2-results__group {
+            font-weight: 600 !important;
+            color: #6c757d !important;
+            padding: 0.5rem 0.75rem 0.25rem !important;
+            font-size: 0.875rem !important;
+            background-color: #f8f9fa !important;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #e9ecef !important;
+            color: #495057 !important;
+        }
+
+        /* Focus state */
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #86b7fe !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        }
+
+        /* Placeholder styling */
+        .select2-container--default .select2-selection--multiple .select2-selection__placeholder {
+            color: #6c757d !important;
+            font-size: 0.875rem !important;
+        }
+    </style>
+
+    <!-- The inline script has been moved to company-show.js -->
     <script>
         $(document).ready(function() {
-            // Handle edit button click
-            $(document).on('click', '[data-bs-target="#offcanvas_edit"]', function() {
-                var locationId = {{ $location->id }};
-
-                // Set the location ID to the form
-                $('#edit-location-form').data('location-id', locationId);
-                $('#edit-location-form').attr('action', '/location/' + locationId);
-
-                // Fetch location data via AJAX
-                $.ajax({
-                    url: '/location/' + locationId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data) {
-                        // Populate form fields
-                        $('#edit-name').val(data.name);
-                        $('#edit-email').val(data.email);
-                        $('#edit-address').val(data.address);
-                        $('#edit-city').val(data.city);
-                        $('#edit-state').val(data.state);
-                        $('#edit-country').val(data.country);
-                        $('#edit-zip_code').val(data.zip_code);
-                        $('#edit-status').val(data.status);
-                    },
-                    error: function(xhr) {
-                        console.error('Error fetching location data');
-                        alert('Error loading location data. Please try again.');
+            // Initialize Select2 with proper configuration
+            $('.select2-multiple').each(function() {
+                $(this).select2({
+                    theme: 'default',
+                    width: '100%',
+                    placeholder: 'Choose locations...',
+                    allowClear: true,
+                    closeOnSelect: false,
+                    tags: false,
+                    tokenSeparators: [',', ' '],
+                    language: {
+                        noResults: function() {
+                            return "No locations found";
+                        },
+                        searching: function() {
+                            return "Searching...";
+                        }
                     }
                 });
             });
 
-            // Function to update location data on the page without reloading
-            function updateLocationDataOnPage(location) {
-                // Update location name and first letter avatar in the header section
-                $('.avatar-xxl.avatar-rounded .avatar-text').text(location.name.substr(0, 1));
-                $('.avatar-xxl.avatar-rounded').next().find('h5.mb-1').text(location.name);
-
-                // Update address in the header section
-                $('.avatar-xxl.avatar-rounded').next().find('p.mb-2').text(location.address);
-
-                // Update status badge and indicators
-                // Convert status to boolean to handle both string ('0', '1') and number (0, 1) values
-                var isActive = location.status == 1 || location.status === true || location.status === '1';
-                var statusClass = isActive ? 'badge-soft-success' : 'badge-soft-danger';
-                var statusIcon = isActive ? 'ti-check' : 'ti-lock';
-                var statusText = isActive ? 'Active' : 'Inactive';
-
-                // Update status indicator dot in the avatar
-                $('.avatar-xxl.avatar-rounded .status').removeClass('online offline').addClass(isActive ? 'online' :
-                    'offline');
-
-                // Update all status badges in Location Details section
-                $('.card-body .badge:contains("Active"), .card-body .badge:contains("Inactive")').each(function() {
-                    $(this).removeClass('badge-soft-success badge-soft-danger').addClass(statusClass);
-                    if ($(this).find('.ti').length) {
-                        $(this).html('<i class="ti ' + statusIcon + ' me-1"></i>' + statusText);
-                    } else {
-                        $(this).text(statusText);
+            // Re-initialize Select2 after dynamic content is added
+            $(document).on('shown.bs.offcanvas', function() {
+                $('.select2-multiple').each(function() {
+                    if (!$(this).hasClass('select2-hidden-accessible')) {
+                        $(this).select2({
+                            theme: 'default',
+                            width: '100%',
+                            placeholder: 'Choose locations...',
+                            allowClear: true,
+                            closeOnSelect: false,
+                            tags: false,
+                            tokenSeparators: [',', ' ']
+                        });
                     }
                 });
+            });
 
-                // Update city, country display in the header section
-                $('.avatar-xxl.avatar-rounded').next().find('p.d-inline-flex').html(
-                    '<i class="ti ti-map-pin text-warning me-1"></i> ' + location.city + ', ' + location.country
-                );
-
-                // Update sidebar information
-                $('.card h6.mb-3.fw-semibold:contains("Location Information")').parent().find('a[href^="mailto:"]')
-                    .text(location.email).attr('href', 'mailto:' + location.email);
-                $('.card h6.mb-3.fw-semibold:contains("Location Information")').parent().find('.ti-map-pin')
-                    .closest('div').find('p.mb-0').text(location.address);
-                $('.card h6.mb-3.fw-semibold:contains("Location Information")').parent().find('.ti-building')
-                    .closest('div').find('p.mb-0').text(location.city + ', ' + location.state);
-                $('.card h6.mb-3.fw-semibold:contains("Location Information")').parent().find('.ti-world').closest(
-                    'div').find('p.mb-0').text(location.country);
-                $('.card h6.mb-3.fw-semibold:contains("Location Information")').parent().find('.ti-mailbox')
-                    .closest('div').find('p.mb-0').text(location.zip_code);
-
-                // Update status badge in Status Information section
-                $('h6.mb-3.fw-semibold:contains("Status Information")').next().find(
-                        'li.row:contains("Status") .col-6.text-dark .badge')
-                    .removeClass('badge-soft-success badge-soft-danger')
-                    .addClass(statusClass)
-                    .text(statusText);
-
-                // Update last modified time
-                var now = new Date();
-                var formattedDate = now.toLocaleDateString('en-US', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
-                    }) +
-                    ', ' + now.toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    });
-                $('h6.mb-3.fw-semibold:contains("Status Information")').next().find(
-                    'li.row:contains("Last Modified") .col-6.text-dark').text(formattedDate);
-                $('h6.mb-3.fw-semibold:contains("Status Information")').next().find(
-                    'li.row:contains("Last Update") .col-6.text-dark').text('Just now');
-
-                // Update Location Overview section
-                var overviewCard = $('.card-title:contains("Location Overview")').closest('.card');
-                overviewCard.find('h6.fw-semibold:contains("Location Name")').next().text(location.name);
-                overviewCard.find('h6.fw-semibold:contains("Email Address")').next().html('<a href="mailto:' +
-                    location.email + '">' + location.email + '</a>');
-                overviewCard.find('h6.fw-semibold:contains("Address")').next().text(location.address);
-                overviewCard.find('h6.fw-semibold:contains("City")').next().text(location.city);
-                overviewCard.find('h6.fw-semibold:contains("State")').next().text(location.state);
-                overviewCard.find('h6.fw-semibold:contains("Country")').next().text(location.country);
-                overviewCard.find('h6.fw-semibold:contains("Zip Code")').next().text(location.zip_code);
-
-                // Update the created_at and updated_at information if available
-                if (location.created_at) {
-                    $('.avatar-xxl.avatar-rounded').next().find('.ti-calendar-exclamation').closest('div').find(
-                        'p.mb-0').text('Created: ' + new Date(location.created_at).toLocaleDateString('en-US', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                        }) + ', ' +
-                        new Date(location.created_at).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        }));
-                }
-
-                // Update created_by information if available
-                if (location.created_by && location.created_by.name) {
-                    $('h6.mb-3.fw-semibold:contains("Status Information")').next().find(
-                        'li.row:contains("Created By") .col-6.text-dark').text(location.created_by.name);
-                }
-
-                // Update updated_by information if available
-                if (location.updated_by && location.updated_by.name) {
-                    $('h6.mb-3.fw-semibold:contains("Status Information")').next().find(
-                        'li.row:contains("Updated By") .col-6.text-dark').text(location.updated_by.name);
-                }
-            }
-
-            // Handle edit form submission
-            $('#edit-location-form').on('submit', function(e) {
+            // Handle form submission for editing company
+            $('#edit-company-form').on('submit', function(e) {
                 e.preventDefault();
-                var locationId = $(this).data('location-id');
-                var formData = $(this).serialize();
+
+                // Get form data and action URL
+                const formData = $(this).serialize();
+                const actionUrl = $(this).attr('action');
+
+                // Disable submit button to prevent double submission
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+                submitBtn.html('Updating...').prop('disabled', true);
 
                 $.ajax({
-                    url: '/location/' + locationId,
+                    url: actionUrl,
                     type: 'PUT',
                     data: formData,
                     headers: {
@@ -657,41 +930,215 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            // Show success message in the form
+                            // Show success message
+                            $('#edit-form-alert').removeClass('alert-danger').addClass(
+                                'alert-success');
+                            $('#edit-form-alert').html(
+                                'Company updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+                            );
                             $('#edit-form-alert').show();
 
-                            // Close the offcanvas after a short delay
+                            // Update the page content with the new company data
+                            updateCompanyDetails(response.company);
+
+                            // Close the offcanvas after a delay (matching Index page behavior)
                             setTimeout(function() {
                                 $('#offcanvas_edit').offcanvas('hide');
-                                $('#edit-form-alert').hide();
-
-                                // Update the location data on the page without reloading
-                                updateLocationDataOnPage(response.location);
-                            }, 1500);
+                            }, 2000);
                         } else {
-                            alert('Error updating location');
+                            $('#edit-form-alert').removeClass('alert-success').addClass(
+                                'alert-danger');
+                            $('#edit-form-alert').html(
+                                `Failed to update company: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`
+                            );
+                            $('#edit-form-alert').show();
                         }
                     },
                     error: function(xhr) {
-                        console.error('Error updating location:', xhr);
+                        console.error('Error updating company:', xhr);
 
-                        // Handle validation errors
-                        if (xhr.status === 422) {
-                            var errors = xhr.responseJSON.errors;
-                            var errorMessage = 'Validation errors:\n';
-
-                            for (var field in errors) {
-                                errorMessage += errors[field][0] + '\n';
+                        let errorMessage = 'Failed to update company. Please try again.';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            errorMessage = '<ul>';
+                            for (const field in xhr.responseJSON.errors) {
+                                errorMessage += `<li>${xhr.responseJSON.errors[field][0]}</li>`;
                             }
-
-                            alert(errorMessage);
-                        } else {
-                            alert('Error updating location: ' + (xhr.responseJSON ? xhr
-                                .responseJSON.message : 'Unknown error'));
+                            errorMessage += '</ul>';
                         }
+
+                        $('#edit-form-alert').removeClass('alert-success').addClass(
+                            'alert-danger');
+                        $('#edit-form-alert').html(
+                            `${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`
+                        );
+                        $('#edit-form-alert').show();
+                    },
+                    complete: function() {
+                        // Re-enable submit button
+                        submitBtn.html(originalBtnText).prop('disabled', false);
                     }
                 });
             });
+
+            // Function to update company details on the page without reloading
+            function updateCompanyDetails(company) {
+                // Update company name
+                $('h5.mb-1:contains("' + company.name + '")').text(company.name);
+
+                // Update industry
+                $('p.mb-2:contains("' + company.industry + '")').text(company.industry);
+
+                // Update status badge
+                const statusClass = company.status == 1 ? 'badge-soft-success' : 'badge-soft-danger';
+                const statusIcon = company.status == 1 ? 'ti-check' : 'ti-lock';
+                const statusText = company.status == 1 ? 'Active' : 'Inactive';
+                $('.badge:contains("Active"), .badge:contains("Inactive")').first()
+                    .removeClass('badge-soft-success badge-soft-danger')
+                    .addClass(statusClass)
+                    .html(`<i class="ti ${statusIcon} me-1"></i>${statusText}`);
+
+                // Update website, email, phone
+                if (company.website) {
+                    $('.d-inline-flex:contains("' + company.website + '")').html(
+                        `<i class="ti ti-world text-warning me-1"></i> ${company.website}`);
+                }
+                if (company.email) {
+                    $('.d-inline-flex:contains("' + company.website + '")').html(
+                        `<i class="ti ti-mail text-info me-1"></i> ${company.email}`);
+                }
+                if (company.phone) {
+                    $('.d-inline-flex:contains("' + company.phone + '")').html(
+                        `<i class="ti ti-phone text-success me-1"></i> ${company.phone}`);
+                }
+
+                // Update company overview section
+                $('.col-md-6 .mb-4:contains("Company Name") p').text(company.name);
+                $('.col-md-6 .mb-4:contains("Email Address") p a').text(company.email).attr('href', 'mailto:' +
+                    company.email);
+                $('.col-md-6 .mb-4:contains("Industry") p').text(company.industry);
+                $('.col-md-6 .mb-4:contains("Website") p').text(company.website);
+                $('.col-md-6 .mb-4:contains("Phone") p').text(company.phone);
+
+                // Update status in overview
+                $('.col-md-6 .mb-4:contains("Status") p span')
+                    .removeClass('badge-soft-success badge-soft-danger')
+                    .addClass(statusClass)
+                    .text(statusText);
+            }
         });
+
+        // Function to add new address in edit form
+        function addEditAddress() {
+            const container = document.getElementById('edit-addresses-container');
+            const addressCount = container.children.length;
+
+            const addressHtml = `
+                <div class="address-item border rounded p-3 mb-2">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <select class="form-select" name="addresses[${addressCount}][type]" required>
+                                <option value="">Select Type</option>
+                                <option value="Head Office">Head Office</option>
+                                <option value="Branch">Branch</option>
+                                <option value="Office">Office</option>
+                                <option value="Warehouse">Warehouse</option>
+                                <option value="Factory">Factory</option>
+                                <option value="Store">Store</option>
+                                <option value="Billing">Billing</option>
+                                <option value="Shipping">Shipping</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="addresses[${addressCount}][address]" placeholder="Address">
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="addresses[${addressCount}][city]" placeholder="City">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="addresses[${addressCount}][state]" placeholder="State">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="addresses[${addressCount}][country]" placeholder="Country">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="addresses[${addressCount}][zip_code]" placeholder="Zip Code">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="this.parentElement.remove()">
+                        <i class="ti ti-trash me-1"></i>Remove
+                    </button>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', addressHtml);
+        }
+
+        // Function to add new contact in edit form
+        function addEditContact() {
+            const container = document.getElementById('edit-contacts-container');
+            const contactCount = container.children.length;
+
+            const contactHtml = `
+                <div class="contact-item border rounded p-3 mb-2">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="contacts[${contactCount}][name]" placeholder="Contact Name">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="email" class="form-control" name="contacts[${contactCount}][email]" placeholder="Email">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="contacts[${contactCount}][phone]" placeholder="Phone">
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="contacts[${contactCount}][designation]" placeholder="Designation">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="contacts[${contactCount}][is_primary]" value="1">
+                                <label class="form-check-label">Primary Contact</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="this.parentElement.remove()">
+                        <i class="ti ti-trash me-1"></i>Remove
+                    </button>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', contactHtml);
+        }
+
+        // Function to add new note in edit form
+        function addEditNote() {
+            const container = document.getElementById('edit-notes-container');
+            const noteCount = container.children.length;
+
+            const noteHtml = `
+                <div class="note-item border rounded p-3 mb-2">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <textarea class="form-control" name="notes[${noteCount}][note]" rows="3" placeholder="Note content"></textarea>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="notes[${noteCount}][status]">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="this.parentElement.remove()">
+                        <i class="ti ti-trash me-1"></i>Remove
+                    </button>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', noteHtml);
+        }
     </script>
 @endpush
