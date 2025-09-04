@@ -125,7 +125,7 @@
                         <li>
                             <a href="{{ route('user.index') }}"><i class="ti ti-user"></i><span>Users</span></a>
                         </li>
-                        <li>
+                        {{-- <li>
                             <a href="{{ route('dashboard') }}"><i class="ti ti-chart-arcs"></i><span>Leads</span></a>
                         </li>
                         <li>
@@ -169,10 +169,10 @@
                         <li>
                             <a href="{{ route('dashboard') }}"><i
                                     class="ti ti-bounce-right"></i><span>Activities</span></a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </li>
-                <li class="menu-title"><span>Reports</span></li>
+                {{-- <li class="menu-title"><span>Reports</span></li>
                 <li>
                     <ul>
                         <li class="submenu">
@@ -565,7 +565,7 @@
                             </ul>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
             </ul>
         </div>
     </div>
