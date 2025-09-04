@@ -80,10 +80,10 @@
                                         <p class="mb-2">{{ $area->description ?: 'No description available' }}</p>
                                         <div class="d-flex align-items-center flex-wrap gap-2">
                                             <span
-                                                class="badge {{ $area->status == 'active' ? 'badge-soft-success' : 'badge-soft-danger' }} border-0 me-2">
+                                                class="badge {{ $area->status == 1 ? 'badge-soft-success' : ($area->status == 2 ? 'badge-soft-warning' : ($area->status == 3 ? 'badge-soft-danger' : 'badge-soft-secondary')) }} border-0 me-2">
                                                 <i
-                                                    class="ti {{ $area->status == 'active' ? 'ti-check' : 'ti-lock' }} me-1"></i>
-                                                {{ $area->status == 'active' ? 'Active' : 'Inactive' }}
+                                                    class="ti {{ $area->status == 1 ? 'ti-check' : ($area->status == 2 ? 'ti-lock' : ($area->status == 3 ? 'ti-ban' : 'ti-trash')) }} me-1"></i>
+                                                {{ $area->status == 1 ? 'Active' : ($area->status == 2 ? 'Inactive' : ($area->status == 3 ? 'Block' : 'Delete')) }}
                                             </span>
                                             @if ($area->code)
                                                 <p class="d-inline-flex align-items-center mb-0 me-3">
@@ -141,8 +141,8 @@
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">Status</h6>
                                         <p><span
-                                                class="badge {{ $area->status == 'active' ? 'badge-soft-success' : 'badge-soft-danger' }}">
-                                                {{ $area->status == 'active' ? 'Active' : 'Inactive' }}
+                                                class="badge {{ $area->status == 1 ? 'badge-soft-success' : ($area->status == 2 ? 'badge-soft-warning' : ($area->status == 3 ? 'badge-soft-danger' : 'badge-soft-secondary')) }}">
+                                                {{ $area->status == 1 ? 'Active' : ($area->status == 2 ? 'Inactive' : ($area->status == 3 ? 'Block' : 'Delete')) }}
                                             </span></p>
                                     </div>
                                     <div class="mb-4">
@@ -322,12 +322,14 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status" id="edit-status">
-                                                        <option value="active"
-                                                            {{ $area->status == 'active' ? 'selected' : '' }}>Active
-                                                        </option>
-                                                        <option value="inactive"
-                                                            {{ $area->status == 'inactive' ? 'selected' : '' }}>Inactive
-                                                        </option>
+                                                        <option value="1" {{ $area->status == 1 ? 'selected' : '' }}>
+                                                            Activate</option>
+                                                        <option value="2" {{ $area->status == 2 ? 'selected' : '' }}>
+                                                            Inactive</option>
+                                                        <option value="3" {{ $area->status == 3 ? 'selected' : '' }}>
+                                                            Block</option>
+                                                        <option value="0" {{ $area->status == 0 ? 'selected' : '' }}>
+                                                            Delete</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -401,12 +403,19 @@
                         </div>
 
                         <!-- Alert for form submission -->
-                        <div id="edit-form-alert" class="alert mt-3" style="display: none;"></div>
+                        <div id="edit-form-alert" class="col-12" style="display: none;">
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                Area updated successfully!
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        </div>
 
                         <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary">Update Area</button>
-                            <button type="button" class="btn btn-outline-secondary"
-                                data-bs-dismiss="offcanvas">Cancel</button>
+                            <button type="button" data-bs-dismiss="offcanvas"
+                                class="btn btn-sm btn-light me-2">Cancel</button>
+                            <button type="submit" class="btn btn-sm btn-primary">Update
+                                Area</button>
                         </div>
                     </form>
                 </div>
@@ -416,80 +425,11 @@
     <!-- End Edit Area Offcanvas -->
 @endsection
 
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            // Initialize Select2 for edit form
-            $('#edit-location_ids, #edit-company_ids').select2({
-                theme: 'default',
-                width: '100%',
-                placeholder: 'Choose...',
-                allowClear: true,
-                closeOnSelect: false,
-                tags: false,
-                tokenSeparators: [',', ' ']
-            });
-
-            // Handle form submission for editing area
-            $('#edit-area-form').on('submit', function(e) {
-                e.preventDefault();
-
-                const areaId = $(this).data('area-id') || {{ $area->id }};
-                const formData = $(this).serialize();
-
-                $.ajax({
-                    url: `/area/${areaId}`,
-                    type: 'PUT',
-                    data: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            // Show success message
-                            $('#edit-form-alert').removeClass('alert-danger').addClass(
-                                'alert-success');
-                            $('#edit-form-alert').html(
-                                'Area updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
-                            );
-                            $('#edit-form-alert').show();
-
-                            // Reload the page to show updated data
-                            setTimeout(function() {
-                                location.reload();
-                            }, 2000);
-                        } else {
-                            $('#edit-form-alert').removeClass('alert-success').addClass(
-                                'alert-danger');
-                            $('#edit-form-alert').html(
-                                `Failed to update area: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`
-                            );
-                            $('#edit-form-alert').show();
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Error updating area:', xhr);
-
-                        let errorMessage = 'Failed to update area. Please try again.';
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            errorMessage = '<ul>';
-                            for (const field in xhr.responseJSON.errors) {
-                                errorMessage += `<li>${xhr.responseJSON.errors[field][0]}</li>`;
-                            }
-                            errorMessage += '</ul>';
-                        }
-
-                        $('#edit-form-alert').removeClass('alert-success').addClass(
-                            'alert-danger');
-                        $('#edit-form-alert').html(
-                            `${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`
-                        );
-                        $('#edit-form-alert').show();
-                    }
-                });
-            });
-        });
-    </script>
+@push('js')
+    <!-- Select2 CSS and JS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+    <script src="{{ asset('assets/js/datatable/area-show.js') }}" type="text/javascript"></script>
 
     <style>
         .select2-container--default .select2-selection--multiple {

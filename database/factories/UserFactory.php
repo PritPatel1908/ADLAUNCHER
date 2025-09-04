@@ -26,14 +26,18 @@ class UserFactory extends Factory
         $firstName = fake()->firstName();
         $lastName = fake()->lastName();
         $middleName = fake()->boolean(30) ? fake()->firstName() : null;
-        
+        $username = strtolower($firstName . $lastName . fake()->numberBetween(1, 999));
+
         return [
             'first_name' => $firstName,
             'middle_name' => $middleName,
             'last_name' => $lastName,
+            'username' => $username,
             'name' => $firstName . ' ' . $lastName,
             'gender' => fake()->randomElement([1, 2]), // 1 for male, 2 for female
             'phone' => fake()->phoneNumber(),
+            'mobile' => fake()->phoneNumber(),
+            'employee_id' => 'EMP' . fake()->unique()->numberBetween(1000, 9999),
             'date_of_birth' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
             'date_of_joining' => fake()->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),
             'email' => fake()->unique()->safeEmail(),
@@ -56,7 +60,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

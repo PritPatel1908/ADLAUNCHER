@@ -106,24 +106,25 @@
     <script src="{{ asset('assets/json/deals-project.js') }}" type="text/javascript"></script>
 
     <!-- Mobile JS -->
-    
+
     <!-- Quill JS -->
     <script src="{{ asset('assets/plugins/quill/quill.min.js') }}" type="text/javascript"></script>
-    
+
     <!-- Select2 JS -->
     <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}" type="text/javascript"></script>
-    
+
     <!-- Flatpickr JS -->
     <script src="{{ asset('assets/plugins/flatpickr/flatpickr.min.js') }}" type="text/javascript"></script>
-    
+
     <!-- Mobile JS -->
     <script src="{{ asset('assets/plugins/intltelinput/js/intlTelInput.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/plugins/intltelinput/js/utils.js') }}" type="text/javascript"></script>
-    
+
     <!-- Main JS -->
     <script src="{{ asset('assets/js/script.js') }}" type="text/javascript"></script>
 
-    <script src="{{ asset('assets/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js') }}" type="text/javascript" defer></script>
+    <script src="{{ asset('assets/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js') }}" type="text/javascript"
+        defer></script>
     <script defer src="{{ asset('assets/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015.js') }}"
         integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
         data-cf-beacon='{"rayId":"9715e3427d274199","version":"2025.8.0","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}},"token":"3ca157e612a14eccbb30cf6db6691c29","b":1}'
@@ -135,8 +136,7 @@
     </script>
 
     <!-- Sticky Sidebar JS -->
-    <script src="{{ asset('assets/plugins/theia-sticky-sidebar/ResizeSensor.js') }}" type="text/javascript">
-    </script>
+    <script src="{{ asset('assets/plugins/theia-sticky-sidebar/ResizeSensor.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js') }}" type="text/javascript">
     </script>
     @stack('js')

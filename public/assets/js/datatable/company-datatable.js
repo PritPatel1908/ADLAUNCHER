@@ -300,11 +300,24 @@ $(document).ready(function () {
                         "name": "status",
                         "orderable": true,
                         "render": function (data, type, row) {
-                            if (data === 'Active' || data === 1 || data === '1' || data === true) {
-                                return '<span class="badge badge-pill badge-status bg-success text-white">Active</span>';
-                            } else {
-                                return '<span class="badge badge-pill badge-status bg-danger text-white">Inactive</span>';
+                            // Support server sending string labels or numeric codes
+                            var label = (typeof data === 'string') ? data.toLowerCase() : data;
+                            var badgeClass = 'bg-secondary';
+                            var text = 'Inactive';
+                            if (label === 1 || label === '1' || label === 'active') {
+                                badgeClass = 'bg-success';
+                                text = 'Active';
+                            } else if (label === 2 || label === '2' || label === 'inactive' || label === 'deactivate') {
+                                badgeClass = 'bg-danger';
+                                text = 'Inactive';
+                            } else if (label === 3 || label === '3' || label === 'block' || label === 'blocked') {
+                                badgeClass = 'bg-warning';
+                                text = 'Block';
+                            } else if (label === 0 || label === '0' || label === 'delete' || label === 'deleted') {
+                                badgeClass = 'bg-danger';
+                                text = 'Delete';
                             }
+                            return '<span class="badge badge-pill badge-status ' + badgeClass + ' text-white">' + text + '</span>';
                         }
                     },
                     {
@@ -522,10 +535,25 @@ $(document).ready(function () {
                 $('#edit-company-form').data('company-id', companyId);
                 $('#edit-company-form').attr('action', `/company/${companyId}`);
 
+                // Show loading state using inner alert element for proper styling
+                var $editAlertWrapper = $('#edit-form-alert');
+                var $editAlert = $editAlertWrapper.find('.alert');
+                if ($editAlert.length === 0) {
+                    $editAlertWrapper.html('<div class="alert alert-info alert-dismissible fade show" role="alert">Loading company data...<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+                } else {
+                    $editAlert.removeClass('alert-success alert-danger').addClass('alert-info');
+                    $editAlert.html('Loading company data... <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                }
+                $editAlertWrapper.show();
+
+                // Add loading state to form
+                $('#edit-company-form').addClass('form-loading');
+
                 // Fetch company data via AJAX
                 $.ajax({
                     url: `/company/${companyId}/edit`,
                     type: 'GET',
+                    timeout: 10000, // 10 second timeout
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -539,17 +567,15 @@ $(document).ready(function () {
                             $('#edit-website').val(company.website);
                             $('#edit-email').val(company.email);
                             $('#edit-phone').val(company.phone);
-                            $('#edit-status').val(company.status == 1 ? '1' : '0');
+                            // Convert status integer to string
+                            let statusValue = 'active';
+                            if (company.status == 0) statusValue = 'delete';
+                            else if (company.status == 1) statusValue = 'active';
+                            else if (company.status == 2) statusValue = 'inactive';
+                            else if (company.status == 3) statusValue = 'block';
+                            $('#edit-status').val(statusValue);
 
-                            // Populate locations
-                            if (company.locations && company.locations.length > 0) {
-                                const locationIds = company.locations.map(loc => loc.id);
-                                $('#edit-location_ids').val(locationIds).trigger('change');
-                            } else {
-                                $('#edit-location_ids').val([]).trigger('change');
-                            }
-
-                            // Re-initialize Select2 for edit form
+                            // Re-initialize Select2 for edit form first
                             $('#edit-location_ids').select2({
                                 theme: 'default',
                                 width: '100%',
@@ -560,14 +586,54 @@ $(document).ready(function () {
                                 tokenSeparators: [',', ' ']
                             });
 
+                            // Populate locations after Select2 is initialized
+                            if (company.locations && company.locations.length > 0) {
+                                const locationIds = company.locations.map(loc => loc.id);
+                                $('#edit-location_ids').val(locationIds).trigger('change');
+                            } else {
+                                $('#edit-location_ids').val([]).trigger('change');
+                            }
+
                             // Populate addresses
                             $('#edit-addresses-container').empty();
                             editAddressCounter = 0;
                             if (company.addresses && company.addresses.length > 0) {
-                                company.addresses.forEach(address => {
+                                console.log('Addresses data from server:', company.addresses);
+                                company.addresses.forEach((address, index) => {
+                                    console.log(`Setting address ${index + 1}:`, address);
                                     addEditAddress();
                                     const lastAddress = $('#edit-addresses-container .address-item').last();
-                                    lastAddress.find('input[name*="[type]"]').val(address.type);
+                                    console.log(`Setting type to: "${address.type}"`);
+                                    const typeSelect = lastAddress.find('select[name*="[type]"]');
+                                    const typeValue = address.type ? address.type.toLowerCase() : '';
+                                    console.log(`Normalized type value: "${typeValue}"`);
+                                    typeSelect.val(typeValue);
+
+                                    // If the value doesn't match any option, try to find a close match
+                                    if (typeSelect.val() !== typeValue) {
+                                        console.log(`Type value "${typeValue}" not found in options, trying to find match...`);
+                                        const options = typeSelect.find('option');
+                                        let found = false;
+                                        options.each(function () {
+                                            const optionValue = $(this).val().toLowerCase();
+                                            if (optionValue === typeValue) {
+                                                typeSelect.val($(this).val());
+                                                found = true;
+                                                console.log(`Found matching option: "${$(this).val()}"`);
+                                                return false; // break the loop
+                                            }
+                                        });
+                                        // If still not found, add it as a new option
+                                        if (!found && typeValue) {
+                                            console.log(`Adding new option for type "${typeValue}"`);
+                                            const newOption = new Option(address.type, typeValue);
+                                            typeSelect.append(newOption);
+                                            typeSelect.val(typeValue);
+                                        } else if (!found) {
+                                            console.log(`No match found for type "${typeValue}", setting to empty`);
+                                            typeSelect.val('');
+                                        }
+                                    }
                                     lastAddress.find('input[name*="[address]"]').val(address.address);
                                     lastAddress.find('input[name*="[city]"]').val(address.city);
                                     lastAddress.find('input[name*="[state]"]').val(address.state);
@@ -601,11 +667,14 @@ $(document).ready(function () {
                                     addEditNote();
                                     const lastNote = $('#edit-notes-container .note-item').last();
                                     lastNote.find('textarea[name*="[note]"]').val(note.note);
-                                    // Convert integer status to string for form
-                                    const statusValue = note.status == 1 ? 'active' : 'inactive';
-                                    lastNote.find('select[name*="[status]"]').val(statusValue);
+                                    // Set the numeric status value directly
+                                    lastNote.find('select[name*="[status]"]').val(note.status);
                                 });
                             }
+
+                            // Clear any previous alerts and remove loading state
+                            $('#edit-form-alert').hide();
+                            $('#edit-company-form').removeClass('form-loading');
 
                             // Show the edit form
                             $('#offcanvas_edit').offcanvas('show');
@@ -613,19 +682,89 @@ $(document).ready(function () {
                             alert('Failed to load company data. Please try again.');
                         }
                     },
-                    error: function (xhr) {
-                        console.error('Error loading company data:', xhr);
-                        console.error('Response text:', xhr.responseText);
-                        console.error('Status:', xhr.status);
+                    error: function (xhr, status, error) {
+                        console.error('Error loading company data:', xhr.responseText);
+                        console.error('Status:', status);
+                        console.error('Error:', error);
+                        console.error('Response status:', xhr.status);
 
                         let errorMessage = 'Failed to load company data. Please try again.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                        if (status === 'timeout') {
+                            errorMessage = 'Request timed out. Please try again.';
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.status === 404) {
+                            errorMessage = 'Company not found.';
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Server error occurred. Please try again.';
                         }
 
-                        alert(errorMessage);
+                        // Show error in a more user-friendly way and remove loading state
+                        var $editAlertWrapperErr = $('#edit-form-alert');
+                        var $editAlertErr = $editAlertWrapperErr.find('.alert');
+                        if ($editAlertErr.length === 0) {
+                            $editAlertWrapperErr.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                            $editAlertErr = $editAlertWrapperErr.find('.alert');
+                        }
+                        $editAlertErr.removeClass('alert-success alert-info').addClass('alert-danger');
+                        $editAlertErr.html(`${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                        $editAlertWrapperErr.show();
+                        $('#edit-company-form').removeClass('form-loading');
                     }
                 });
+            });
+
+            // Reset forms once the offcanvas fully closes
+            $(document).on('hidden.bs.offcanvas', '#offcanvas_add', function () {
+                var $form = $('#create-company-form');
+                if ($form.length) {
+                    try {
+                        $form[0].reset();
+                        // Reset Select2
+                        $form.find('.select2-multiple').val([]).trigger('change');
+                        // Clear dynamic sections and counters
+                        $('#addresses-container').empty();
+                        $('#contacts-container').empty();
+                        $('#notes-container').empty();
+                        addressCounter = 1;
+                        contactCounter = 1;
+                        noteCounter = 1;
+                        // Hide alerts
+                        $('#create-form-alert').hide();
+                        // Prepare one fresh slot for next open
+                        ensureAtLeastOneAddress();
+                        ensureAtLeastOneContact();
+                        ensureAtLeastOneNote();
+                    } catch (err) {
+                        console.error('Error resetting create form after close:', err);
+                    }
+                }
+            });
+
+            // When the Add Company offcanvas opens, ensure one default slot exists
+            $(document).on('shown.bs.offcanvas', '#offcanvas_add', function () {
+                ensureAtLeastOneAddress();
+                ensureAtLeastOneContact();
+                ensureAtLeastOneNote();
+            });
+
+            $(document).on('hidden.bs.offcanvas', '#offcanvas_edit', function () {
+                var $form = $('#edit-company-form');
+                if ($form.length) {
+                    try {
+                        $form[0].reset();
+                        $('#edit-location_ids').val([]).trigger('change');
+                        $('#edit-addresses-container').empty();
+                        $('#edit-contacts-container').empty();
+                        $('#edit-notes-container').empty();
+                        editAddressCounter = 0;
+                        editContactCounter = 0;
+                        editNoteCounter = 0;
+                        $('#edit-form-alert').hide();
+                    } catch (err) {
+                        console.error('Error resetting edit form after close:', err);
+                    }
+                }
             });
 
             // Handle form submission for creating company
@@ -654,10 +793,16 @@ $(document).ready(function () {
                         console.log('Success response:', response);
 
                         if (response.success) {
-                            // Show success message
-                            $('#create-form-alert').removeClass('alert-danger').addClass('alert-success');
-                            $('#create-form-alert').html('Company created successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
-                            $('#create-form-alert').show();
+                            // Show success message using inner alert element for proper styling
+                            var $createAlertWrapper = $('#create-form-alert');
+                            var $createAlert = $createAlertWrapper.find('.alert');
+                            if ($createAlert.length === 0) {
+                                $createAlertWrapper.html('<div class="alert alert-success alert-dismissible fade show" role="alert"></div>');
+                                $createAlert = $createAlertWrapper.find('.alert');
+                            }
+                            $createAlert.removeClass('alert-danger').addClass('alert-success');
+                            $createAlert.html('Company created successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                            $createAlertWrapper.show();
 
                             // Clear the form
                             $('#create-company-form')[0].reset();
@@ -673,6 +818,11 @@ $(document).ready(function () {
                             contactCounter = 1;
                             noteCounter = 1;
 
+                            // Add back one blank slot in each section for convenience
+                            ensureAtLeastOneAddress();
+                            ensureAtLeastOneContact();
+                            ensureAtLeastOneNote();
+
                             // Reload the DataTable to show the new company
                             dataTable.ajax.reload();
 
@@ -681,9 +831,15 @@ $(document).ready(function () {
                                 $('#offcanvas_add').offcanvas('hide');
                             }, 2000);
                         } else {
-                            $('#create-form-alert').removeClass('alert-success').addClass('alert-danger');
-                            $('#create-form-alert').html(`Failed to create company: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
-                            $('#create-form-alert').show();
+                            var $createAlertWrapperErr = $('#create-form-alert');
+                            var $createAlertErr = $createAlertWrapperErr.find('.alert');
+                            if ($createAlertErr.length === 0) {
+                                $createAlertWrapperErr.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                                $createAlertErr = $createAlertWrapperErr.find('.alert');
+                            }
+                            $createAlertErr.removeClass('alert-success').addClass('alert-danger');
+                            $createAlertErr.html(`Failed to create company: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                            $createAlertWrapperErr.show();
                         }
                     },
                     error: function (xhr, status, error) {
@@ -702,9 +858,15 @@ $(document).ready(function () {
                             errorMessage += '</ul>';
                         }
 
-                        $('#create-form-alert').removeClass('alert-success').addClass('alert-danger');
-                        $('#create-form-alert').html(`${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
-                        $('#create-form-alert').show();
+                        var $createAlertWrapperFail = $('#create-form-alert');
+                        var $createAlertFail = $createAlertWrapperFail.find('.alert');
+                        if ($createAlertFail.length === 0) {
+                            $createAlertWrapperFail.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                            $createAlertFail = $createAlertWrapperFail.find('.alert');
+                        }
+                        $createAlertFail.removeClass('alert-success').addClass('alert-danger');
+                        $createAlertFail.html(`${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                        $createAlertWrapperFail.show();
                     },
                     complete: function () {
                         // Re-enable submit button
@@ -716,23 +878,39 @@ $(document).ready(function () {
             // Handle form submission for editing company
             $('#edit-company-form').on('submit', function (e) {
                 e.preventDefault();
+                console.log('Edit company form submission started');
+
+                // Disable submit button to prevent double submission
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+                submitBtn.html('Updating...').prop('disabled', true);
 
                 const companyId = $(this).data('company-id');
                 const formData = $(this).serialize();
+                console.log('Edit form data being sent:', formData);
 
                 $.ajax({
                     url: `/company/${companyId}`,
                     type: 'PUT',
                     data: formData,
+                    dataType: 'json',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (response) {
+                        console.log('Edit success response:', response);
+
                         if (response.success) {
-                            // Show success message
-                            $('#edit-form-alert').removeClass('alert-danger').addClass('alert-success');
-                            $('#edit-form-alert').html('Company updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
-                            $('#edit-form-alert').show();
+                            // Show success message using inner alert element for proper styling
+                            var $editAlertWrapper2 = $('#edit-form-alert');
+                            var $editAlert2 = $editAlertWrapper2.find('.alert');
+                            if ($editAlert2.length === 0) {
+                                $editAlertWrapper2.html('<div class="alert alert-success alert-dismissible fade show" role="alert"></div>');
+                                $editAlert2 = $editAlertWrapper2.find('.alert');
+                            }
+                            $editAlert2.removeClass('alert-danger').addClass('alert-success');
+                            $editAlert2.html('Company updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                            $editAlertWrapper2.show();
 
                             // Reload the DataTable
                             dataTable.ajax.reload();
@@ -742,13 +920,22 @@ $(document).ready(function () {
                                 $('#offcanvas_edit').offcanvas('hide');
                             }, 2000);
                         } else {
-                            $('#edit-form-alert').removeClass('alert-success').addClass('alert-danger');
-                            $('#edit-form-alert').html(`Failed to update company: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
-                            $('#edit-form-alert').show();
+                            var $editAlertWrapper3 = $('#edit-form-alert');
+                            var $editAlert3 = $editAlertWrapper3.find('.alert');
+                            if ($editAlert3.length === 0) {
+                                $editAlertWrapper3.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                                $editAlert3 = $editAlertWrapper3.find('.alert');
+                            }
+                            $editAlert3.removeClass('alert-success').addClass('alert-danger');
+                            $editAlert3.html(`Failed to update company: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                            $editAlertWrapper3.show();
                         }
                     },
-                    error: function (xhr) {
-                        console.error('Error updating company:', xhr);
+                    error: function (xhr, status, error) {
+                        console.error('Error updating company:', xhr.responseText);
+                        console.error('Status:', status);
+                        console.error('Error:', error);
+                        console.error('Response status:', xhr.status);
 
                         let errorMessage = 'Failed to update company. Please try again.';
                         if (xhr.responseJSON && xhr.responseJSON.errors) {
@@ -757,11 +944,23 @@ $(document).ready(function () {
                                 errorMessage += `<li>${xhr.responseJSON.errors[field][0]}</li>`;
                             }
                             errorMessage += '</ul>';
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
                         }
 
-                        $('#edit-form-alert').removeClass('alert-success').addClass('alert-danger');
-                        $('#edit-form-alert').html(`${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
-                        $('#edit-form-alert').show();
+                        var $editAlertWrapper4 = $('#edit-form-alert');
+                        var $editAlert4 = $editAlertWrapper4.find('.alert');
+                        if ($editAlert4.length === 0) {
+                            $editAlertWrapper4.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                            $editAlert4 = $editAlertWrapper4.find('.alert');
+                        }
+                        $editAlert4.removeClass('alert-success').addClass('alert-danger');
+                        $editAlert4.html(`${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                        $editAlertWrapper4.show();
+                    },
+                    complete: function () {
+                        // Re-enable submit button
+                        submitBtn.html(originalBtnText).prop('disabled', false);
                     }
                 });
             });
@@ -776,6 +975,28 @@ $(document).ready(function () {
     let editContactCounter = 0;
     let editNoteCounter = 0;
 
+    // Ensure at least one blank slot exists in create form
+    function ensureAtLeastOneAddress() {
+        const container = document.getElementById('addresses-container');
+        if (container && container.children.length === 0) {
+            addAddress();
+        }
+    }
+
+    function ensureAtLeastOneContact() {
+        const container = document.getElementById('contacts-container');
+        if (container && container.children.length === 0) {
+            addContact();
+        }
+    }
+
+    function ensureAtLeastOneNote() {
+        const container = document.getElementById('notes-container');
+        if (container && container.children.length === 0) {
+            addNote();
+        }
+    }
+
     // Function to add address field in create form
     window.addAddress = function () {
         const container = document.getElementById('addresses-container');
@@ -786,15 +1007,18 @@ $(document).ready(function () {
                 <div class="col-md-3">
                     <select class="form-select" name="addresses[${addressCounter}][type]" required>
                         <option value="">Select Type</option>
-                        <option value="Head Office">Head Office</option>
-                        <option value="Branch">Branch</option>
-                        <option value="Office">Office</option>
-                        <option value="Warehouse">Warehouse</option>
-                        <option value="Factory">Factory</option>
-                        <option value="Store">Store</option>
-                        <option value="Billing">Billing</option>
-                        <option value="Shipping">Shipping</option>
-                        <option value="Other">Other</option>
+                        <option value="head office">Head Office</option>
+                        <option value="branch">Branch</option>
+                        <option value="office">Office</option>
+                        <option value="warehouse">Warehouse</option>
+                        <option value="factory">Factory</option>
+                        <option value="store">Store</option>
+                        <option value="billing">Billing</option>
+                        <option value="shipping">Shipping</option>
+                        <option value="home">Home</option>
+                        <option value="mailing">Mailing</option>
+                        <option value="corporate">Corporate</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
                 <div class="col-md-9">
@@ -871,8 +1095,10 @@ $(document).ready(function () {
                 </div>
                 <div class="col-md-3">
                     <select class="form-select" name="notes[${noteCounter}][status]">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="0">Delete</option>
+                        <option value="1">Active</option>
+                        <option value="2">Inactive</option>
+                        <option value="3">Block</option>
                     </select>
                 </div>
             </div>
@@ -894,15 +1120,18 @@ $(document).ready(function () {
                 <div class="col-md-3">
                     <select class="form-select" name="addresses[${editAddressCounter}][type]">
                         <option value="">Select Type</option>
-                        <option value="Head Office">Head Office</option>
-                        <option value="Branch">Branch</option>
-                        <option value="Office">Office</option>
-                        <option value="Warehouse">Warehouse</option>
-                        <option value="Factory">Factory</option>
-                        <option value="Store">Store</option>
-                        <option value="Billing">Billing</option>
-                        <option value="Shipping">Shipping</option>
-                        <option value="Other">Other</option>
+                        <option value="head office">Head Office</option>
+                        <option value="branch">Branch</option>
+                        <option value="office">Office</option>
+                        <option value="warehouse">Warehouse</option>
+                        <option value="factory">Factory</option>
+                        <option value="store">Store</option>
+                        <option value="billing">Billing</option>
+                        <option value="shipping">Shipping</option>
+                        <option value="home">Home</option>
+                        <option value="mailing">Mailing</option>
+                        <option value="corporate">Corporate</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
                 <div class="col-md-9">
@@ -979,8 +1208,10 @@ $(document).ready(function () {
                 </div>
                 <div class="col-md-3">
                     <select class="form-select" name="notes[${editNoteCounter}][status]">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="0">Delete</option>
+                        <option value="1">Active</option>
+                        <option value="2">Inactive</option>
+                        <option value="3">Block</option>
                     </select>
                 </div>
             </div>

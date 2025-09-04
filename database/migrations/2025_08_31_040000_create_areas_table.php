@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->string('code')->nullable();
-            $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active, 2: Blocked, 3: Deleted');
+            $table->tinyInteger('status')->default(1)->comment('0: Delete, 1: Activate, 2: Inactive, 3: Block');
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->timestamps();

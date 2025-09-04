@@ -25,7 +25,7 @@ $(document).ready(function () {
 
                 // We'll apply CSS to hide columns after DataTable is initialized
                 // Store the visibility state for now, and it will be applied when DataTable is created
-                Object.keys(columnVisibility).forEach(function(column) {
+                Object.keys(columnVisibility).forEach(function (column) {
                     if (!columnVisibility[column]) {
                         console.log('Column will be hidden on initialization:', column);
                     }
@@ -48,7 +48,7 @@ $(document).ready(function () {
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(response) {
+            success: function (response) {
                 // Initialize all columns as visible by default
                 columnVisibility = {
                     'name': true,
@@ -68,7 +68,7 @@ $(document).ready(function () {
 
                 // Update with saved preferences
                 if (response.success && response.columns && response.columns.length > 0) {
-                    response.columns.forEach(function(col) {
+                    response.columns.forEach(function (col) {
                         // Convert to boolean if needed
                         let isVisible = col.is_show;
                         if (typeof isVisible !== 'boolean') {
@@ -90,7 +90,7 @@ $(document).ready(function () {
                 updateColumnToggles();
                 console.log('Loaded column visibility:', columnVisibility);
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error('Error loading column visibility:', xhr);
                 console.log('Response:', xhr.responseJSON);
             }
@@ -103,7 +103,7 @@ $(document).ready(function () {
 
         // Update each toggle based on current visibility state
         // Process each column independently to avoid any cross-influence
-        $('.column-visibility-toggle').each(function() {
+        $('.column-visibility-toggle').each(function () {
             const column = $(this).data('column');
             if (column in columnVisibility) {
                 $(this).prop('checked', columnVisibility[column]);
@@ -134,10 +134,10 @@ $(document).ready(function () {
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(response) {
+            success: function (response) {
                 console.log(`Column visibility for ${column} saved:`, response);
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error(`Error saving column visibility for ${column}:`, xhr);
                 console.log('Response:', xhr.responseJSON);
 
@@ -149,7 +149,7 @@ $(document).ready(function () {
                 localStorage.setItem('locationColumnVisibility', JSON.stringify(columnVisibility));
 
                 // Revert the DataTable column visibility if available
-                var columnIndex = dataTable ? dataTable.column(function(idx, data, node) {
+                var columnIndex = dataTable ? dataTable.column(function (idx, data, node) {
                     return data.name === column;
                 }).index() : undefined;
                 if (columnIndex !== undefined) {
@@ -163,7 +163,7 @@ $(document).ready(function () {
     }
 
     // Load column visibility preferences before initializing DataTable
-    loadColumnVisibility().then(function() {
+    loadColumnVisibility().then(function () {
         if ($('#contactslist').length > 0) {
             // Initialize the DataTable - use window scope to ensure it's accessible everywhere
             window.dataTable = $('#contactslist').DataTable({
@@ -181,7 +181,7 @@ $(document).ready(function () {
                     "headers": {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    "data": function(d) {
+                    "data": function (d) {
                         // Add custom filter parameters
                         d.name_filter = $('.location-filter[data-column="name"]').val();
                         d.email_filter = $('.location-filter[data-column="email"]').val();
@@ -203,14 +203,14 @@ $(document).ready(function () {
 
                         // Handle status checkboxes
                         var statusValues = [];
-                        $('.status-filter:checked').each(function() {
+                        $('.status-filter:checked').each(function () {
                             statusValues.push($(this).val());
                         });
                         d.status_filter = statusValues.length > 0 ? statusValues : null;
 
                         return d;
                     },
-                    "error": function(xhr, error, thrown) {
+                    "error": function (xhr, error, thrown) {
                         $('#error-container').show();
                         $('#error-message').text('Unable to load data. ' + thrown);
                     }
@@ -227,7 +227,7 @@ $(document).ready(function () {
                         "data": "created_by",
                         "name": "created_by",
                         "orderable": true,
-                        "render": function(data, type, row) {
+                        "render": function (data, type, row) {
                             return data ? data : 'N/A';
                         },
                         "className": "column-created-by"
@@ -236,7 +236,7 @@ $(document).ready(function () {
                         "data": "updated_by",
                         "name": "updated_by",
                         "orderable": true,
-                        "render": function(data, type, row) {
+                        "render": function (data, type, row) {
                             return data ? data : 'N/A';
                         },
                         "className": "column-updated-by"
@@ -245,7 +245,7 @@ $(document).ready(function () {
                         "data": "created_at",
                         "name": "created_at",
                         "orderable": true,
-                        "render": function(data, type, row) {
+                        "render": function (data, type, row) {
                             return data ? new Date(data).toLocaleString() : 'N/A';
                         },
                         "className": "column-created-at"
@@ -254,7 +254,7 @@ $(document).ready(function () {
                         "data": "updated_at",
                         "name": "updated_at",
                         "orderable": true,
-                        "render": function(data, type, row) {
+                        "render": function (data, type, row) {
                             return data ? new Date(data).toLocaleString() : 'N/A';
                         },
                         "className": "column-updated-at"
@@ -263,19 +263,25 @@ $(document).ready(function () {
                         "data": "status",
                         "name": "status",
                         "orderable": true,
-                        "render": function(data, type, row) {
+                        "render": function (data, type, row) {
+                            let badgeClass = 'bg-secondary';
                             if (data === 'Active') {
-                                return '<span class="badge badge-pill badge-status bg-success text-white">Active</span>';
-                            } else {
-                                return '<span class="badge badge-pill badge-status bg-danger text-white">Inactive</span>';
+                                badgeClass = 'bg-success';
+                            } else if (data === 'Inactive') {
+                                badgeClass = 'bg-danger';
+                            } else if (data === 'Blocked') {
+                                badgeClass = 'bg-warning';
+                            } else if (data === 'Deleted') {
+                                badgeClass = 'bg-secondary';
                             }
+                            return '<span class="badge badge-pill badge-status ' + badgeClass + ' text-white">' + data + '</span>';
                         }
                     },
                     {
                         "data": "id",
                         "orderable": false,
                         "name": "action",
-                        "render": function(data, type, row) {
+                        "render": function (data, type, row) {
                             return `
                                 <div class="dropdown dropdown-action">
                                     <a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></a>
@@ -300,7 +306,7 @@ $(document).ready(function () {
                         previous: '<i class="ti ti-chevron-left"></i> '
                     },
                 },
-                initComplete: function(settings, json) {
+                initComplete: function (settings, json) {
                     $('.dataTables_paginate').appendTo('.datatable-paginate');
                     $('.dataTables_length').appendTo('.datatable-length');
                     $('#error-container').hide();
@@ -316,7 +322,7 @@ $(document).ready(function () {
                         console.log('Initial sorting column index:', columnIndex, 'direction:', direction);
 
                         // Delay the indicator update slightly to ensure the DOM is ready
-                        setTimeout(function() {
+                        setTimeout(function () {
                             updateSortIndicators(columnIndex, direction);
                         }, 100);
                     } else {
@@ -324,7 +330,7 @@ $(document).ready(function () {
                     }
 
                     // Add click event for sorting after initialization
-                    this.api().on('order.dt', function(e, settings) {
+                    this.api().on('order.dt', function (e, settings) {
                         // Use the API instance provided by the event context
                         const api = new $.fn.dataTable.Api(settings);
                         const order = api.order();
@@ -349,12 +355,12 @@ $(document).ready(function () {
 
             // Apply initial column visibility after DataTable is initialized
             // This ensures all columns are properly hidden/shown based on saved preferences
-            Object.keys(columnVisibility).forEach(function(column) {
+            Object.keys(columnVisibility).forEach(function (column) {
                 const isVisible = columnVisibility[column];
 
                 // Find the correct column index by matching the column name
                 let columnIndex = null;
-                dataTable.columns().every(function(index) {
+                dataTable.columns().every(function (index) {
                     const colName = this.settings()[0].aoColumns[index].name;
                     if (colName === column) {
                         columnIndex = index;
@@ -372,179 +378,179 @@ $(document).ready(function () {
             });
 
             // Handle column visibility toggle
-    $(document).on('change', '.column-visibility-toggle', function(e) {
-        // Stop event propagation to prevent affecting other columns
-        e.stopPropagation();
+            $(document).on('change', '.column-visibility-toggle', function (e) {
+                // Stop event propagation to prevent affecting other columns
+                e.stopPropagation();
 
-        const column = $(this).data('column');
-        const isVisible = $(this).prop('checked');
+                const column = $(this).data('column');
+                const isVisible = $(this).prop('checked');
 
-        // Find the correct column index by matching the column name
-        let columnIndex = null;
-        dataTable.columns().every(function(index) {
-            const colData = this.dataSrc();
-            const colName = this.settings()[0].aoColumns[index].name;
-            if (colName === column) {
-                columnIndex = index;
-                return false; // Break the loop
-            }
-        });
+                // Find the correct column index by matching the column name
+                let columnIndex = null;
+                dataTable.columns().every(function (index) {
+                    const colData = this.dataSrc();
+                    const colName = this.settings()[0].aoColumns[index].name;
+                    if (colName === column) {
+                        columnIndex = index;
+                        return false; // Break the loop
+                    }
+                });
 
-        console.log('Toggling column visibility for:', column, 'with index:', columnIndex, 'to:', isVisible);
+                console.log('Toggling column visibility for:', column, 'with index:', columnIndex, 'to:', isVisible);
 
-        if (columnIndex !== null) {
-            // Remove any existing style for this column
-            $(`style#column-style-${column}`).remove();
+                if (columnIndex !== null) {
+                    // Remove any existing style for this column
+                    $(`style#column-style-${column}`).remove();
 
-            // Update DataTable column visibility using the API
-            dataTable.column(columnIndex).visible(isVisible, false);
+                    // Update DataTable column visibility using the API
+                    dataTable.column(columnIndex).visible(isVisible, false);
 
-            // Adjust the table layout after changing visibility
-            dataTable.columns.adjust().draw(false);
+                    // Adjust the table layout after changing visibility
+                    dataTable.columns.adjust().draw(false);
 
-            // Save preference to database for this column only
-            saveColumnVisibility(column, isVisible);
-        } else {
-            console.error('Column not found:', column);
-        }
-    });
-
-    // Add event listeners for live filtering
-    $('.location-filter').on('keyup', function() {
-        dataTable.ajax.reload();
-    });
-
-    // Add event listeners for status checkbox filtering
-    $('.status-filter').on('change', function() {
-        dataTable.ajax.reload();
-    });
-
-    // Add event listener for date range picker
-    $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
-        dataTable.ajax.reload();
-    });
-
-    // Add event listener for sort options
-    $(document).on('click', '.sort-option', function() {
-        const sortBy = $(this).data('sort');
-        const sortText = $(this).text();
-        window.currentSortBy = sortBy;
-
-        // Update the dropdown button text to show current sort option
-        $('.dropdown-toggle i.ti-sort-ascending-2').closest('a').html(
-            '<i class="ti ti-sort-ascending-2 me-2"></i>Sort By: ' + sortText
-        );
-
-        dataTable.ajax.reload();
-    });
-
-    // We'll use DataTables' built-in sorting functionality
-    // The click handler is removed as DataTables handles this automatically
-    // We'll use the order.dt event to update our custom indicators
-
-
-    // Function to update sort indicators in table headers
-    function updateSortIndicators(columnIndex, direction) {
-        console.log('Updating sort indicators - column:', columnIndex, 'direction:', direction);
-
-        // Ensure columnIndex is treated as a number
-        columnIndex = parseInt(columnIndex);
-
-        // Wait a short time to ensure the DOM is fully rendered
-        setTimeout(function() {
-            // Remove all existing sort indicators
-            $('.sort-indicator').remove();
-
-            // Make sure columnIndex is a valid number
-            if (isNaN(columnIndex) || columnIndex === undefined || columnIndex === null) {
-                console.error('Invalid column index for sort indicator:', columnIndex);
-                return;
-            }
-
-            // Log all available headers for debugging
-            const allHeaders = $('#contactslist thead th');
-            console.log('Total headers found:', allHeaders.length);
-            allHeaders.each(function(idx) {
-                console.log('Header', idx, 'text:', $(this).text().trim());
+                    // Save preference to database for this column only
+                    saveColumnVisibility(column, isVisible);
+                } else {
+                    console.error('Column not found:', column);
+                }
             });
 
-            // Get the header element directly by index
-            const sortedHeader = allHeaders.eq(columnIndex);
+            // Add event listeners for live filtering
+            $('.location-filter').on('keyup', function () {
+                dataTable.ajax.reload();
+            });
 
-            if (sortedHeader.length === 0) {
-                console.error('Could not find header element for column index:', columnIndex);
-                return;
+            // Add event listeners for status checkbox filtering
+            $('.status-filter').on('change', function () {
+                dataTable.ajax.reload();
+            });
+
+            // Add event listener for date range picker
+            $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+                dataTable.ajax.reload();
+            });
+
+            // Add event listener for sort options
+            $(document).on('click', '.sort-option', function () {
+                const sortBy = $(this).data('sort');
+                const sortText = $(this).text();
+                window.currentSortBy = sortBy;
+
+                // Update the dropdown button text to show current sort option
+                $('.dropdown-toggle i.ti-sort-ascending-2').closest('a').html(
+                    '<i class="ti ti-sort-ascending-2 me-2"></i>Sort By: ' + sortText
+                );
+
+                dataTable.ajax.reload();
+            });
+
+            // We'll use DataTables' built-in sorting functionality
+            // The click handler is removed as DataTables handles this automatically
+            // We'll use the order.dt event to update our custom indicators
+
+
+            // Function to update sort indicators in table headers
+            function updateSortIndicators(columnIndex, direction) {
+                console.log('Updating sort indicators - column:', columnIndex, 'direction:', direction);
+
+                // Ensure columnIndex is treated as a number
+                columnIndex = parseInt(columnIndex);
+
+                // Wait a short time to ensure the DOM is fully rendered
+                setTimeout(function () {
+                    // Remove all existing sort indicators
+                    $('.sort-indicator').remove();
+
+                    // Make sure columnIndex is a valid number
+                    if (isNaN(columnIndex) || columnIndex === undefined || columnIndex === null) {
+                        console.error('Invalid column index for sort indicator:', columnIndex);
+                        return;
+                    }
+
+                    // Log all available headers for debugging
+                    const allHeaders = $('#contactslist thead th');
+                    console.log('Total headers found:', allHeaders.length);
+                    allHeaders.each(function (idx) {
+                        console.log('Header', idx, 'text:', $(this).text().trim());
+                    });
+
+                    // Get the header element directly by index
+                    const sortedHeader = allHeaders.eq(columnIndex);
+
+                    if (sortedHeader.length === 0) {
+                        console.error('Could not find header element for column index:', columnIndex);
+                        return;
+                    }
+
+                    console.log('Found header for column', columnIndex, ':', sortedHeader.text().trim());
+
+                    // Create indicator based on sort direction
+                    const indicator = direction === 'asc' ?
+                        '<span class="sort-indicator" style="display:inline-block;margin-left:5px;color:#0d6efd;"><i class="ti ti-arrow-up"></i></span>' :
+                        '<span class="sort-indicator" style="display:inline-block;margin-left:5px;color:#0d6efd;"><i class="ti ti-arrow-down"></i></span>';
+
+                    // Append the indicator to the header
+                    sortedHeader.append(indicator);
+                    console.log('Added sort indicator to header:', sortedHeader.text().trim());
+
+                    // Indicator already appended above
+
+                    console.log('Updated sort indicator for column', columnIndex, 'direction:', direction);
+                }, 50);
             }
 
-            console.log('Found header for column', columnIndex, ':', sortedHeader.text().trim());
+            // Add CSS for sort indicators
+            $('<style>\n' +
+                '#contactslist thead th { cursor: pointer; position: relative; }\n' +
+                '#contactslist thead th:hover { background-color: rgba(0,0,0,0.05); }\n' +
+                '.sort-indicator { display: inline-block; margin-left: 5px; }\n' +
+                '</style>').appendTo('head');
 
-            // Create indicator based on sort direction
-            const indicator = direction === 'asc' ?
-                '<span class="sort-indicator" style="display:inline-block;margin-left:5px;color:#0d6efd;"><i class="ti ti-arrow-up"></i></span>' :
-                '<span class="sort-indicator" style="display:inline-block;margin-left:5px;color:#0d6efd;"><i class="ti ti-arrow-down"></i></span>';
+            // Add direct click handler for table headers
+            $(document).on('click', '#contactslist thead th', function () {
+                console.log('Header clicked directly');
+                const columnIndex = $(this).index();
+                console.log('Clicked column index:', columnIndex);
 
-            // Append the indicator to the header
-            sortedHeader.append(indicator);
-            console.log('Added sort indicator to header:', sortedHeader.text().trim());
+                // Check if this column is sortable
+                const column = window.locationDataTable.column(columnIndex);
+                if (column && column.visible()) {
+                    console.log('Sorting column via direct click');
 
-            // Indicator already appended above
+                    // Get current order
+                    const currentOrder = window.locationDataTable.order();
+                    console.log('Current order before change:', JSON.stringify(currentOrder));
+                    let direction = 'asc';
 
-            console.log('Updated sort indicator for column', columnIndex, 'direction:', direction);
-        }, 50);
-    }
+                    // If already sorted by this column, toggle direction
+                    if (currentOrder && currentOrder.length > 0) {
+                        console.log('Current sorted column:', currentOrder[0][0], 'Clicked column:', columnIndex);
+                        if (parseInt(currentOrder[0][0]) === parseInt(columnIndex)) {
+                            console.log('Column already sorted, current direction:', currentOrder[0][1]);
+                            direction = currentOrder[0][1] === 'asc' ? 'desc' : 'asc';
+                            console.log('Toggling to direction:', direction);
+                        } else {
+                            console.log('Different column clicked, using default direction:', direction);
+                        }
+                    } else {
+                        console.log('No current order, using default direction:', direction);
+                    }
 
-    // Add CSS for sort indicators
-    $('<style>\n' +
-      '#contactslist thead th { cursor: pointer; position: relative; }\n' +
-      '#contactslist thead th:hover { background-color: rgba(0,0,0,0.05); }\n' +
-      '.sort-indicator { display: inline-block; margin-left: 5px; }\n' +
-      '</style>').appendTo('head');
+                    // Apply sort - fix the format of the order array
+                    console.log('Setting order to:', [[columnIndex, direction]]);
+                    window.locationDataTable.order([[columnIndex, direction]]).draw();
 
-    // Add direct click handler for table headers
-    $(document).on('click', '#contactslist thead th', function() {
-        console.log('Header clicked directly');
-        const columnIndex = $(this).index();
-        console.log('Clicked column index:', columnIndex);
-
-        // Check if this column is sortable
-        const column = window.locationDataTable.column(columnIndex);
-        if (column && column.visible()) {
-            console.log('Sorting column via direct click');
-
-            // Get current order
-            const currentOrder = window.locationDataTable.order();
-            console.log('Current order before change:', JSON.stringify(currentOrder));
-            let direction = 'asc';
-
-            // If already sorted by this column, toggle direction
-            if (currentOrder && currentOrder.length > 0) {
-                console.log('Current sorted column:', currentOrder[0][0], 'Clicked column:', columnIndex);
-                if (parseInt(currentOrder[0][0]) === parseInt(columnIndex)) {
-                    console.log('Column already sorted, current direction:', currentOrder[0][1]);
-                    direction = currentOrder[0][1] === 'asc' ? 'desc' : 'asc';
-                    console.log('Toggling to direction:', direction);
-                } else {
-                    console.log('Different column clicked, using default direction:', direction);
+                    // Force update of sort indicators after draw
+                    setTimeout(function () {
+                        updateSortIndicators(columnIndex, direction);
+                    }, 100);
                 }
-            } else {
-                console.log('No current order, using default direction:', direction);
-            }
-
-            // Apply sort - fix the format of the order array
-            console.log('Setting order to:', [[columnIndex, direction]]);
-            window.locationDataTable.order([[columnIndex, direction]]).draw();
-
-            // Force update of sort indicators after draw
-            setTimeout(function() {
-                updateSortIndicators(columnIndex, direction);
-            }, 100);
-        }
-    });
+            });
         }
     });
 
     // Delete location
-    $(document).on('click', '.delete-location', function() {
+    $(document).on('click', '.delete-location', function () {
         var locationId = $(this).data('id');
         if (confirm('Are you sure you want to delete this location?')) {
             $.ajax({
@@ -553,7 +559,7 @@ $(document).ready(function () {
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         // Reload the DataTable
                         $('#contactslist').DataTable().ajax.reload();
@@ -562,7 +568,7 @@ $(document).ready(function () {
                         alert('Error deleting location');
                     }
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     console.error('Error deleting location:', xhr);
                     alert('Error deleting location: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'));
                 }
@@ -571,7 +577,7 @@ $(document).ready(function () {
     });
 
     // Handle edit button click
-    $(document).on('click', '[data-bs-target="#offcanvas_edit"]', function() {
+    $(document).on('click', '[data-bs-target="#offcanvas_edit"]', function () {
         var locationId = $(this).closest('.dropdown-action').find('.delete-location').data('id');
 
         // Set the location ID to the form
@@ -583,7 +589,7 @@ $(document).ready(function () {
             url: '/location/' + locationId,
             type: 'GET',
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 // Populate form fields
                 $('#edit-name').val(data.name);
                 $('#edit-email').val(data.email);
@@ -594,7 +600,7 @@ $(document).ready(function () {
                 $('#edit-zip_code').val(data.zip_code);
                 $('#edit-status').val(data.status);
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error('Error fetching location data');
                 alert('Error loading location data. Please try again.');
             }
@@ -602,7 +608,7 @@ $(document).ready(function () {
     });
 
     // Handle edit form submission
-    $('#edit-location-form').on('submit', function(e) {
+    $('#edit-location-form').on('submit', function (e) {
         e.preventDefault();
         var locationId = $(this).data('location-id');
         var formData = $(this).serialize();
@@ -614,13 +620,13 @@ $(document).ready(function () {
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     // Show success message in the form
                     $('#edit-form-alert').show();
 
                     // Close the offcanvas after a short delay
-                    setTimeout(function() {
+                    setTimeout(function () {
                         $('#offcanvas_edit').offcanvas('hide');
                         $('#edit-form-alert').hide();
                     }, 1500);
@@ -631,7 +637,7 @@ $(document).ready(function () {
                     alert('Error updating location');
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error('Error updating location:', xhr);
 
                 // Handle validation errors
@@ -652,7 +658,7 @@ $(document).ready(function () {
     });
 
     // Handle create location form submit
-    $('#create-location-form').on('submit', function(e) {
+    $('#create-location-form').on('submit', function (e) {
         e.preventDefault();
 
         // Disable submit button to prevent double submission
@@ -668,7 +674,7 @@ $(document).ready(function () {
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(response) {
+            success: function (response) {
                 console.log('Success response:', response);
 
                 // Show success message in the form
@@ -678,7 +684,7 @@ $(document).ready(function () {
                 $('#create-location-form')[0].reset();
 
                 // Close the offcanvas after a short delay
-                setTimeout(function() {
+                setTimeout(function () {
                     $('#offcanvas_add').offcanvas('hide');
                     $('#create-form-alert').hide();
                 }, 1500);
@@ -686,7 +692,7 @@ $(document).ready(function () {
                 // Reload the DataTable
                 $('#contactslist').DataTable().ajax.reload();
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error creating location:', xhr.responseText);
 
                 // Handle validation errors
@@ -703,7 +709,7 @@ $(document).ready(function () {
                     alert('Error creating location: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'));
                 }
             },
-            complete: function() {
+            complete: function () {
                 // Re-enable submit button
                 submitBtn.html(originalBtnText).prop('disabled', false);
             }

@@ -28,7 +28,7 @@ class CompanyNote extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'status' => 'boolean',
+        'status' => 'integer',
     ];
 
     /**

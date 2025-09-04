@@ -46,6 +46,7 @@ class LocationController extends Controller
             'state' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
             'zip_code' => 'nullable|string|max:20',
+            'status' => 'nullable|integer|in:0,1,2,3',
         ]);
 
         // Set the created_by field to the current authenticated user's ID
@@ -177,7 +178,7 @@ class LocationController extends Controller
         $length = $request->get('length', 10);
         $search = $request->get('search.value');
         $sortBy = $request->get('sort_by', 'newest'); // Default to newest
-        
+
         // Get order column and direction from DataTables
         $orderColumn = $request->get('order.0.column');
         $orderDir = $request->get('order.0.dir');
@@ -197,62 +198,66 @@ class LocationController extends Controller
                     ->orWhere('country', 'like', "%{$search}%");
             });
         }
-        
+
         // Apply individual column filters
         if ($request->has('name_filter') && !empty($request->name_filter)) {
             $query->where('name', 'like', "%{$request->name_filter}%");
         }
-        
+
         if ($request->has('email_filter') && !empty($request->email_filter)) {
             $query->where('email', 'like', "%{$request->email_filter}%");
         }
-        
+
         if ($request->has('address_filter') && !empty($request->address_filter)) {
             $query->where('address', 'like', "%{$request->address_filter}%");
         }
-        
+
         if ($request->has('city_filter') && !empty($request->city_filter)) {
             $query->where('city', 'like', "%{$request->city_filter}%");
         }
-        
+
         if ($request->has('state_filter') && !empty($request->state_filter)) {
             $query->where('state', 'like', "%{$request->state_filter}%");
         }
-        
+
         if ($request->has('country_filter') && !empty($request->country_filter)) {
             $query->where('country', 'like', "%{$request->country_filter}%");
         }
-        
+
         if ($request->has('zip_code_filter') && !empty($request->zip_code_filter)) {
             $query->where('zip_code', 'like', "%{$request->zip_code_filter}%");
         }
-        
+
         // Apply date range filter
         if ($request->has('start_date') && $request->has('end_date')) {
             $startDate = $request->start_date;
             $endDate = $request->end_date;
-            
+
             // Add one day to end date to include the entire end date
             $endDate = date('Y-m-d', strtotime($endDate . ' +1 day'));
-            
+
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
-        
+
         if ($request->has('status_filter') && !empty($request->status_filter)) {
             // Handle array of status values from checkboxes
             $statusFilter = $request->status_filter;
-            
+
             // If it's a string, convert to array for consistent handling
             if (!is_array($statusFilter)) {
                 $statusFilter = [$statusFilter];
             }
-            
-            $query->where(function($q) use ($statusFilter) {
+
+            $query->where(function ($q) use ($statusFilter) {
                 foreach ($statusFilter as $status) {
                     if (strtolower($status) === 'active') {
-                        $q->orWhere('status', 1);
+                        $q->orWhere('status', Location::STATUS_ACTIVE);
                     } else if (strtolower($status) === 'inactive') {
-                        $q->orWhere('status', 0);
+                        $q->orWhere('status', Location::STATUS_INACTIVE);
+                    } else if (strtolower($status) === 'blocked') {
+                        $q->orWhere('status', Location::STATUS_BLOCKED);
+                    } else if (strtolower($status) === 'deleted') {
+                        $q->orWhere('status', Location::STATUS_DELETED);
                     }
                 }
             });
@@ -275,7 +280,7 @@ class LocationController extends Controller
                 $query->latest('id'); // Default to newest
             }
         }
-        
+
         // Apply pagination
         $locations = $query->skip($start)
             ->take($length)
@@ -295,7 +300,7 @@ class LocationController extends Controller
                 'zip_code' => $location->zip_code,
                 'created_by' => $location->created_by ? User::find($location->created_by)->name : null,
                 'updated_by' => $location->updated_by ? User::find($location->updated_by)->name : null,
-                'status' => $location->status == 1 ? 'Active' : 'Inactive',
+                'status' => $location->status_text,
                 'created_at' => $location->created_at->format('d M Y, h:i A'),
                 'updated_at' => $location->updated_at ? $location->updated_at->format('d M Y, h:i A') : null
             ];

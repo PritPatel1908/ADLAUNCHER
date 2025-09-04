@@ -6,7 +6,9 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\CompanyNote;
 use App\Models\CompanyAddress;
+use App\Models\Location;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
 
 class CompanySeeder extends Seeder
 {
@@ -23,7 +25,7 @@ class CompanySeeder extends Seeder
                 'website' => 'https://techcorp-solutions.com',
                 'email' => 'info@techcorp-solutions.com',
                 'phone' => '+1-555-0123',
-                'status' => true,
+                'status' => 1,
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
@@ -33,7 +35,7 @@ class CompanySeeder extends Seeder
                 'website' => 'https://healthfirst-medical.com',
                 'email' => 'contact@healthfirst-medical.com',
                 'phone' => '+1-555-0124',
-                'status' => true,
+                'status' => 1,
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
@@ -43,7 +45,7 @@ class CompanySeeder extends Seeder
                 'website' => 'https://globalfinance-group.com',
                 'email' => 'info@globalfinance-group.com',
                 'phone' => '+1-555-0125',
-                'status' => true,
+                'status' => 1,
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
@@ -53,7 +55,7 @@ class CompanySeeder extends Seeder
                 'website' => 'https://edutech-innovations.com',
                 'email' => 'hello@edutech-innovations.com',
                 'phone' => '+1-555-0126',
-                'status' => true,
+                'status' => 1,
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
@@ -63,7 +65,7 @@ class CompanySeeder extends Seeder
                 'website' => 'https://manufacturing-plus.com',
                 'email' => 'sales@manufacturing-plus.com',
                 'phone' => '+1-555-0127',
-                'status' => true,
+                'status' => 1,
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
@@ -81,26 +83,31 @@ class CompanySeeder extends Seeder
     }
 
     /**
-     * Create related data for companies (addresses, contacts, notes)
+     * Create related data for companies (addresses, contacts, notes, locations)
      */
     private function createRelatedData(): void
     {
-        Company::all()->each(function ($company) {
+        $faker = Faker::create();
+
+        Company::all()->each(function ($company) use ($faker) {
             // Create company addresses
-            $this->createCompanyAddresses($company);
+            $this->createCompanyAddresses($company, $faker);
 
             // Create company contacts
-            $this->createCompanyContacts($company);
+            $this->createCompanyContacts($company, $faker);
 
             // Create company notes
-            $this->createCompanyNotes($company);
+            $this->createCompanyNotes($company, $faker);
+
+            // Create company locations
+            $this->createCompanyLocations($company, $faker);
         });
     }
 
     /**
      * Create addresses for a company
      */
-    private function createCompanyAddresses(Company $company): void
+    private function createCompanyAddresses(Company $company, $faker): void
     {
         $addressTypes = ['billing', 'shipping', 'office'];
 
@@ -108,11 +115,11 @@ class CompanySeeder extends Seeder
             CompanyAddress::create([
                 'company_id' => $company->id,
                 'type' => $type,
-                'address' => fake()->streetAddress(),
-                'city' => fake()->city(),
-                'state' => fake()->state(),
-                'country' => fake()->country(),
-                'zip_code' => fake()->postcode(),
+                'address' => $faker->streetAddress(),
+                'city' => $faker->city(),
+                'state' => $faker->state(),
+                'country' => $faker->country(),
+                'zip_code' => $faker->postcode(),
             ]);
         }
     }
@@ -120,17 +127,17 @@ class CompanySeeder extends Seeder
     /**
      * Create contacts for a company
      */
-    private function createCompanyContacts(Company $company): void
+    private function createCompanyContacts(Company $company, $faker): void
     {
-        $contactCount = fake()->numberBetween(1, 3);
+        $contactCount = $faker->numberBetween(1, 3);
 
         for ($i = 0; $i < $contactCount; $i++) {
             Contact::create([
                 'company_id' => $company->id,
-                'name' => fake()->name(),
-                'email' => fake()->email(),
-                'phone' => fake()->phoneNumber(),
-                'designation' => fake()->jobTitle(),
+                'name' => $faker->name(),
+                'email' => $faker->email(),
+                'phone' => $faker->phoneNumber(),
+                'designation' => $faker->jobTitle(),
                 'is_primary' => $i === 0, // First contact is primary
             ]);
         }
@@ -139,17 +146,48 @@ class CompanySeeder extends Seeder
     /**
      * Create notes for a company
      */
-    private function createCompanyNotes(Company $company): void
+    private function createCompanyNotes(Company $company, $faker): void
     {
-        $noteCount = fake()->numberBetween(1, 2);
+        $noteCount = $faker->numberBetween(1, 2);
 
         for ($i = 0; $i < $noteCount; $i++) {
             CompanyNote::create([
                 'company_id' => $company->id,
-                'note' => fake()->paragraph(3),
+                'note' => $faker->paragraph(3),
                 'created_by' => 1,
-                'status' => true,
+                'status' => 1,
             ]);
         }
+    }
+
+    /**
+     * Create locations for a company
+     */
+    private function createCompanyLocations(Company $company, $faker): void
+    {
+        // Get existing locations or create new ones if needed
+        $locations = Location::inRandomOrder()->limit($faker->numberBetween(1, 3))->get();
+
+        if ($locations->isEmpty()) {
+            // If no locations exist, create some
+            $locationCount = $faker->numberBetween(1, 3);
+            for ($i = 0; $i < $locationCount; $i++) {
+                $location = Location::create([
+                    'name' => $faker->city() . ' ' . $faker->randomElement(['Center', 'Hub', 'Zone', 'District']),
+                    'email' => $faker->email(),
+                    'address' => $faker->streetAddress(),
+                    'city' => $faker->city(),
+                    'state' => $faker->state(),
+                    'country' => $faker->country(),
+                    'zip_code' => $faker->postcode(),
+                    'created_by' => 1,
+                    'updated_by' => 1,
+                ]);
+                $locations->push($location);
+            }
+        }
+
+        // Attach locations to company
+        $company->locations()->attach($locations->pluck('id')->toArray());
     }
 }

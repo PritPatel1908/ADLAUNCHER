@@ -303,12 +303,28 @@
                                                                     Active
                                                                 </label>
                                                             </div>
-                                                            <div class="form-check">
+                                                            <div class="form-check mb-2">
                                                                 <input class="form-check-input status-filter"
                                                                     type="checkbox" id="status-inactive" value="inactive"
                                                                     data-column="status">
                                                                 <label class="form-check-label" for="status-inactive">
                                                                     Inactive
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input status-filter"
+                                                                    type="checkbox" id="status-blocked" value="blocked"
+                                                                    data-column="status">
+                                                                <label class="form-check-label" for="status-blocked">
+                                                                    Blocked
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input status-filter"
+                                                                    type="checkbox" id="status-deleted" value="deleted"
+                                                                    data-column="status">
+                                                                <label class="form-check-label" for="status-deleted">
+                                                                    Deleted
                                                                 </label>
                                                             </div>
                                                         </div>
@@ -595,6 +611,17 @@
                                                     <input type="text" class="form-control" name="zip_code">
                                                 </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Status</label>
+                                                    <select class="form-select" name="status">
+                                                        <option value="1">Active</option>
+                                                        <option value="0">Inactive</option>
+                                                        <option value="2">Blocked</option>
+                                                        <option value="3">Deleted</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                             <div id="create-form-alert" class="col-12" style="display: none;">
                                                 <div class="alert alert-success alert-dismissible fade show"
                                                     role="alert">
@@ -700,6 +727,8 @@
                                                     <select class="form-select" name="status" id="edit-status">
                                                         <option value="1">Active</option>
                                                         <option value="0">Inactive</option>
+                                                        <option value="2">Blocked</option>
+                                                        <option value="3">Deleted</option>
                                                     </select>
                                                 </div>
                                             </div>

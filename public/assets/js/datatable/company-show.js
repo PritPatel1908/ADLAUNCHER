@@ -27,6 +27,16 @@ $(document).ready(function () {
         });
     });
 
+    // Reset form when offcanvas is opened
+    $('#offcanvas_edit').on('show.bs.offcanvas', function () {
+        // Reset submit button text and state
+        var submitBtn = $('#edit-company-form').find('button[type="submit"]');
+        submitBtn.html('Update Company').prop('disabled', false);
+
+        // Hide any previous alerts
+        $('#edit-form-alert').hide();
+    });
+
     // Re-initialize Select2 after dynamic content is added
     $(document).on('shown.bs.offcanvas', function () {
         $('.select2-multiple').each(function () {
@@ -54,7 +64,7 @@ $(document).ready(function () {
 
         // Disable submit button to prevent double submission
         var submitBtn = $(this).find('button[type="submit"]');
-        var originalBtnText = submitBtn.html();
+        var originalBtnText = 'Update Company'; // Use fixed text instead of current HTML
         submitBtn.html('Updating...').prop('disabled', true);
 
         $.ajax({
@@ -66,10 +76,16 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.success) {
-                    // Show success message
-                    $('#edit-form-alert').removeClass('alert-danger').addClass('alert-success');
-                    $('#edit-form-alert').html('Company updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
-                    $('#edit-form-alert').show();
+                    // Show success message using inner alert element for proper styling
+                    var $editAlertWrapper = $('#edit-form-alert');
+                    var $editAlert = $editAlertWrapper.find('.alert');
+                    if ($editAlert.length === 0) {
+                        $editAlertWrapper.html('<div class="alert alert-success alert-dismissible fade show" role="alert"></div>');
+                        $editAlert = $editAlertWrapper.find('.alert');
+                    }
+                    $editAlert.removeClass('alert-danger').addClass('alert-success');
+                    $editAlert.html('Company updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                    $editAlertWrapper.show();
 
                     // Update the page content with the new company data
                     updateCompanyDetails(response.company);
@@ -79,9 +95,15 @@ $(document).ready(function () {
                         $('#offcanvas_edit').offcanvas('hide');
                     }, 2000);
                 } else {
-                    $('#edit-form-alert').removeClass('alert-success').addClass('alert-danger');
-                    $('#edit-form-alert').html(`Failed to update company: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
-                    $('#edit-form-alert').show();
+                    var $editAlertWrapper1 = $('#edit-form-alert');
+                    var $editAlert1 = $editAlertWrapper1.find('.alert');
+                    if ($editAlert1.length === 0) {
+                        $editAlertWrapper1.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                        $editAlert1 = $editAlertWrapper1.find('.alert');
+                    }
+                    $editAlert1.removeClass('alert-success').addClass('alert-danger');
+                    $editAlert1.html(`Failed to update company: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                    $editAlertWrapper1.show();
                 }
             },
             error: function (xhr) {
@@ -96,9 +118,15 @@ $(document).ready(function () {
                     errorMessage += '</ul>';
                 }
 
-                $('#edit-form-alert').removeClass('alert-success').addClass('alert-danger');
-                $('#edit-form-alert').html(`${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
-                $('#edit-form-alert').show();
+                var $editAlertWrapper2 = $('#edit-form-alert');
+                var $editAlert2 = $editAlertWrapper2.find('.alert');
+                if ($editAlert2.length === 0) {
+                    $editAlertWrapper2.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                    $editAlert2 = $editAlertWrapper2.find('.alert');
+                }
+                $editAlert2.removeClass('alert-success').addClass('alert-danger');
+                $editAlert2.html(`${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                $editAlertWrapper2.show();
             },
             complete: function () {
                 // Re-enable submit button
@@ -115,16 +143,36 @@ $(document).ready(function () {
         // Update industry
         $('p.mb-2:contains("' + company.industry + '")').text(company.industry);
 
-        // Update status badge
-        const statusClass = company.status == 1 ? 'badge-soft-success' : 'badge-soft-danger';
-        const statusIcon = company.status == 1 ? 'ti-check' : 'ti-lock';
-        const statusText = company.status == 1 ? 'Active' : 'Inactive';
-        $('.badge:contains("Active"), .badge:contains("Inactive")').first()
-            .removeClass('badge-soft-success badge-soft-danger')
+        // Update status badge in company header (main status badge)
+        let statusClass = 'badge-soft-danger';
+        let statusIcon = 'ti-lock';
+        let statusText = 'Inactive';
+
+        if (company.status == 0) {
+            statusClass = 'badge-soft-danger';
+            statusIcon = 'ti-trash';
+            statusText = 'Delete';
+        } else if (company.status == 1) {
+            statusClass = 'badge-soft-success';
+            statusIcon = 'ti-check';
+            statusText = 'Active';
+        } else if (company.status == 2) {
+            statusClass = 'badge-soft-warning';
+            statusIcon = 'ti-lock';
+            statusText = 'Inactive';
+        } else if (company.status == 3) {
+            statusClass = 'badge-soft-danger';
+            statusIcon = 'ti-ban';
+            statusText = 'Block';
+        }
+
+        // Update the main status badge in company header
+        $('.avatar-xxl + div .badge').first()
+            .removeClass('badge-soft-success badge-soft-danger badge-soft-warning')
             .addClass(statusClass)
             .html(`<i class="ti ${statusIcon} me-1"></i>${statusText}`);
 
-        // Update website, email, phone
+        // Update website, email, phone in company header
         if (company.website) {
             $('.d-inline-flex:contains("' + company.website + '")').html(`<i class="ti ti-world text-warning me-1"></i> ${company.website}`);
         }
@@ -142,11 +190,11 @@ $(document).ready(function () {
         $('.col-md-6 .mb-4:contains("Website") p').text(company.website);
         $('.col-md-6 .mb-4:contains("Phone") p').text(company.phone);
 
-        // Update status in overview
+        // Update status in overview section
         $('.col-md-6 .mb-4:contains("Status") p span')
-            .removeClass('badge-soft-success badge-soft-danger')
+            .removeClass('badge-soft-success badge-soft-danger badge-soft-warning')
             .addClass(statusClass)
-            .text(statusText);
+            .html(`<i class="ti ${statusIcon} me-1"></i>${statusText}`);
 
         // Note: For locations, addresses, contacts, and notes, a page reload would be needed
         // to properly update these complex sections. However, the main company details
@@ -165,15 +213,18 @@ function addEditAddress() {
                 <div class="col-md-3">
                     <select class="form-select" name="addresses[${addressCount}][type]" required>
                         <option value="">Select Type</option>
-                        <option value="Head Office">Head Office</option>
-                        <option value="Branch">Branch</option>
-                        <option value="Office">Office</option>
-                        <option value="Warehouse">Warehouse</option>
-                        <option value="Factory">Factory</option>
-                        <option value="Store">Store</option>
-                        <option value="Billing">Billing</option>
-                        <option value="Shipping">Shipping</option>
-                        <option value="Other">Other</option>
+                        <option value="head office">Head Office</option>
+                        <option value="branch">Branch</option>
+                        <option value="office">Office</option>
+                        <option value="warehouse">Warehouse</option>
+                        <option value="factory">Factory</option>
+                        <option value="store">Store</option>
+                        <option value="billing">Billing</option>
+                        <option value="shipping">Shipping</option>
+                        <option value="home">Home</option>
+                        <option value="mailing">Mailing</option>
+                        <option value="corporate">Corporate</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
                 <div class="col-md-9">
@@ -254,8 +305,10 @@ function addEditNote() {
                 </div>
                 <div class="col-md-3">
                     <select class="form-select" name="notes[${noteCount}][status]">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="0">Delete</option>
+                        <option value="1">Active</option>
+                        <option value="2">Inactive</option>
+                        <option value="3">Block</option>
                     </select>
                 </div>
             </div>

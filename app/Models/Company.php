@@ -34,7 +34,8 @@ class Company extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'status' => 'boolean',
+        // Store 0-3 per migration comment; do not coerce to boolean
+        'status' => 'integer',
     ];
 
     /**
@@ -91,5 +92,13 @@ class Company extends Model
     public function areas(): BelongsToMany
     {
         return $this->belongsToMany(Area::class, 'area_companies');
+    }
+
+    /**
+     * Get the users associated with this company.
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_companies');
     }
 }

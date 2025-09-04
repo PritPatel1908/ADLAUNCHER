@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -22,9 +23,12 @@ class User extends Authenticatable
         'first_name',
         'middle_name',
         'last_name',
+        'username',
+        'employee_id',
         'name',
         'gender',
         'phone',
+        'mobile',
         'date_of_birth',
         'date_of_joining',
         'email',
@@ -70,12 +74,66 @@ class User extends Authenticatable
             'status' => 'integer',
         ];
     }
-    
+
     /**
      * Get the column preferences for the user.
      */
     public function showColumns(): HasMany
     {
         return $this->hasMany(ShowColumn::class);
+    }
+
+    /**
+     * Get the companies associated with the user.
+     */
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'user_companies');
+    }
+
+    /**
+     * Get the locations associated with the user.
+     */
+    public function locations(): BelongsToMany
+    {
+        return $this->belongsToMany(Location::class, 'user_locations');
+    }
+
+    /**
+     * Get the areas associated with the user.
+     */
+    public function areas(): BelongsToMany
+    {
+        return $this->belongsToMany(Area::class, 'user_areas');
+    }
+
+    /**
+     * Generate username from first_name and last_name
+     */
+    public static function generateUsername($firstName, $lastName)
+    {
+        $baseUsername = strtolower($firstName . $lastName);
+        $username = $baseUsername;
+        $counter = 1;
+
+        while (self::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        return $username;
+    }
+
+    /**
+     * Get the user's full name
+     */
+    public function getFullNameAttribute()
+    {
+        $name = $this->first_name;
+        if ($this->middle_name) {
+            $name .= ' ' . $this->middle_name;
+        }
+        $name .= ' ' . $this->last_name;
+        return $name;
     }
 }

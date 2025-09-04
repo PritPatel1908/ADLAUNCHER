@@ -21,11 +21,11 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Companies</h4>
+                    <h4 class="mb-1">Users</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Companies</li>
+                            <li class="breadcrumb-item active" aria-current="page">Users</li>
                         </ol>
                     </nav>
                 </div>
@@ -67,7 +67,7 @@
                     </div>
                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
-                        Company</a>
+                        User</a>
                 </div>
                 <div class="card-body">
                     <!-- table header -->
@@ -109,12 +109,12 @@
                                     </div>
                                     <div class="filter-set-view p-3">
                                         <div class="accordion" id="accordionExample">
-                                            <!-- Name Filter -->
+                                            <!-- First Name Filter -->
                                             <div class="filter-set-content">
                                                 <div class="filter-set-content-head">
                                                     <a href="#" data-bs-toggle="collapse"
                                                         data-bs-target="#collapseTwo" aria-expanded="true"
-                                                        aria-controls="collapseTwo">Name</a>
+                                                        aria-controls="collapseTwo">First Name</a>
                                                 </div>
                                                 <div class="filter-set-contents accordion-collapse collapse show"
                                                     id="collapseTwo" data-bs-parent="#accordionExample">
@@ -126,23 +126,23 @@
                                                                     <i class="ti ti-search"></i>
                                                                 </span>
                                                                 <input type="text"
-                                                                    class="form-control form-control-md company-filter"
-                                                                    placeholder="Search" data-column="name">
+                                                                    class="form-control form-control-md user-filter"
+                                                                    placeholder="Search" data-column="first_name">
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <!-- Industry Filter -->
+                                            <!-- Last Name Filter -->
                                             <div class="filter-set-content">
                                                 <div class="filter-set-content-head">
                                                     <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseIndustry" aria-expanded="false"
-                                                        aria-controls="collapseIndustry">Industry</a>
+                                                        data-bs-target="#collapseLastName" aria-expanded="false"
+                                                        aria-controls="collapseLastName">Last Name</a>
                                                 </div>
                                                 <div class="filter-set-contents accordion-collapse collapse"
-                                                    id="collapseIndustry" data-bs-parent="#accordionExample">
+                                                    id="collapseLastName" data-bs-parent="#accordionExample">
                                                     <div
                                                         class="filter-content-list bg-light rounded border p-2 shadow mt-2">
                                                         <div class="mb-2">
@@ -151,33 +151,8 @@
                                                                     <i class="ti ti-search"></i>
                                                                 </span>
                                                                 <input type="text"
-                                                                    class="form-control form-control-md company-filter"
-                                                                    placeholder="Search" data-column="industry">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Website Filter -->
-                                            <div class="filter-set-content">
-                                                <div class="filter-set-content-head">
-                                                    <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseWebsite" aria-expanded="false"
-                                                        aria-controls="collapseWebsite">Website</a>
-                                                </div>
-                                                <div class="filter-set-contents accordion-collapse collapse"
-                                                    id="collapseWebsite" data-bs-parent="#accordionExample">
-                                                    <div
-                                                        class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                        <div class="mb-2">
-                                                            <div class="input-icon-start input-icon position-relative">
-                                                                <span class="input-icon-addon fs-12">
-                                                                    <i class="ti ti-search"></i>
-                                                                </span>
-                                                                <input type="text"
-                                                                    class="form-control form-control-md company-filter"
-                                                                    placeholder="Search" data-column="website">
+                                                                    class="form-control form-control-md user-filter"
+                                                                    placeholder="Search" data-column="last_name">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -201,7 +176,7 @@
                                                                     <i class="ti ti-search"></i>
                                                                 </span>
                                                                 <input type="text"
-                                                                    class="form-control form-control-md company-filter"
+                                                                    class="form-control form-control-md user-filter"
                                                                     placeholder="Search" data-column="email">
                                                             </div>
                                                         </div>
@@ -209,15 +184,15 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Phone Filter -->
+                                            <!-- Employee ID Filter -->
                                             <div class="filter-set-content">
                                                 <div class="filter-set-content-head">
                                                     <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapsePhone" aria-expanded="false"
-                                                        aria-controls="collapsePhone">Phone</a>
+                                                        data-bs-target="#collapseEmployeeId" aria-expanded="false"
+                                                        aria-controls="collapseEmployeeId">Employee ID</a>
                                                 </div>
                                                 <div class="filter-set-contents accordion-collapse collapse"
-                                                    id="collapsePhone" data-bs-parent="#accordionExample">
+                                                    id="collapseEmployeeId" data-bs-parent="#accordionExample">
                                                     <div
                                                         class="filter-content-list bg-light rounded border p-2 shadow mt-2">
                                                         <div class="mb-2">
@@ -226,8 +201,33 @@
                                                                     <i class="ti ti-search"></i>
                                                                 </span>
                                                                 <input type="text"
-                                                                    class="form-control form-control-md company-filter"
-                                                                    placeholder="Search" data-column="phone">
+                                                                    class="form-control form-control-md user-filter"
+                                                                    placeholder="Search" data-column="employee_id">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Mobile Filter -->
+                                            <div class="filter-set-content">
+                                                <div class="filter-set-content-head">
+                                                    <a href="#" class="collapsed" data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseMobile" aria-expanded="false"
+                                                        aria-controls="collapseMobile">Mobile</a>
+                                                </div>
+                                                <div class="filter-set-contents accordion-collapse collapse"
+                                                    id="collapseMobile" data-bs-parent="#accordionExample">
+                                                    <div
+                                                        class="filter-content-list bg-light rounded border p-2 shadow mt-2">
+                                                        <div class="mb-2">
+                                                            <div class="input-icon-start input-icon position-relative">
+                                                                <span class="input-icon-addon fs-12">
+                                                                    <i class="ti ti-search"></i>
+                                                                </span>
+                                                                <input type="text"
+                                                                    class="form-control form-control-md user-filter"
+                                                                    placeholder="Search" data-column="mobile">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -248,88 +248,38 @@
                                                         <div class="mb-2">
                                                             <div class="form-check mb-2">
                                                                 <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-active" value="active"
+                                                                    type="checkbox" id="status-delete" value="0"
                                                                     data-column="status">
-                                                                <label class="form-check-label" for="status-active">
-                                                                    Active
-                                                                </label>
+                                                                <label class="form-check-label"
+                                                                    for="status-delete">Delete</label>
                                                             </div>
                                                             <div class="form-check mb-2">
                                                                 <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-inactive" value="inactive"
+                                                                    type="checkbox" id="status-active" value="1"
                                                                     data-column="status">
-                                                                <label class="form-check-label" for="status-inactive">
-                                                                    Inactive
-                                                                </label>
+                                                                <label class="form-check-label"
+                                                                    for="status-active">Active</label>
                                                             </div>
                                                             <div class="form-check mb-2">
                                                                 <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-block" value="block"
+                                                                    type="checkbox" id="status-deactivate" value="2"
                                                                     data-column="status">
-                                                                <label class="form-check-label" for="status-block">
-                                                                    Block
-                                                                </label>
+                                                                <label class="form-check-label"
+                                                                    for="status-deactivate">Deactivate</label>
                                                             </div>
                                                             <div class="form-check">
                                                                 <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-delete" value="delete"
+                                                                    type="checkbox" id="status-block" value="3"
                                                                     data-column="status">
-                                                                <label class="form-check-label" for="status-delete">
-                                                                    Delete
-                                                                </label>
+                                                                <label class="form-check-label"
+                                                                    for="status-block">Block</label>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="filter-set-content">
-                                                <div class="filter-set-content-head">
-                                                    <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                        data-bs-target="#Status" aria-expanded="false"
-                                                        aria-controls="Status">Status</a>
-                                                </div>
-                                                <div class="filter-set-contents accordion-collapse collapse"
-                                                    id="Status" data-bs-parent="#accordionExample">
-                                                    <div
-                                                        class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                        <div class="mb-2">
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-active-2" value="active"
-                                                                    data-column="status">
-                                                                <label class="form-check-label" for="status-active-2">
-                                                                    Active
-                                                                </label>
-                                                            </div>
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-inactive-2"
-                                                                    value="inactive" data-column="status">
-                                                                <label class="form-check-label" for="status-inactive-2">
-                                                                    Inactive
-                                                                </label>
-                                                            </div>
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-block-2" value="block"
-                                                                    data-column="status">
-                                                                <label class="form-check-label" for="status-block-2">
-                                                                    Block
-                                                                </label>
-                                                            </div>
-                                                            <div class="form-check">
-                                                                <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-delete-2" value="delete"
-                                                                    data-column="status">
-                                                                <label class="form-check-label" for="status-delete-2">
-                                                                    Delete
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                         </div>
                                         {{-- <div class="d-flex align-items-center gap-2">
                                             <a href="javascript:void(0);" class="btn btn-outline-light w-100">Reset</a>
@@ -348,9 +298,9 @@
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
                                                 <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Name</span>
+                                                    <span>First Name</span>
                                                     <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="name">
+                                                        type="checkbox" role="switch" checked data-column="first_name">
                                                 </label>
                                             </div>
                                         </li>
@@ -358,9 +308,9 @@
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
                                                 <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Industry</span>
+                                                    <span>Last Name</span>
                                                     <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="industry">
+                                                        type="checkbox" role="switch" checked data-column="last_name">
                                                 </label>
                                             </div>
                                         </li>
@@ -368,9 +318,9 @@
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
                                                 <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Website</span>
+                                                    <span>Username</span>
                                                     <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="website">
+                                                        type="checkbox" role="switch" checked data-column="username">
                                                 </label>
                                             </div>
                                         </li>
@@ -388,9 +338,72 @@
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
                                                 <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Mobile</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked data-column="mobile">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
                                                     <span>Phone</span>
                                                     <input class="form-check-input column-visibility-toggle ms-auto"
                                                         type="checkbox" role="switch" checked data-column="phone">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Employee ID</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked data-column="employee_id">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Gender</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked data-column="gender">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Date of Birth</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked
+                                                        data-column="date_of_birth">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Date of Joining</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked
+                                                        data-column="date_of_joining">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Companies</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked
+                                                        data-column="companies_count">
                                                 </label>
                                             </div>
                                         </li>
@@ -409,51 +422,50 @@
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
                                                 <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Addresses</span>
+                                                    <span>Areas</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked data-column="areas_count">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Is Admin</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked data-column="is_admin">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Is Client</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked data-column="is_client">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Is User</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked data-column="is_user">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Last Login</span>
                                                     <input class="form-check-input column-visibility-toggle ms-auto"
                                                         type="checkbox" role="switch" checked
-                                                        data-column="addresses_count">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Contacts</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked
-                                                        data-column="contacts_count">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Notes</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="notes_count">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Created By</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="created_by">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Updated By</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="updated_by">
+                                                        data-column="last_login_at">
                                                 </label>
                                             </div>
                                         </li>
@@ -520,20 +532,26 @@
                         </div>
                     </div>
                     <div class="table-responsive custom-table">
-                        <table class="table table-nowrap" id="companieslist">
+                        <table class="table table-nowrap" id="userslist">
                             <thead class="table-light">
                                 <tr>
-                                    <th>name</th>
-                                    <th>industry</th>
-                                    <th>website</th>
+                                    <th>first_name</th>
+                                    <th>last_name</th>
+                                    <th>username</th>
                                     <th>email</th>
+                                    <th>mobile</th>
                                     <th>phone</th>
+                                    <th>employee_id</th>
+                                    <th>gender</th>
+                                    <th>date_of_birth</th>
+                                    <th>date_of_joining</th>
+                                    <th>companies_count</th>
                                     <th>locations_count</th>
-                                    <th>addresses_count</th>
-                                    <th>contacts_count</th>
-                                    <th>notes_count</th>
-                                    <th>created_by</th>
-                                    <th>updated_by</th>
+                                    <th>areas_count</th>
+                                    <th>is_admin</th>
+                                    <th>is_client</th>
+                                    <th>is_user</th>
+                                    <th>last_login_at</th>
                                     <th>created_at</th>
                                     <th>updated_at</th>
                                     <th>status</th>
@@ -546,7 +564,14 @@
                         </table>
                     </div>
                     <div id="error-container" class="alert alert-danger mt-3" style="display: none;">
-                        <strong>Error!</strong> <span id="error-message">Unable to load data.</span>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong>Error!</strong> <span id="error-message">Unable to load data.</span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="retry-load">
+                                <i class="ti ti-refresh me-1"></i>Retry
+                            </button>
+                        </div>
                     </div>
                     <div class="row align-items-center">
                         <div class="col-md-6">
@@ -563,10 +588,10 @@
         </div>
     </div>
 
-    <!-- Start Add Company -->
+    <!-- Start Add User -->
     <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_add">
         <div class="offcanvas-header border-bottom">
-            <h5 class="fw-semibold">Add Company</h5>
+            <h5 class="fw-semibold">Add User</h5>
             <button type="button"
                 class="btn-close custom-btn-close border p-1 me-0 d-flex align-items-center justify-content-center rounded-circle"
                 data-bs-dismiss="offcanvas" aria-label="Close">
@@ -576,7 +601,7 @@
         <div class="offcanvas-body">
             <div class="card">
                 <div class="card-body">
-                    <form id="create-company-form" method="POST" action="{{ route('company.store') }}">
+                    <form id="create-user-form" method="POST" action="{{ route('user.store') }}">
                         @csrf
                         <div class="accordion accordion-bordered" id="main_accordion">
                             <!-- Basic Info -->
@@ -592,29 +617,45 @@
                                     data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Company Name <span
+                                                    <label class="form-label">First Name <span
                                                             class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" name="name" required>
+                                                    <input type="text" class="form-control" name="first_name"
+                                                        required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Middle Name</label>
+                                                    <input type="text" class="form-control" name="middle_name">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Last Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" name="last_name" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Industry</label>
-                                                    <input type="text" class="form-control" name="industry">
+                                                    <label class="form-label">Email <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="email" class="form-control" name="email" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Website</label>
-                                                    <input type="url" class="form-control" name="website">
+                                                    <label class="form-label">Password <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="password" class="form-control" name="password" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input type="email" class="form-control" name="email">
+                                                    <label class="form-label">Mobile</label>
+                                                    <input type="text" class="form-control" name="mobile">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -625,11 +666,40 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
+                                                    <label class="form-label">Employee ID</label>
+                                                    <input type="text" class="form-control" name="employee_id">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Gender</label>
+                                                    <select class="form-select" name="gender">
+                                                        <option value="">Select Gender</option>
+                                                        <option value="1">Male</option>
+                                                        <option value="2">Female</option>
+                                                        <option value="3">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Date of Birth</label>
+                                                    <input type="date" class="form-control" name="date_of_birth">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Date of Joining</label>
+                                                    <input type="date" class="form-control" name="date_of_joining">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status">
                                                         <option value="delete">Delete</option>
                                                         <option value="active">Active</option>
-                                                        <option value="inactive">Inactive</option>
+                                                        <option value="deactivate">Deactivate</option>
                                                         <option value="block">Block</option>
                                                     </select>
                                                 </div>
@@ -639,17 +709,17 @@
                                 </div>
                             </div>
 
-                            {{-- Location --}}
+                            {{-- Locations --}}
                             <div class="accordion-item border-top rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#location">
+                                        data-bs-toggle="collapse" data-bs-target="#locations">
                                         <span class="avatar avatar-md rounded me-1"><i
                                                 class="ti ti-map-pin-cog"></i></span>
-                                        Location Info
+                                        Locations
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse" id="location" data-bs-parent="#main_accordion">
+                                <div class="accordion-collapse collapse" id="locations" data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
                                             <div class="col-md-12">
@@ -671,75 +741,30 @@
                                 </div>
                             </div>
 
-                            {{-- Address --}}
+                            {{-- Companies --}}
                             <div class="accordion-item border-top rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#address">
-                                        <span class="avatar avatar-md rounded me-1"><i
-                                                class="ti ti-map-pin-cog"></i></span>
-                                        Address Info
+                                        data-bs-toggle="collapse" data-bs-target="#companies">
+                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-building"></i></span>
+                                        Companies
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse" id="address" data-bs-parent="#main_accordion">
+                                <div class="accordion-collapse collapse" id="companies" data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Addresses</label>
-                                                    <div id="addresses-container">
-                                                        <div class="address-item border rounded p-3 mb-2">
-                                                            <div class="row">
-                                                                <div class="col-md-3">
-                                                                    <select class="form-select" name="addresses[0][type]"
-                                                                        required>
-                                                                        <option value="">Select Type</option>
-                                                                        <option value="head office">Head Office</option>
-                                                                        <option value="branch">Branch</option>
-                                                                        <option value="office">Office</option>
-                                                                        <option value="warehouse">Warehouse</option>
-                                                                        <option value="factory">Factory</option>
-                                                                        <option value="store">Store</option>
-                                                                        <option value="billing">Billing</option>
-                                                                        <option value="shipping">Shipping</option>
-                                                                        <option value="home">Home</option>
-                                                                        <option value="mailing">Mailing</option>
-                                                                        <option value="corporate">Corporate</option>
-                                                                        <option value="other">Other</option>
-                                                                    </select>
-                                                                </div>
-                                                                <div class="col-md-9">
-                                                                    <input type="text" class="form-control"
-                                                                        name="addresses[0][address]"
-                                                                        placeholder="Address">
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-md-3">
-                                                                    <input type="text" class="form-control"
-                                                                        name="addresses[0][city]" placeholder="City">
-                                                                </div>
-                                                                <div class="col-md-3">
-                                                                    <input type="text" class="form-control"
-                                                                        name="addresses[0][state]" placeholder="State">
-                                                                </div>
-                                                                <div class="col-md-3">
-                                                                    <input type="text" class="form-control"
-                                                                        name="addresses[0][country]"
-                                                                        placeholder="Country">
-                                                                </div>
-                                                                <div class="col-md-3">
-                                                                    <input type="text" class="form-control"
-                                                                        name="addresses[0][zip_code]"
-                                                                        placeholder="Zip Code">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="addAddress()">
-                                                        <i class="ti ti-plus me-1"></i>Add Address
-                                                    </button>
+                                                    <label class="form-label">Companies</label>
+                                                    <select class="select2 form-control select2-multiple"
+                                                        name="company_ids[]" data-toggle="select2" multiple="multiple"
+                                                        data-placeholder="Choose companies...">
+                                                        <option value="">Select companies...</option>
+                                                        @foreach (\App\Models\Company::where('status', 1)->get() as $company)
+                                                            <option value="{{ $company->id }}">{{ $company->name }} -
+                                                                {{ $company->industry }}</option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -747,102 +772,30 @@
                                 </div>
                             </div>
 
-                            {{-- Contacts --}}
+                            {{-- Areas --}}
                             <div class="accordion-item border-top rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#contacts">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-user-plus"></i></span>
-                                        Contacts Info
+                                        data-bs-toggle="collapse" data-bs-target="#areas">
+                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-map-pin"></i></span>
+                                        Areas
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse" id="contacts" data-bs-parent="#main_accordion">
+                                <div class="accordion-collapse collapse" id="areas" data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Contacts</label>
-                                                    <div id="contacts-container">
-                                                        <div class="contact-item border rounded p-3 mb-2">
-                                                            <div class="row">
-                                                                <div class="col-md-4">
-                                                                    <input type="text" class="form-control"
-                                                                        name="contacts[0][name]"
-                                                                        placeholder="Contact Name">
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <input type="email" class="form-control"
-                                                                        name="contacts[0][email]" placeholder="Email">
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <input type="text" class="form-control"
-                                                                        name="contacts[0][phone]" placeholder="Phone">
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-md-8">
-                                                                    <input type="text" class="form-control"
-                                                                        name="contacts[0][designation]"
-                                                                        placeholder="Designation">
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input" type="checkbox"
-                                                                            name="contacts[0][is_primary]" value="1">
-                                                                        <label class="form-check-label">Primary
-                                                                            Contact</label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="addContact()">
-                                                        <i class="ti ti-plus me-1"></i>Add Contact
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Notes --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#notes">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-note"></i></span>
-                                        Notes Info
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="notes" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Notes</label>
-                                                    <div id="notes-container">
-                                                        <div class="note-item border rounded p-3 mb-2">
-                                                            <div class="row">
-                                                                <div class="col-md-9">
-                                                                    <textarea class="form-control" name="notes[0][note]" rows="3" placeholder="Note content"></textarea>
-                                                                </div>
-                                                                <div class="col-md-3">
-                                                                    <select class="form-select" name="notes[0][status]">
-                                                                        <option value="0">Delete</option>
-                                                                        <option value="1">Active</option>
-                                                                        <option value="2">Inactive</option>
-                                                                        <option value="3">Block</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="addNote()">
-                                                        <i class="ti ti-plus me-1"></i>Add Note
-                                                    </button>
+                                                    <label class="form-label">Areas</label>
+                                                    <select class="select2 form-control select2-multiple"
+                                                        name="area_ids[]" data-toggle="select2" multiple="multiple"
+                                                        data-placeholder="Choose areas...">
+                                                        <option value="">Select areas...</option>
+                                                        @foreach (\App\Models\Area::where('status', 1)->get() as $area)
+                                                            <option value="{{ $area->id }}">{{ $area->name }} -
+                                                                {{ $area->city }}, {{ $area->state }}</option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -852,7 +805,7 @@
 
                             <div id="create-form-alert" class="col-12" style="display: none;">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    Company created successfully!
+                                    User created successfully!
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                                         aria-label="Close"></button>
                                 </div>
@@ -861,7 +814,7 @@
                         <div class="d-flex align-items-center justify-content-end">
                             <button type="button" data-bs-dismiss="offcanvas"
                                 class="btn btn-sm btn-light me-2">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-primary">Create Company</button>
+                            <button type="submit" class="btn btn-sm btn-primary">Create User</button>
                         </div>
                     </form>
                 </div>
@@ -869,19 +822,18 @@
         </div>
     </div>
 
-    {{-- Stat Edit Company --}}
-    <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_edit"
-        aria-labelledby="offcanvas_edit_label">
+    {{-- Start Edit User --}}
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas_edit" aria-labelledby="offcanvas_edit_label">
         <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="offcanvas_edit_label">Edit Company</h5>
+            <h5 class="offcanvas-title" id="offcanvas_edit_label">Edit User</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <div class="card">
-                <div class="card-body">
-                    <form id="edit-company-form" method="POST">
+            <div class="row">
+                <div class="col-12">
+                    <form id="edit-user-form" method="POST">
                         @csrf
-                        <input type="hidden" name="_method" value="PUT">
+                        @method('PUT')
                         <input type="hidden" name="from_index" value="1">
                         <div class="accordion accordion-bordered" id="main_accordion">
                             <!-- Basic Info -->
@@ -897,33 +849,50 @@
                                     data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Company Name <span
+                                                    <label class="form-label">First Name <span
                                                             class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" name="name"
-                                                        id="edit-name" required>
+                                                    <input type="text" class="form-control" name="first_name"
+                                                        id="edit-first_name" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Middle Name</label>
+                                                    <input type="text" class="form-control" name="middle_name"
+                                                        id="edit-middle_name">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Last Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" name="last_name"
+                                                        id="edit-last_name" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Industry</label>
-                                                    <input type="text" class="form-control" name="industry"
-                                                        id="edit-industry">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Website</label>
-                                                    <input type="url" class="form-control" name="website"
-                                                        id="edit-website">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Email</label>
+                                                    <label class="form-label">Email <span
+                                                            class="text-danger">*</span></label>
                                                     <input type="email" class="form-control" name="email"
-                                                        id="edit-email">
+                                                        id="edit-email" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Password</label>
+                                                    <input type="password" class="form-control" name="password"
+                                                        id="edit-password"
+                                                        placeholder="Leave blank to keep current password">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Mobile</label>
+                                                    <input type="text" class="form-control" name="mobile"
+                                                        id="edit-mobile">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -935,11 +904,43 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
+                                                    <label class="form-label">Employee ID</label>
+                                                    <input type="text" class="form-control" name="employee_id"
+                                                        id="edit-employee_id">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Gender</label>
+                                                    <select class="form-select" name="gender" id="edit-gender">
+                                                        <option value="">Select Gender</option>
+                                                        <option value="1">Male</option>
+                                                        <option value="2">Female</option>
+                                                        <option value="3">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Date of Birth</label>
+                                                    <input type="date" class="form-control" name="date_of_birth"
+                                                        id="edit-date_of_birth">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Date of Joining</label>
+                                                    <input type="date" class="form-control" name="date_of_joining"
+                                                        id="edit-date_of_joining">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status" id="edit-status">
                                                         <option value="delete">Delete</option>
                                                         <option value="active">Active</option>
-                                                        <option value="inactive">Inactive</option>
+                                                        <option value="deactivate">Deactivate</option>
                                                         <option value="block">Block</option>
                                                     </select>
                                                 </div>
@@ -949,17 +950,17 @@
                                 </div>
                             </div>
 
-                            {{-- Location --}}
+                            {{-- Locations --}}
                             <div class="accordion-item border-top rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#location">
+                                        data-bs-toggle="collapse" data-bs-target="#locations">
                                         <span class="avatar avatar-md rounded me-1"><i
                                                 class="ti ti-map-pin-cog"></i></span>
-                                        Location Info
+                                        Locations
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse" id="location" data-bs-parent="#main_accordion">
+                                <div class="accordion-collapse collapse" id="locations" data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
                                             <div class="col-md-12">
@@ -981,29 +982,29 @@
                                 </div>
                             </div>
 
-                            {{-- Address --}}
+                            {{-- Companies --}}
                             <div class="accordion-item border-top rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#address">
-                                        <span class="avatar avatar-md rounded me-1"><i
-                                                class="ti ti-map-pin-cog"></i></span>
-                                        Address Info
+                                        data-bs-toggle="collapse" data-bs-target="#companies">
+                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-building"></i></span>
+                                        Companies
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse" id="address" data-bs-parent="#main_accordion">
+                                <div class="accordion-collapse collapse" id="companies" data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Addresses</label>
-                                                    <div id="edit-addresses-container">
-                                                        <!-- Addresses will be populated via JavaScript -->
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="addEditAddress()">
-                                                        <i class="ti ti-plus me-1"></i>Add Address
-                                                    </button>
+                                                    <label class="form-label">Companies</label>
+                                                    <select class="select2 form-control select2-multiple"
+                                                        name="company_ids[]" id="edit-company_ids" data-toggle="select2"
+                                                        multiple="multiple" data-placeholder="Choose companies...">
+                                                        @foreach (\App\Models\Company::where('status', 1)->get() as $company)
+                                                            <option value="{{ $company->id }}">{{ $company->name }} -
+                                                                {{ $company->industry }}</option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -1011,57 +1012,29 @@
                                 </div>
                             </div>
 
-                            {{-- Contacts --}}
+                            {{-- Areas --}}
                             <div class="accordion-item border-top rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#contacts">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-user-plus"></i></span>
-                                        Contacts Info
+                                        data-bs-toggle="collapse" data-bs-target="#areas">
+                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-map-pin"></i></span>
+                                        Areas
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse" id="contacts" data-bs-parent="#main_accordion">
+                                <div class="accordion-collapse collapse" id="areas" data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Contacts</label>
-                                                    <div id="edit-contacts-container">
-                                                        <!-- Contacts will be populated via JavaScript -->
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="addEditContact()">
-                                                        <i class="ti ti-plus me-1"></i>Add Contact
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Notes --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#notes">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-note"></i></span>
-                                        Notes Info
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="notes" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Notes</label>
-                                                    <div id="edit-notes-container">
-                                                        <!-- Notes will be populated via JavaScript -->
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="addEditNote()">
-                                                        <i class="ti ti-plus me-1"></i>Add Note
-                                                    </button>
+                                                    <label class="form-label">Areas</label>
+                                                    <select class="select2 form-control select2-multiple"
+                                                        name="area_ids[]" id="edit-area_ids" data-toggle="select2"
+                                                        multiple="multiple" data-placeholder="Choose areas...">
+                                                        @foreach (\App\Models\Area::where('status', 1)->get() as $area)
+                                                            <option value="{{ $area->id }}">{{ $area->name }} -
+                                                                {{ $area->city }}, {{ $area->state }}</option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -1071,17 +1044,17 @@
 
                             <div id="edit-form-alert" class="col-12" style="display: none;">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    Company updated successfully!
+                                    User updated successfully!
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                                         aria-label="Close"></button>
                                 </div>
                             </div>
 
-                        </div>
-                        <div class="d-flex align-items-center justify-content-end">
-                            <button type="button" data-bs-dismiss="offcanvas"
-                                class="btn btn-sm btn-light me-2">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-primary">Update Company</button>
+                            <div class="d-flex align-items-center justify-content-end">
+                                <button type="button" data-bs-dismiss="offcanvas"
+                                    class="btn btn-sm btn-light me-2">Cancel</button>
+                                <button type="submit" class="btn btn-sm btn-primary">Update User</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -1199,8 +1172,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
 
-    <!-- Company DataTable JS -->
-    <script src="{{ asset('assets/js/datatable/company-datatable.js') }}" type="text/javascript"></script>
+    <!-- User DataTable JS -->
+    <script src="{{ asset('assets/js/datatable/user-datatable.js') }}" type="text/javascript"></script>
 
     <style>
         .highlight-row {
@@ -1215,23 +1188,6 @@
             100% {
                 background-color: transparent;
             }
-        }
-
-        /* Alert styling improvements */
-        .alert-info {
-            background-color: #d1ecf1;
-            border-color: #bee5eb;
-            color: #0c5460;
-        }
-
-        .alert-info .btn-close {
-            color: #0c5460;
-        }
-
-        /* Form loading state */
-        .form-loading {
-            opacity: 0.6;
-            pointer-events: none;
         }
 
         /* Select2 Custom Styles - Perfect Design Match */
@@ -1462,14 +1418,14 @@
                 $(this).select2({
                     theme: 'default',
                     width: '100%',
-                    placeholder: 'Choose locations...',
+                    placeholder: 'Choose companies...',
                     allowClear: true,
                     closeOnSelect: false,
                     tags: false,
                     tokenSeparators: [',', ' '],
                     language: {
                         noResults: function() {
-                            return "No locations found";
+                            return "No companies found";
                         },
                         searching: function() {
                             return "Searching...";
@@ -1494,7 +1450,7 @@
                         $(this).select2({
                             theme: 'default',
                             width: '100%',
-                            placeholder: 'Choose locations...',
+                            placeholder: 'Choose companies...',
                             allowClear: true,
                             closeOnSelect: false,
                             tags: false,
@@ -1512,7 +1468,7 @@
                         $(this).select2({
                             theme: 'default',
                             width: '100%',
-                            placeholder: 'Choose locations...',
+                            placeholder: 'Choose companies...',
                             allowClear: true,
                             closeOnSelect: false,
                             tags: false,

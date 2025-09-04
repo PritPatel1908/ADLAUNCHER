@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->text('note');
             $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->tinyInteger('status')->default(1)->comment('1: Show, 0: Delete');
+            $table->tinyInteger('status')->default(1)->comment('0: Delete, 1: Active, 2: Inactive, 3: Block');
             $table->timestamps();
         });
     }

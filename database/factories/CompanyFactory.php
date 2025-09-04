@@ -41,7 +41,7 @@ class CompanyFactory extends Factory
             'website' => fake()->url(),
             'email' => fake()->companyEmail(),
             'phone' => fake()->phoneNumber(),
-            'status' => fake()->boolean(80), // 80% chance of being active
+            'status' => fake()->randomElement([0, 1, 2, 3]), // 0: Inactive, 1: Active, 2: Blocked, 3: Deleted
             'created_by' => 1, // Default to admin user
             'updated_by' => 1, // Default to admin user
         ];
@@ -53,7 +53,7 @@ class CompanyFactory extends Factory
     public function active(): static
     {
         return $this->state(fn(array $attributes) => [
-            'status' => true,
+            'status' => 1,
         ]);
     }
 
@@ -63,7 +63,7 @@ class CompanyFactory extends Factory
     public function inactive(): static
     {
         return $this->state(fn(array $attributes) => [
-            'status' => false,
+            'status' => 0,
         ]);
     }
 }

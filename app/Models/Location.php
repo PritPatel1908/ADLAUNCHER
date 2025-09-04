@@ -11,6 +11,12 @@ class Location extends Model
 {
     use HasFactory;
 
+    // Status constants
+    const STATUS_INACTIVE = 0;
+    const STATUS_ACTIVE = 1;
+    const STATUS_BLOCKED = 2;
+    const STATUS_DELETED = 3;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -28,6 +34,36 @@ class Location extends Model
         'created_by',
         'updated_by',
     ];
+
+    /**
+     * Get the status text attribute
+     */
+    public function getStatusTextAttribute()
+    {
+        $status = (int) $this->status;
+        return match ($status) {
+            self::STATUS_ACTIVE => 'Active',
+            self::STATUS_INACTIVE => 'Inactive',
+            self::STATUS_BLOCKED => 'Blocked',
+            self::STATUS_DELETED => 'Deleted',
+            default => 'Unknown'
+        };
+    }
+
+    /**
+     * Get the status badge class attribute
+     */
+    public function getStatusBadgeClassAttribute()
+    {
+        $status = (int) $this->status;
+        return match ($status) {
+            self::STATUS_ACTIVE => 'bg-success',
+            self::STATUS_INACTIVE => 'bg-danger',
+            self::STATUS_BLOCKED => 'bg-warning',
+            self::STATUS_DELETED => 'bg-secondary',
+            default => 'bg-secondary'
+        };
+    }
 
     /**
      * Get the user who created this location.

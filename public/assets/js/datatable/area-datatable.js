@@ -276,11 +276,24 @@ $(document).ready(function () {
                         "name": "status",
                         "orderable": true,
                         "render": function (data, type, row) {
-                            if (data === 'Active' || data === 1 || data === '1' || data === true) {
-                                return '<span class="badge badge-pill badge-status bg-success text-white">Active</span>';
-                            } else {
-                                return '<span class="badge badge-pill badge-status bg-danger text-white">Inactive</span>';
+                            // Use status_value for numeric comparison and status for display text
+                            const statusValue = row.status_value !== undefined ? row.status_value : data;
+
+                            if (type === 'display') {
+                                switch (parseInt(statusValue)) {
+                                    case 1:
+                                        return '<span class="badge badge-pill badge-status bg-success text-white">Activate</span>';
+                                    case 2:
+                                        return '<span class="badge badge-pill badge-status bg-warning text-white">Inactive</span>';
+                                    case 3:
+                                        return '<span class="badge badge-pill badge-status bg-danger text-white">Block</span>';
+                                    case 0:
+                                        return '<span class="badge badge-pill badge-status bg-secondary text-white">Delete</span>';
+                                    default:
+                                        return '<span class="badge badge-pill badge-status bg-secondary text-white">Unknown</span>';
+                                }
                             }
+                            return data;
                         }
                     },
                     {
@@ -513,7 +526,7 @@ $(document).ready(function () {
                             $('#edit-name').val(area.name);
                             $('#edit-description').val(area.description);
                             $('#edit-code').val(area.code);
-                            $('#edit-status').val(area.status == 1 ? '1' : '0');
+                            $('#edit-status').val(area.status.toString());
 
                             // Populate locations
                             if (area.locations && area.locations.length > 0) {

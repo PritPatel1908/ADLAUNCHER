@@ -40,6 +40,11 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
+        // Normalize status to lowercase to tolerate UI capitalization (e.g., "Deactivate")
+        if ($request->has('status') && is_string($request->status)) {
+            $request->merge(['status' => strtolower(trim($request->status))]);
+        }
+
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -47,7 +52,8 @@ class CompanyController extends Controller
             'website' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
-            'status' => 'nullable|string|in:active,inactive,1,0',
+            // Accept human labels or integers; mapped below
+            'status' => 'nullable|string|in:active,inactive,deactivate,block,delete,0,1,2,3',
             'location_ids' => 'nullable|array',
             'location_ids.*' => 'exists:locations,id',
             'addresses' => 'nullable|array',
@@ -65,12 +71,27 @@ class CompanyController extends Controller
             'contacts.*.is_primary' => 'nullable|boolean',
             'notes' => 'nullable|array',
             'notes.*.note' => 'nullable|string|max:1000',
-            'notes.*.status' => 'nullable|string|in:active,inactive',
+            // Keep note statuses aligned with UI chips
+            'notes.*.status' => 'nullable|integer|in:0,1,2,3',
         ]);
 
         // Set the created_by field to the current authenticated user's ID
         $validated['created_by'] = Auth::user()->id;
-        $validated['status'] = ($validated['status'] ?? 'active') === 'active' ? 1 : 0;
+
+        // Convert status string to integer
+        // Map incoming values to desired numeric statuses: 0=Delete, 1=Active, 2=Inactive, 3=Block
+        $statusMap = [
+            'delete' => 0,
+            '0' => 0,
+            'active' => 1,
+            '1' => 1,
+            'inactive' => 2,
+            'deactivate' => 2,
+            '2' => 2,
+            'block' => 3,
+            '3' => 3,
+        ];
+        $validated['status'] = $statusMap[strtolower((string)($validated['status'] ?? 'active'))] ?? 1;
 
         // Create the company
         $company = Company::create($validated);
@@ -103,7 +124,7 @@ class CompanyController extends Controller
             foreach ($validated['notes'] as $noteData) {
                 if (!empty($noteData['note']) && trim($noteData['note']) !== '') {
                     $noteData['created_by'] = Auth::user()->id;
-                    $noteData['status'] = ($noteData['status'] ?? 'active') === 'active' ? 1 : 0;
+                    $noteData['status'] = (int)($noteData['status'] ?? 1);
                     $company->notes()->create($noteData);
                 }
             }
@@ -146,6 +167,12 @@ class CompanyController extends Controller
 
             // Check if request is AJAX
             if (request()->ajax()) {
+                // Debug: Log the addresses data
+                Log::info('Company addresses data:', [
+                    'company_id' => $company->id,
+                    'addresses' => $company->addresses->toArray()
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'company' => $company
@@ -178,6 +205,11 @@ class CompanyController extends Controller
     {
         $company = Company::findOrFail($id);
 
+        // Normalize status to lowercase to tolerate UI capitalization (e.g., "Deactivate")
+        if ($request->has('status') && is_string($request->status)) {
+            $request->merge(['status' => strtolower(trim($request->status))]);
+        }
+
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -185,7 +217,8 @@ class CompanyController extends Controller
             'website' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
-            'status' => 'nullable|string|in:active,inactive,1,0',
+            // Accept human labels or integers; mapped below
+            'status' => 'nullable|string|in:active,inactive,deactivate,block,delete,0,1,2,3',
             'location_ids' => 'nullable|array',
             'location_ids.*' => 'exists:locations,id',
             'addresses' => 'nullable|array',
@@ -203,12 +236,27 @@ class CompanyController extends Controller
             'contacts.*.is_primary' => 'nullable|boolean',
             'notes' => 'nullable|array',
             'notes.*.note' => 'required_with:notes.*.status|nullable|string|max:1000',
-            'notes.*.status' => 'nullable|string|in:active,inactive',
+            // Match create validation to avoid mismatch errors
+            'notes.*.status' => 'nullable|integer|in:0,1,2,3',
         ]);
 
         // Set the updated_by field to the current authenticated user's ID
         $validated['updated_by'] = Auth::user()->id;
-        $validated['status'] = ($validated['status'] ?? 'active') === 'active' ? 1 : 0;
+
+        // Convert status string to integer
+        // Map incoming values to desired numeric statuses: 0=Delete, 1=Active, 2=Inactive, 3=Block
+        $statusMap = [
+            'delete' => 0,
+            '0' => 0,
+            'active' => 1,
+            '1' => 1,
+            'inactive' => 2,
+            'deactivate' => 2,
+            '2' => 2,
+            'block' => 3,
+            '3' => 3,
+        ];
+        $validated['status'] = $statusMap[strtolower((string)($validated['status'] ?? 'active'))] ?? 1;
 
         // Update the company
         $company->update($validated);
@@ -244,7 +292,7 @@ class CompanyController extends Controller
             foreach ($validated['notes'] as $noteData) {
                 if (!empty($noteData['note']) && trim($noteData['note']) !== '') {
                     $noteData['created_by'] = Auth::user()->id;
-                    $noteData['status'] = ($noteData['status'] ?? 'active') === 'active' ? 1 : 0;
+                    $noteData['status'] = (int)($noteData['status'] ?? 1);
                     $company->notes()->create($noteData);
                 }
             }
@@ -349,9 +397,14 @@ class CompanyController extends Controller
 
                 $query->where(function ($q) use ($statusFilter) {
                     foreach ($statusFilter as $status) {
-                        if (strtolower($status) === 'active') {
+                        $normalized = strtolower($status);
+                        if ($normalized === 'active' || $normalized === '1' || $normalized === 1) {
                             $q->orWhere('status', 1);
-                        } else if (strtolower($status) === 'inactive') {
+                        } else if ($normalized === 'inactive' || $normalized === '2' || $normalized === 2) {
+                            $q->orWhere('status', 2);
+                        } else if ($normalized === 'block' || $normalized === 'blocked' || $normalized === '3' || $normalized === 3) {
+                            $q->orWhere('status', 3);
+                        } else if ($normalized === 'delete' || $normalized === 'deleted' || $normalized === '0' || $normalized === 0) {
                             $q->orWhere('status', 0);
                         }
                     }
@@ -393,7 +446,13 @@ class CompanyController extends Controller
                     'updated_by' => $company->updatedByUser ? $company->updatedByUser->name : 'N/A',
                     'created_at' => $company->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $company->updated_at->format('Y-m-d H:i:s'),
-                    'status' => $company->status == 1 ? 'Active' : 'Inactive',
+                    'status' => match ((int) $company->status) {
+                        0 => 'Delete',
+                        1 => 'Active',
+                        2 => 'Inactive',
+                        3 => 'Block',
+                        default => 'Inactive',
+                    },
                     'locations_count' => $company->locations->count(),
                     'addresses_count' => $company->addresses->count(),
                     'contacts_count' => $company->contacts->count(),

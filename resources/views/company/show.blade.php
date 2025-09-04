@@ -73,21 +73,32 @@
                                 <div class="d-flex align-items-center mb-2">
                                     <div class="avatar avatar-xxl avatar-rounded me-3 flex-shrink-0 bg-primary">
                                         <span class="avatar-text">{{ substr($company->name, 0, 1) }}</span>
-                                        <span
-                                            class="status {{ $company->status == 'active' ? 'online' : 'offline' }}"></span>
+                                        <span class="status {{ $company->status == 1 ? 'online' : 'offline' }}"></span>
                                     </div>
                                     <div>
                                         <h5 class="mb-1">{{ $company->name }}</h5>
                                         <p class="mb-2">{{ $company->industry }}</p>
                                         <div class="d-flex align-items-center flex-wrap gap-2">
                                             <span
-                                                class="badge {{ $company->status == 'active' ? 'badge-soft-success' : 'badge-soft-danger' }} border-0 me-2">
+                                                class="badge {{ $company->status == 0 ? 'badge-soft-danger' : ($company->status == 1 ? 'badge-soft-success' : ($company->status == 2 ? 'badge-soft-danger' : ($company->status == 3 ? 'badge-soft-warning' : 'badge-soft-danger'))) }} border-0 me-2">
                                                 <i
-                                                    class="ti {{ $company->status == 'active' ? 'ti-check' : 'ti-lock' }} me-1"></i>
-                                                {{ $company->status == 'active' ? 'Active' : 'Inactive' }}
+                                                    class="ti {{ $company->status == 0 ? 'ti-trash' : ($company->status == 1 ? 'ti-check' : ($company->status == 2 ? 'ti-lock' : ($company->status == 3 ? 'ti-ban' : 'ti-lock'))) }} me-1"></i>
+                                                @if ($company->status == 0)
+                                                    Delete
+                                                @elseif($company->status == 1)
+                                                    Active
+                                                @elseif($company->status == 2)
+                                                    Inactive
+                                                @elseif($company->status == 3)
+                                                    Block
+                                                @else
+                                                    Inactive
+                                                @endif
                                             </span>
                                             @if ($company->website)
-                                                <p class="d-inline-flex align-items-center mb-0 me-3">
+                                                <p
+                                                    class="d-inline-flex
+                                                align-items-center mb-0 me-3">
                                                     <i class="ti ti-world text-warning me-1"></i> {{ $company->website }}
                                                 </p>
                                             @endif
@@ -161,8 +172,18 @@
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">Status</h6>
                                         <p><span
-                                                class="badge {{ $company->status == 'active' ? 'badge-soft-success' : 'badge-soft-danger' }}">
-                                                {{ $company->status == 'active' ? 'Active' : 'Inactive' }}
+                                                class="badge {{ $company->status == 0 ? 'badge-soft-danger' : ($company->status == 1 ? 'badge-soft-success' : ($company->status == 2 ? 'badge-soft-danger' : ($company->status == 3 ? 'badge-soft-warning' : 'badge-soft-danger'))) }}">
+                                                @if ($company->status == 0)
+                                                    Delete
+                                                @elseif($company->status == 1)
+                                                    Active
+                                                @elseif($company->status == 2)
+                                                    Inactive
+                                                @elseif($company->status == 3)
+                                                    Block
+                                                @else
+                                                    Inactive
+                                                @endif
                                             </span></p>
                                     </div>
                                 </div>
@@ -172,7 +193,8 @@
                 </div>
 
                 <!-- Company Statistics -->
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6
+                                                mb-4">
                     <div class="card">
                         <div class="card-header">
                             <h5 class="card-title mb-0">Company Statistics</h5>
@@ -182,30 +204,36 @@
                                 <div class="col-md-6">
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">Locations</h6>
-                                        <p class="h4 text-primary">{{ $company->locations->count() }}</p>
+                                        <p class="h4 text-primary">
+                                            {{ $company->locations->count() }}</p>
                                     </div>
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">Addresses</h6>
-                                        <p class="h4 text-success">{{ $company->addresses->count() }}</p>
+                                        <p class="h4 text-success">
+                                            {{ $company->addresses->count() }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">Contacts</h6>
-                                        <p class="h4 text-warning">{{ $company->contacts->count() }}</p>
+                                        <p class="h4 text-warning">
+                                            {{ $company->contacts->count() }}</p>
                                     </div>
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">Notes</h6>
-                                        <p class="h4 text-info">{{ $company->notes->count() }}</p>
+                                        <p class="h4 text-info">{{ $company->notes->count() }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                             <div class="mt-3">
                                 <h6 class="fw-semibold">Created</h6>
-                                <p class="text-muted">{{ $company->created_at->format('d M Y, h:i A') }}</p>
+                                <p class="text-muted">
+                                    {{ $company->created_at->format('d M Y, h:i A') }}</p>
                                 @if ($company->updated_at)
                                     <h6 class="fw-semibold">Last Updated</h6>
-                                    <p class="text-muted">{{ $company->updated_at->format('d M Y, h:i A') }}</p>
+                                    <p class="text-muted">
+                                        {{ $company->updated_at->format('d M Y, h:i A') }}</p>
                                 @endif
                             </div>
                         </div>
@@ -220,7 +248,8 @@
                     <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Locations ({{ $company->locations->count() }})</h5>
+                                <h5 class="card-title mb-0">Locations
+                                    ({{ $company->locations->count() }})</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -229,13 +258,15 @@
                                             <div class="border rounded p-3">
                                                 <h6 class="fw-semibold">{{ $location->name }}</h6>
                                                 <p class="mb-1"><i
-                                                        class="ti ti-mail text-info me-2"></i>{{ $location->email }}</p>
+                                                        class="ti ti-mail text-info me-2"></i>{{ $location->email }}
+                                                </p>
                                                 <p class="mb-1"><i
                                                         class="ti ti-map-pin text-warning me-2"></i>{{ $location->address }}
                                                 </p>
                                                 <p class="mb-0"><i
                                                         class="ti ti-building text-success me-2"></i>{{ $location->city }},
-                                                    {{ $location->state }}, {{ $location->country }}</p>
+                                                    {{ $location->state }}, {{ $location->country }}
+                                                </p>
                                             </div>
                                         </div>
                                     @endforeach
@@ -250,7 +281,8 @@
                     <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Addresses ({{ $company->addresses->count() }})</h5>
+                                <h5 class="card-title mb-0">Addresses
+                                    ({{ $company->addresses->count() }})</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -279,7 +311,8 @@
                     <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Contacts ({{ $company->contacts->count() }})</h5>
+                                <h5 class="card-title mb-0">Contacts
+                                    ({{ $company->contacts->count() }})</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -287,13 +320,15 @@
                                         <div class="col-md-6 mb-3">
                                             <div class="border rounded p-3">
                                                 <div class="d-flex align-items-center mb-2">
-                                                    <h6 class="fw-semibold mb-0">{{ $contact->name }}</h6>
+                                                    <h6 class="fw-semibold mb-0">{{ $contact->name }}
+                                                    </h6>
                                                     @if ($contact->is_primary)
                                                         <span class="badge badge-soft-primary ms-2">Primary</span>
                                                     @endif
                                                 </div>
                                                 <p class="mb-1"><i class="ti ti-mail text-info me-2"></i><a
-                                                        href="mailto:{{ $contact->email }}">{{ $contact->email }}</a></p>
+                                                        href="mailto:{{ $contact->email }}">{{ $contact->email }}</a>
+                                                </p>
                                                 <p class="mb-1"><i
                                                         class="ti ti-phone text-success me-2"></i>{{ $contact->phone }}
                                                 </p>
@@ -314,7 +349,8 @@
                     <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Notes ({{ $company->notes->count() }})</h5>
+                                <h5 class="card-title mb-0">Notes ({{ $company->notes->count() }})
+                                </h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -323,7 +359,19 @@
                                             <div class="border rounded p-3">
                                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                                     <span
-                                                        class="badge {{ $note->status == 'active' ? 'badge-soft-success' : 'badge-soft-danger' }}">{{ $note->status == 'active' ? 'Active' : 'Inactive' }}</span>
+                                                        class="badge {{ $note->status == 1 ? 'badge-soft-success' : ($note->status == 2 ? 'badge-soft-warning' : ($note->status == 3 ? 'badge-soft-danger' : 'badge-soft-secondary')) }}">
+                                                        @if ($note->status == 0)
+                                                            Delete
+                                                        @elseif($note->status == 1)
+                                                            Active
+                                                        @elseif($note->status == 2)
+                                                            Inactive
+                                                        @elseif($note->status == 3)
+                                                            Block
+                                                        @else
+                                                            Unknown
+                                                        @endif
+                                                    </span>
                                                     <small
                                                         class="text-muted">{{ $note->created_at->format('d M Y, h:i A') }}</small>
                                                 </div>
@@ -409,11 +457,21 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status" id="edit-status">
+                                                        <option value="delete"
+                                                            {{ $company->status == 0 ? 'selected' : '' }}>
+                                                            Delete
+                                                        </option>
                                                         <option value="active"
-                                                            {{ $company->status == 'active' ? 'selected' : '' }}>Active
+                                                            {{ $company->status == 1 ? 'selected' : '' }}>
+                                                            Active
                                                         </option>
                                                         <option value="inactive"
-                                                            {{ $company->status == 'inactive' ? 'selected' : '' }}>Inactive
+                                                            {{ $company->status == 2 ? 'selected' : '' }}>
+                                                            Inactive
+                                                        </option>
+                                                        <option value="block"
+                                                            {{ $company->status == 3 ? 'selected' : '' }}>
+                                                            Block
                                                         </option>
                                                     </select>
                                                 </div>
@@ -446,7 +504,8 @@
                                                         @foreach (\App\Models\Location::where('status', 1)->get() as $location)
                                                             <option value="{{ $location->id }}"
                                                                 {{ $company->locations->contains($location->id) ? 'selected' : '' }}>
-                                                                {{ $location->name }} - {{ $location->city }},
+                                                                {{ $location->name }} -
+                                                                {{ $location->city }},
                                                                 {{ $location->country }}
                                                             </option>
                                                         @endforeach
@@ -481,33 +540,43 @@
                                                                     <div class="col-md-3">
                                                                         <select class="form-select"
                                                                             name="addresses[{{ $index }}][type]">
-                                                                            <option value="">Select Type</option>
-                                                                            <option value="Head Office"
-                                                                                {{ $address->type == 'Head Office' ? 'selected' : '' }}>
+                                                                            <option value="">
+                                                                                Select Type</option>
+                                                                            <option value="head office"
+                                                                                {{ $address->type == 'head office' ? 'selected' : '' }}>
                                                                                 Head Office</option>
-                                                                            <option value="Branch"
-                                                                                {{ $address->type == 'Branch' ? 'selected' : '' }}>
+                                                                            <option value="branch"
+                                                                                {{ $address->type == 'branch' ? 'selected' : '' }}>
                                                                                 Branch</option>
-                                                                            <option value="Office"
-                                                                                {{ $address->type == 'Office' ? 'selected' : '' }}>
+                                                                            <option value="office"
+                                                                                {{ $address->type == 'office' ? 'selected' : '' }}>
                                                                                 Office</option>
-                                                                            <option value="Warehouse"
-                                                                                {{ $address->type == 'Warehouse' ? 'selected' : '' }}>
+                                                                            <option value="warehouse"
+                                                                                {{ $address->type == 'warehouse' ? 'selected' : '' }}>
                                                                                 Warehouse</option>
-                                                                            <option value="Factory"
-                                                                                {{ $address->type == 'Factory' ? 'selected' : '' }}>
+                                                                            <option value="factory"
+                                                                                {{ $address->type == 'factory' ? 'selected' : '' }}>
                                                                                 Factory</option>
-                                                                            <option value="Store"
-                                                                                {{ $address->type == 'Store' ? 'selected' : '' }}>
+                                                                            <option value="store"
+                                                                                {{ $address->type == 'store' ? 'selected' : '' }}>
                                                                                 Store</option>
-                                                                            <option value="Billing"
-                                                                                {{ $address->type == 'Billing' ? 'selected' : '' }}>
+                                                                            <option value="billing"
+                                                                                {{ $address->type == 'billing' ? 'selected' : '' }}>
                                                                                 Billing</option>
-                                                                            <option value="Shipping"
-                                                                                {{ $address->type == 'Shipping' ? 'selected' : '' }}>
+                                                                            <option value="shipping"
+                                                                                {{ $address->type == 'shipping' ? 'selected' : '' }}>
                                                                                 Shipping</option>
-                                                                            <option value="Other"
-                                                                                {{ $address->type == 'Other' ? 'selected' : '' }}>
+                                                                            <option value="home"
+                                                                                {{ $address->type == 'home' ? 'selected' : '' }}>
+                                                                                Home</option>
+                                                                            <option value="mailing"
+                                                                                {{ $address->type == 'mailing' ? 'selected' : '' }}>
+                                                                                Mailing</option>
+                                                                            <option value="corporate"
+                                                                                {{ $address->type == 'corporate' ? 'selected' : '' }}>
+                                                                                Corporate</option>
+                                                                            <option value="other"
+                                                                                {{ $address->type == 'other' ? 'selected' : '' }}>
                                                                                 Other</option>
                                                                         </select>
                                                                     </div>
@@ -544,6 +613,11 @@
                                                                             placeholder="Zip Code">
                                                                     </div>
                                                                 </div>
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger mt-2"
+                                                                    onclick="this.parentElement.remove()">
+                                                                    <i class="ti ti-trash me-1"></i>Remove
+                                                                </button>
                                                             </div>
                                                         @endforeach
                                                     </div>
@@ -615,6 +689,11 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger mt-2"
+                                                                    onclick="this.parentElement.remove()">
+                                                                    <i class="ti ti-trash me-1"></i>Remove
+                                                                </button>
                                                             </div>
                                                         @endforeach
                                                     </div>
@@ -654,15 +733,26 @@
                                                                     <div class="col-md-3">
                                                                         <select class="form-select"
                                                                             name="notes[{{ $index }}][status]">
-                                                                            <option value="active"
-                                                                                {{ $note->status == 'active' ? 'selected' : '' }}>
+                                                                            <option value="0"
+                                                                                {{ $note->status == 0 ? 'selected' : '' }}>
+                                                                                Delete</option>
+                                                                            <option value="1"
+                                                                                {{ $note->status == 1 ? 'selected' : '' }}>
                                                                                 Active</option>
-                                                                            <option value="inactive"
-                                                                                {{ $note->status == 'inactive' ? 'selected' : '' }}>
+                                                                            <option value="2"
+                                                                                {{ $note->status == 2 ? 'selected' : '' }}>
                                                                                 Inactive</option>
+                                                                            <option value="3"
+                                                                                {{ $note->status == 3 ? 'selected' : '' }}>
+                                                                                Block</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger mt-2"
+                                                                    onclick="this.parentElement.remove()">
+                                                                    <i class="ti ti-trash me-1"></i>Remove
+                                                                </button>
                                                             </div>
                                                         @endforeach
                                                     </div>
@@ -688,7 +778,8 @@
                         <div class="d-flex align-items-center justify-content-end">
                             <button type="button" data-bs-dismiss="offcanvas"
                                 class="btn btn-sm btn-light me-2">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-primary">Update Company</button>
+                            <button type="submit" class="btn btn-sm btn-primary">Update
+                                Company</button>
                         </div>
                     </form>
                 </div>
@@ -867,278 +958,5 @@
         }
     </style>
 
-    <!-- The inline script has been moved to company-show.js -->
-    <script>
-        $(document).ready(function() {
-            // Initialize Select2 with proper configuration
-            $('.select2-multiple').each(function() {
-                $(this).select2({
-                    theme: 'default',
-                    width: '100%',
-                    placeholder: 'Choose locations...',
-                    allowClear: true,
-                    closeOnSelect: false,
-                    tags: false,
-                    tokenSeparators: [',', ' '],
-                    language: {
-                        noResults: function() {
-                            return "No locations found";
-                        },
-                        searching: function() {
-                            return "Searching...";
-                        }
-                    }
-                });
-            });
-
-            // Re-initialize Select2 after dynamic content is added
-            $(document).on('shown.bs.offcanvas', function() {
-                $('.select2-multiple').each(function() {
-                    if (!$(this).hasClass('select2-hidden-accessible')) {
-                        $(this).select2({
-                            theme: 'default',
-                            width: '100%',
-                            placeholder: 'Choose locations...',
-                            allowClear: true,
-                            closeOnSelect: false,
-                            tags: false,
-                            tokenSeparators: [',', ' ']
-                        });
-                    }
-                });
-            });
-
-            // Handle form submission for editing company
-            $('#edit-company-form').on('submit', function(e) {
-                e.preventDefault();
-
-                // Get form data and action URL
-                const formData = $(this).serialize();
-                const actionUrl = $(this).attr('action');
-
-                // Disable submit button to prevent double submission
-                var submitBtn = $(this).find('button[type="submit"]');
-                var originalBtnText = submitBtn.html();
-                submitBtn.html('Updating...').prop('disabled', true);
-
-                $.ajax({
-                    url: actionUrl,
-                    type: 'PUT',
-                    data: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            // Show success message
-                            $('#edit-form-alert').removeClass('alert-danger').addClass(
-                                'alert-success');
-                            $('#edit-form-alert').html(
-                                'Company updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
-                            );
-                            $('#edit-form-alert').show();
-
-                            // Update the page content with the new company data
-                            updateCompanyDetails(response.company);
-
-                            // Close the offcanvas after a delay (matching Index page behavior)
-                            setTimeout(function() {
-                                $('#offcanvas_edit').offcanvas('hide');
-                            }, 2000);
-                        } else {
-                            $('#edit-form-alert').removeClass('alert-success').addClass(
-                                'alert-danger');
-                            $('#edit-form-alert').html(
-                                `Failed to update company: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`
-                            );
-                            $('#edit-form-alert').show();
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Error updating company:', xhr);
-
-                        let errorMessage = 'Failed to update company. Please try again.';
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            errorMessage = '<ul>';
-                            for (const field in xhr.responseJSON.errors) {
-                                errorMessage += `<li>${xhr.responseJSON.errors[field][0]}</li>`;
-                            }
-                            errorMessage += '</ul>';
-                        }
-
-                        $('#edit-form-alert').removeClass('alert-success').addClass(
-                            'alert-danger');
-                        $('#edit-form-alert').html(
-                            `${errorMessage} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`
-                        );
-                        $('#edit-form-alert').show();
-                    },
-                    complete: function() {
-                        // Re-enable submit button
-                        submitBtn.html(originalBtnText).prop('disabled', false);
-                    }
-                });
-            });
-
-            // Function to update company details on the page without reloading
-            function updateCompanyDetails(company) {
-                // Update company name
-                $('h5.mb-1:contains("' + company.name + '")').text(company.name);
-
-                // Update industry
-                $('p.mb-2:contains("' + company.industry + '")').text(company.industry);
-
-                // Update status badge
-                const statusClass = company.status == 1 ? 'badge-soft-success' : 'badge-soft-danger';
-                const statusIcon = company.status == 1 ? 'ti-check' : 'ti-lock';
-                const statusText = company.status == 1 ? 'Active' : 'Inactive';
-                $('.badge:contains("Active"), .badge:contains("Inactive")').first()
-                    .removeClass('badge-soft-success badge-soft-danger')
-                    .addClass(statusClass)
-                    .html(`<i class="ti ${statusIcon} me-1"></i>${statusText}`);
-
-                // Update website, email, phone
-                if (company.website) {
-                    $('.d-inline-flex:contains("' + company.website + '")').html(
-                        `<i class="ti ti-world text-warning me-1"></i> ${company.website}`);
-                }
-                if (company.email) {
-                    $('.d-inline-flex:contains("' + company.website + '")').html(
-                        `<i class="ti ti-mail text-info me-1"></i> ${company.email}`);
-                }
-                if (company.phone) {
-                    $('.d-inline-flex:contains("' + company.phone + '")').html(
-                        `<i class="ti ti-phone text-success me-1"></i> ${company.phone}`);
-                }
-
-                // Update company overview section
-                $('.col-md-6 .mb-4:contains("Company Name") p').text(company.name);
-                $('.col-md-6 .mb-4:contains("Email Address") p a').text(company.email).attr('href', 'mailto:' +
-                    company.email);
-                $('.col-md-6 .mb-4:contains("Industry") p').text(company.industry);
-                $('.col-md-6 .mb-4:contains("Website") p').text(company.website);
-                $('.col-md-6 .mb-4:contains("Phone") p').text(company.phone);
-
-                // Update status in overview
-                $('.col-md-6 .mb-4:contains("Status") p span')
-                    .removeClass('badge-soft-success badge-soft-danger')
-                    .addClass(statusClass)
-                    .text(statusText);
-            }
-        });
-
-        // Function to add new address in edit form
-        function addEditAddress() {
-            const container = document.getElementById('edit-addresses-container');
-            const addressCount = container.children.length;
-
-            const addressHtml = `
-                <div class="address-item border rounded p-3 mb-2">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <select class="form-select" name="addresses[${addressCount}][type]" required>
-                                <option value="">Select Type</option>
-                                <option value="Head Office">Head Office</option>
-                                <option value="Branch">Branch</option>
-                                <option value="Office">Office</option>
-                                <option value="Warehouse">Warehouse</option>
-                                <option value="Factory">Factory</option>
-                                <option value="Store">Store</option>
-                                <option value="Billing">Billing</option>
-                                <option value="Shipping">Shipping</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="addresses[${addressCount}][address]" placeholder="Address">
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-md-3">
-                            <input type="text" class="form-control" name="addresses[${addressCount}][city]" placeholder="City">
-                        </div>
-                        <div class="col-md-3">
-                            <input type="text" class="form-control" name="addresses[${addressCount}][state]" placeholder="State">
-                        </div>
-                        <div class="col-md-3">
-                            <input type="text" class="form-control" name="addresses[${addressCount}][country]" placeholder="Country">
-                        </div>
-                        <div class="col-md-3">
-                            <input type="text" class="form-control" name="addresses[${addressCount}][zip_code]" placeholder="Zip Code">
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="this.parentElement.remove()">
-                        <i class="ti ti-trash me-1"></i>Remove
-                    </button>
-                </div>
-            `;
-
-            container.insertAdjacentHTML('beforeend', addressHtml);
-        }
-
-        // Function to add new contact in edit form
-        function addEditContact() {
-            const container = document.getElementById('edit-contacts-container');
-            const contactCount = container.children.length;
-
-            const contactHtml = `
-                <div class="contact-item border rounded p-3 mb-2">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <input type="text" class="form-control" name="contacts[${contactCount}][name]" placeholder="Contact Name">
-                        </div>
-                        <div class="col-md-4">
-                            <input type="email" class="form-control" name="contacts[${contactCount}][email]" placeholder="Email">
-                        </div>
-                        <div class="col-md-4">
-                            <input type="text" class="form-control" name="contacts[${contactCount}][phone]" placeholder="Phone">
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-md-8">
-                            <input type="text" class="form-control" name="contacts[${contactCount}][designation]" placeholder="Designation">
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="contacts[${contactCount}][is_primary]" value="1">
-                                <label class="form-check-label">Primary Contact</label>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="this.parentElement.remove()">
-                        <i class="ti ti-trash me-1"></i>Remove
-                    </button>
-                </div>
-            `;
-
-            container.insertAdjacentHTML('beforeend', contactHtml);
-        }
-
-        // Function to add new note in edit form
-        function addEditNote() {
-            const container = document.getElementById('edit-notes-container');
-            const noteCount = container.children.length;
-
-            const noteHtml = `
-                <div class="note-item border rounded p-3 mb-2">
-                    <div class="row">
-                        <div class="col-md-9">
-                            <textarea class="form-control" name="notes[${noteCount}][note]" rows="3" placeholder="Note content"></textarea>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" name="notes[${noteCount}][status]">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="this.parentElement.remove()">
-                        <i class="ti ti-trash me-1"></i>Remove
-                    </button>
-                </div>
-            `;
-
-            container.insertAdjacentHTML('beforeend', noteHtml);
-        }
-    </script>
+    <!-- All JavaScript functionality has been moved to company-show.js -->
 @endpush

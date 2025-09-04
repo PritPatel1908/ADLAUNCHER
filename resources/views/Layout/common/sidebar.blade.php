@@ -10,7 +10,8 @@
 
             <!-- Logo Small -->
             <a href="{{ route('dashboard') }}" class="logo-small">
-                <img src="{{ asset('assets/img/logo-small.svg') }}" alt="Logo">
+                {{-- <img src="{{ asset('assets/img/logo-small.svg') }}" alt="Logo"> --}}
+                A
             </a>
 
             <!-- Logo Dark -->
@@ -120,6 +121,9 @@
                         <li>
                             <a href="{{ route('area.index') }}"><i
                                     class="ti ti-building-factory"></i><span>Areas</span></a>
+                        </li>
+                        <li>
+                            <a href="{{ route('user.index') }}"><i class="ti ti-user"></i><span>Users</span></a>
                         </li>
                         <li>
                             <a href="{{ route('dashboard') }}"><i class="ti ti-chart-arcs"></i><span>Leads</span></a>

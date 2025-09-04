@@ -198,18 +198,34 @@
                                                         <div class="mb-2">
                                                             <div class="form-check mb-2">
                                                                 <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-active" value="active"
+                                                                    type="checkbox" id="status-activate" value="1"
                                                                     data-column="status">
-                                                                <label class="form-check-label" for="status-active">
-                                                                    Active
+                                                                <label class="form-check-label" for="status-activate">
+                                                                    Activate
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input status-filter"
+                                                                    type="checkbox" id="status-inactive" value="2"
+                                                                    data-column="status">
+                                                                <label class="form-check-label" for="status-inactive">
+                                                                    Inactive
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input status-filter"
+                                                                    type="checkbox" id="status-block" value="3"
+                                                                    data-column="status">
+                                                                <label class="form-check-label" for="status-block">
+                                                                    Block
                                                                 </label>
                                                             </div>
                                                             <div class="form-check">
                                                                 <input class="form-check-input status-filter"
-                                                                    type="checkbox" id="status-inactive" value="inactive"
+                                                                    type="checkbox" id="status-delete" value="0"
                                                                     data-column="status">
-                                                                <label class="form-check-label" for="status-inactive">
-                                                                    Inactive
+                                                                <label class="form-check-label" for="status-delete">
+                                                                    Delete
                                                                 </label>
                                                             </div>
                                                         </div>
@@ -452,8 +468,10 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status">
-                                                        <option value="active">Active</option>
-                                                        <option value="inactive">Inactive</option>
+                                                        <option value="1">Activate</option>
+                                                        <option value="2">Inactive</option>
+                                                        <option value="3">Block</option>
+                                                        <option value="0">Delete</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -579,8 +597,10 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" id="edit-status" name="status">
-                                                        <option value="active">Active</option>
-                                                        <option value="inactive">Inactive</option>
+                                                        <option value="1">Activate</option>
+                                                        <option value="2">Inactive</option>
+                                                        <option value="3">Block</option>
+                                                        <option value="0">Delete</option>
                                                     </select>
                                                 </div>
                                             </div>

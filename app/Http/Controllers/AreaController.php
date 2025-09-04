@@ -46,7 +46,7 @@ class AreaController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'code' => 'nullable|string|max:100',
-            'status' => 'nullable|string|in:active,inactive,1,0',
+            'status' => 'nullable|integer|in:0,1,2,3',
             'location_ids' => 'nullable|array',
             'location_ids.*' => 'exists:locations,id',
             'company_ids' => 'nullable|array',
@@ -55,7 +55,7 @@ class AreaController extends Controller
 
         // Set the created_by field to the current authenticated user's ID
         $validated['created_by'] = Auth::user()->id;
-        $validated['status'] = ($validated['status'] ?? 'active') === 'active' ? 1 : 0;
+        $validated['status'] = $validated['status'] ?? 1; // Default to Activate (1)
 
         // Create the area
         $area = Area::create($validated);
@@ -144,7 +144,7 @@ class AreaController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'code' => 'nullable|string|max:100',
-            'status' => 'nullable|string|in:active,inactive,1,0',
+            'status' => 'nullable|integer|in:0,1,2,3',
             'location_ids' => 'nullable|array',
             'location_ids.*' => 'exists:locations,id',
             'company_ids' => 'nullable|array',
@@ -153,7 +153,7 @@ class AreaController extends Controller
 
         // Set the updated_by field to the current authenticated user's ID
         $validated['updated_by'] = Auth::user()->id;
-        $validated['status'] = ($validated['status'] ?? 'active') === 'active' ? 1 : 0;
+        $validated['status'] = $validated['status'] ?? 1; // Default to Activate (1)
 
         // Update the area
         $area->update($validated);
@@ -258,10 +258,27 @@ class AreaController extends Controller
 
                 $query->where(function ($q) use ($statusFilter) {
                     foreach ($statusFilter as $status) {
-                        if (strtolower($status) === 'active') {
-                            $q->orWhere('status', 1);
-                        } else if (strtolower($status) === 'inactive') {
-                            $q->orWhere('status', 0);
+                        if (is_numeric($status)) {
+                            $q->orWhere('status', (int) $status);
+                        } else {
+                            // Handle text-based status filters
+                            switch (strtolower($status)) {
+                                case 'activate':
+                                case 'active':
+                                    $q->orWhere('status', 1);
+                                    break;
+                                case 'inactive':
+                                    $q->orWhere('status', 2);
+                                    break;
+                                case 'block':
+                                case 'blocked':
+                                    $q->orWhere('status', 3);
+                                    break;
+                                case 'delete':
+                                case 'deleted':
+                                    $q->orWhere('status', 0);
+                                    break;
+                            }
                         }
                     }
                 });
@@ -300,7 +317,8 @@ class AreaController extends Controller
                     'updated_by' => $area->updatedByUser ? $area->updatedByUser->name : 'N/A',
                     'created_at' => $area->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $area->updated_at->format('Y-m-d H:i:s'),
-                    'status' => $area->status == 1 ? 'Active' : 'Inactive',
+                    'status' => $area->status_text,
+                    'status_value' => $area->status,
                     'locations_count' => $area->locations->count(),
                     'companies_count' => $area->companies->count(),
                 ];

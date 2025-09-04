@@ -2,14 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Area extends Model
 {
     use HasFactory;
+
+    // Status constants
+    const STATUS_DELETE = 0;
+    const STATUS_ACTIVATE = 1;
+    const STATUS_INACTIVE = 2;
+    const STATUS_BLOCK = 3;
 
     /**
      * The attributes that are mass assignable.
@@ -31,8 +37,38 @@ class Area extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'status' => 'boolean',
+        'status' => 'integer',
     ];
+
+    /**
+     * Get the status text attribute
+     */
+    public function getStatusTextAttribute()
+    {
+        $status = (int) $this->status;
+        return match ($status) {
+            self::STATUS_ACTIVATE => 'Activate',
+            self::STATUS_INACTIVE => 'Inactive',
+            self::STATUS_BLOCK => 'Block',
+            self::STATUS_DELETE => 'Delete',
+            default => 'Unknown'
+        };
+    }
+
+    /**
+     * Get the status badge class attribute
+     */
+    public function getStatusBadgeClassAttribute()
+    {
+        $status = (int) $this->status;
+        return match ($status) {
+            self::STATUS_ACTIVATE => 'bg-success',
+            self::STATUS_INACTIVE => 'bg-warning',
+            self::STATUS_BLOCK => 'bg-danger',
+            self::STATUS_DELETE => 'bg-secondary',
+            default => 'bg-secondary'
+        };
+    }
 
     /**
      * Get the user who created this area.
