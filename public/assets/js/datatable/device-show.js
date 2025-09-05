@@ -23,8 +23,8 @@ $(document).ready(function () {
     // Reset form when offcanvas is opened
     $('#offcanvas_edit').on('show.bs.offcanvas', function () {
         // Reset submit button text and state
-        var submitBtn = $('#edit-user-form').find('button[type="submit"]');
-        submitBtn.html('Update User').prop('disabled', false);
+        var submitBtn = $('#edit-device-form').find('button[type="submit"]');
+        submitBtn.html('Update Device').prop('disabled', false);
 
         // Hide any previous alerts
         $('#edit-form-alert').hide();
@@ -47,8 +47,8 @@ $(document).ready(function () {
         });
     });
 
-    // Handle form submission for editing user
-    $('#edit-user-form').on('submit', function (e) {
+    // Handle form submission for editing device
+    $('#edit-device-form').on('submit', function (e) {
         e.preventDefault();
 
         // Get form data and action URL (map numeric status to backend strings)
@@ -79,6 +79,7 @@ $(document).ready(function () {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
+                console.log('Device update response:', response);
                 if (response.success) {
                     // Show success message using inner alert element (keeps background styles)
                     var $wrapper = $('#edit-form-alert');
@@ -88,11 +89,12 @@ $(document).ready(function () {
                         $alert = $wrapper.find('.alert');
                     }
                     $alert.removeClass('alert-danger').addClass('alert-success');
-                    $alert.html('User updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                    $alert.html('Device updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
                     $wrapper.show();
 
-                    // Update the page content with the new user data
-                    updateUserDetails(response.user);
+                    // Update the page content with the new device data
+                    console.log('Updating device details with:', response.device);
+                    updateDeviceDetails(response.device);
 
                     // Close the offcanvas after a delay (matching Index page behavior)
                     setTimeout(function () {
@@ -106,14 +108,14 @@ $(document).ready(function () {
                         $alert2 = $wrapper2.find('.alert');
                     }
                     $alert2.removeClass('alert-success').addClass('alert-danger');
-                    $alert2.html(`Failed to update user: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                    $alert2.html(`Failed to update device: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
                     $wrapper2.show();
                 }
             },
             error: function (xhr) {
-                console.error('Error updating user:', xhr);
+                console.error('Error updating device:', xhr);
 
-                let errorMessage = 'Failed to update user. Please try again.';
+                let errorMessage = 'Failed to update device. Please try again.';
                 if (xhr.responseJSON && xhr.responseJSON.errors) {
                     errorMessage = '<ul>';
                     for (const field in xhr.responseJSON.errors) {
@@ -139,31 +141,37 @@ $(document).ready(function () {
         });
     });
 
-    // Function to update user details on the page without reloading
-    function updateUserDetails(user) {
-        // Update user name
-        $('h5.mb-1:contains("' + user.full_name + '")').text(user.full_name);
+    // Function to update device details on the page without reloading
+    function updateDeviceDetails(device) {
+        console.log('updateDeviceDetails called with device:', device);
 
-        // Update username
-        $('p.mb-2:contains("' + user.username + '")').text(user.username);
+        // Update device name in the top red box section (Device Header Card)
+        const deviceNameElement = $('.card-body .d-flex .d-flex h5.mb-1');
+        console.log('Device name element found:', deviceNameElement.length);
+        deviceNameElement.text(device.name);
+
+        // Update unique ID in the top red box section
+        const uniqueIdElement = $('.card-body .d-flex .d-flex p.mb-2');
+        console.log('Unique ID element found:', uniqueIdElement.length);
+        uniqueIdElement.text(device.unique_id);
 
         // Update status badge
         var statusClass = 'badge-soft-secondary';
         var statusIcon = 'ti-circle';
         var statusText = 'Unknown';
-        if (user.status == 0) {
+        if (device.status == 0) {
             statusClass = 'badge-soft-secondary';
             statusIcon = 'ti-trash';
             statusText = 'Delete';
-        } else if (user.status == 1) {
+        } else if (device.status == 1) {
             statusClass = 'badge-soft-success';
             statusIcon = 'ti-check';
             statusText = 'Active';
-        } else if (user.status == 2) {
+        } else if (device.status == 2) {
             statusClass = 'badge-soft-warning';
             statusIcon = 'ti-player-pause';
-            statusText = 'Deactivate';
-        } else if (user.status == 3) {
+            statusText = 'Inactive';
+        } else if (device.status == 3) {
             statusClass = 'badge-soft-danger';
             statusIcon = 'ti-lock';
             statusText = 'Block';
@@ -174,32 +182,93 @@ $(document).ready(function () {
             .addClass(statusClass)
             .html(`<i class="ti ${statusIcon} me-1"></i>${statusText}`);
 
-        // Update email, mobile, employee_id
-        if (user.email) {
-            $('.d-inline-flex:contains("' + user.email + '")').html(
-                `<i class="ti ti-mail text-info me-1"></i> ${user.email}`);
-        }
-        if (user.mobile) {
-            $('.d-inline-flex:contains("' + user.mobile + '")').html(
-                `<i class="ti ti-phone text-success me-1"></i> ${user.mobile}`);
-        }
-        if (user.employee_id) {
-            $('.d-inline-flex:contains("' + user.employee_id + '")').html(
-                `<i class="ti ti-id text-warning me-1"></i> ${user.employee_id}`);
+        // Update IP address in the top red box section
+        const ipElement = $('.card-body .d-flex .d-flex .d-flex .d-inline-flex');
+        console.log('IP element found:', ipElement.length);
+        if (device.ip) {
+            ipElement.html(`<i class="ti ti-network text-info me-1"></i> ${device.ip}`);
+        } else {
+            ipElement.remove();
         }
 
-        // Update user overview section
-        $('.col-md-6 .mb-4:contains("Full Name") p').text(user.full_name);
-        $('.col-md-6 .mb-4:contains("Email Address") p a').text(user.email).attr('href', 'mailto:' + user.email);
-        $('.col-md-6 .mb-4:contains("Username") p').text(user.username);
-        $('.col-md-6 .mb-4:contains("Employee ID") p').text(user.employee_id || 'N/A');
-        $('.col-md-6 .mb-4:contains("Mobile") p').text(user.mobile || 'N/A');
+        // Update device overview section (green box)
+        const overviewSection = $('.card-header:contains("Device Overview")').next('.card-body');
+        console.log('Device Overview section found:', overviewSection.length);
+
+        overviewSection.find('.col-md-6 .mb-4:contains("Device Name") p').text(device.name);
+        overviewSection.find('.col-md-6 .mb-4:contains("Unique ID") p').text(device.unique_id);
+        overviewSection.find('.col-md-6 .mb-4:contains("IP Address") p').text(device.ip || 'N/A');
+        overviewSection.find('.col-md-6 .mb-4:contains("Company") p').text(device.company ? device.company.name : 'N/A');
+        overviewSection.find('.col-md-6 .mb-4:contains("Location") p').text(device.location ? device.location.name : 'N/A');
 
         // Update status in overview
         $('#overview-status-badge')
             .removeClass('badge-soft-success badge-soft-danger badge-soft-warning badge-soft-secondary')
             .addClass(statusClass)
             .text(statusText);
+
+        // Update Area in Device Information section
+        $('.card-header:contains("Device Information")').next('.card-body').find('.col-md-6 .mb-4:contains("Area") p').text(device.area ? device.area.name : 'N/A');
+
+        // Update Company Details section
+        if (device.company) {
+            console.log('Updating company details:', device.company);
+            // Update company name
+            $('.card-header:contains("Company Details")').next('.card-body').find('h6.fw-semibold').text(device.company.name);
+
+            // Update company industry
+            $('.card-header:contains("Company Details")').next('.card-body').find('.ti-building').parent().text(device.company.industry);
+
+            // Update company email
+            if (device.company.email) {
+                $('.card-header:contains("Company Details")').next('.card-body').find('.ti-mail').parent().text(device.company.email);
+            }
+
+            // Update company phone
+            if (device.company.phone) {
+                $('.card-header:contains("Company Details")').next('.card-body').find('.ti-phone').parent().text(device.company.phone);
+            }
+        } else {
+            // Hide company details section if no company
+            $('.card-header:contains("Company Details")').closest('.col-md-12').hide();
+        }
+
+        // Update Location Details section
+        if (device.location) {
+            console.log('Updating location details:', device.location);
+            // Update location name
+            $('.card-header:contains("Location Details")').next('.card-body').find('h6.fw-semibold').text(device.location.name);
+
+            // Update location email
+            $('.card-header:contains("Location Details")').next('.card-body').find('.ti-mail').parent().text(device.location.email);
+
+            // Update location address
+            $('.card-header:contains("Location Details")').next('.card-body').find('.ti-map-pin').parent().text(device.location.address);
+
+            // Update location city, state, country
+            $('.card-header:contains("Location Details")').next('.card-body').find('.ti-building').parent().text(device.location.city + ', ' + device.location.state + ', ' + device.location.country);
+        } else {
+            // Hide location details section if no location
+            $('.card-header:contains("Location Details")').closest('.col-md-12').hide();
+        }
+
+        // Update Area Details section
+        if (device.area) {
+            console.log('Updating area details:', device.area);
+            // Update area name
+            $('.card-header:contains("Area Details")').next('.card-body').find('h6.fw-semibold').text(device.area.name);
+
+            // Update area city, state
+            $('.card-header:contains("Area Details")').next('.card-body').find('.ti-map-pin').parent().text(device.area.city + ', ' + device.area.state);
+
+            // Update area description
+            if (device.area.description) {
+                $('.card-header:contains("Area Details")').next('.card-body').find('.ti-note').parent().text(device.area.description);
+            }
+        } else {
+            // Hide area details section if no area
+            $('.card-header:contains("Area Details")').closest('.col-md-12').hide();
+        }
     }
 
     // Function to add new address in edit form
@@ -356,4 +425,302 @@ $(document).ready(function () {
             console.log('Excel export functionality to be implemented');
         }
     });
+
+    // Device Layout Management Functions
+    // Load device layouts when layout management offcanvas is shown
+    $('#offcanvas_layout_management').on('show.bs.offcanvas', function () {
+        loadDeviceLayouts();
+        // Ensure inline alert container exists and is cleared
+        if ($('#layout-form-alert').length === 0) {
+            $('#layout-form').prepend('<div id="layout-form-alert" class="mb-3" style="display:none;"></div>');
+        } else {
+            $('#layout-form-alert').hide().empty();
+        }
+    });
+
+    // Handle layout form submission
+    $('#layout-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const layoutId = $('#layout-id').val();
+        const isEdit = layoutId !== '';
+
+        const url = isEdit ? `/device-layout/${layoutId}` : '/device-layout';
+
+        // Add _method field for PUT requests
+        if (isEdit) {
+            formData.append('_method', 'PUT');
+        }
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                // Prepare inline alert container inside the form
+                if ($('#layout-form-alert').length === 0) {
+                    $('#layout-form').prepend('<div id="layout-form-alert" class="mb-3" style="display:none;"></div>');
+                }
+
+                if (response.success) {
+                    // Inline success alert inside the form
+                    var $wrapper = $('#layout-form-alert');
+                    var $alert = $wrapper.find('.alert');
+                    if ($alert.length === 0) {
+                        $wrapper.html('<div class="alert alert-success alert-dismissible fade show" role="alert"></div>');
+                        $alert = $wrapper.find('.alert');
+                    }
+                    $alert.removeClass('alert-danger').addClass('alert-success');
+                    $alert.html(response.message + ' <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                    $wrapper.show();
+
+                    $('#layout-form')[0].reset();
+                    $('#layout-id').val('');
+                    $('#layout-submit-btn').text('Add Layout');
+                    $('#layout-cancel-btn').hide();
+                    $('#layout-form-title').text('Add New Layout');
+                    loadDeviceLayouts();
+
+                    // Close the offcanvas shortly after showing the message
+                    setTimeout(function () {
+                        $('#offcanvas_layout_management').offcanvas('hide');
+                    }, 1200);
+                } else {
+                    // Inline error alert inside the form
+                    var $wrapper2 = $('#layout-form-alert');
+                    var $alert2 = $wrapper2.find('.alert');
+                    if ($alert2.length === 0) {
+                        $wrapper2.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                        $alert2 = $wrapper2.find('.alert');
+                    }
+                    $alert2.removeClass('alert-success').addClass('alert-danger');
+                    $alert2.html((response.message || 'Something went wrong') + ' <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                    $wrapper2.show();
+                }
+            },
+            error: function (xhr) {
+                // Inline error alert inside the form
+                if ($('#layout-form-alert').length === 0) {
+                    $('#layout-form').prepend('<div id="layout-form-alert" class="mb-3" style="display:none;"></div>');
+                }
+                const response = xhr.responseJSON;
+                var $wrapper3 = $('#layout-form-alert');
+                var $alert3 = $wrapper3.find('.alert');
+                if ($alert3.length === 0) {
+                    $wrapper3.html('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                    $alert3 = $wrapper3.find('.alert');
+                }
+                $alert3.removeClass('alert-success').addClass('alert-danger');
+                $alert3.html(((response && response.message) ? response.message : 'An error occurred') + ' <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                $wrapper3.show();
+            }
+        });
+    });
+
+    // Handle edit layout button click
+    $(document).on('click', '.edit-layout-btn', function () {
+        const layoutId = $(this).data('layout-id');
+        const layoutName = $(this).data('layout-name');
+        const layoutType = $(this).data('layout-type');
+        const layoutStatus = $(this).data('layout-status');
+
+        $('#layout-id').val(layoutId);
+        $('#layout-name').val(layoutName);
+        $('#layout-type').val(layoutType);
+        $('#layout-status').val(layoutStatus);
+        $('#layout-submit-btn').text('Update Layout');
+        $('#layout-cancel-btn').show();
+        $('#layout-form-title').text('Edit Layout');
+
+        $('#offcanvas_layout_management').offcanvas('show');
+    });
+
+    // Handle delete layout button click
+    $(document).on('click', '.delete-layout-btn', function () {
+        const layoutId = $(this).data('layout-id');
+
+        if (confirm('Are you sure you want to delete this layout?')) {
+            $.ajax({
+                url: `/device-layout/${layoutId}`,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.success) {
+                        showAlert('success', response.message);
+                        loadDeviceLayouts();
+                    } else {
+                        showAlert('danger', response.message);
+                    }
+                },
+                error: function (xhr) {
+                    const response = xhr.responseJSON;
+                    showAlert('danger', response?.message || 'An error occurred');
+                }
+            });
+        }
+    });
+
+    // Handle cancel edit button
+    $('#layout-cancel-btn').on('click', function () {
+        $('#layout-form')[0].reset();
+        $('#layout-id').val('');
+        $('#layout-submit-btn').text('Add Layout');
+        $('#layout-cancel-btn').hide();
+        $('#layout-form-title').text('Add New Layout');
+    });
+
+    // Function to load device layouts
+    function loadDeviceLayouts() {
+        try {
+            const deviceId = $('#layout-device-id').val();
+            if (!deviceId) {
+                console.warn('Device ID not found for loading layouts');
+                return;
+            }
+
+            $.ajax({
+                url: `/device/${deviceId}/layouts`,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (!response || !response.success) {
+                        console.warn('Failed to load layouts');
+                        return;
+                    }
+
+                    const layouts = response.layouts || [];
+                    const counts = response.counts || { total: layouts.length, active: 0, inactive: 0, blocked: 0 };
+
+                    // Update counts in the Device Layouts card header
+                    const header = $(".card-header:contains('Device Layouts')");
+                    const badges = header.find('.d-flex .badge');
+                    // Total
+                    badges.filter(function () { return $(this).text().trim().startsWith('Total:'); })
+                        .text(`Total: ${counts.total}`);
+                    // Active
+                    badges.filter(function () { return $(this).text().trim().startsWith('Active:'); })
+                        .text(`Active: ${counts.active}`);
+                    // Inactive
+                    badges.filter(function () { return $(this).text().trim().startsWith('Inactive:'); })
+                        .text(`Inactive: ${counts.inactive}`);
+                    // Blocked
+                    badges.filter(function () { return $(this).text().trim().startsWith('Blocked:'); })
+                        .text(`Blocked: ${counts.blocked}`);
+
+                    // Target the card body of the Device Layouts section
+                    const cardBody = header.next('.card-body');
+
+                    if (layouts.length === 0) {
+                        const emptyHtml = `
+                            <div class="text-center py-4">
+                                <i class="ti ti-layout-grid text-muted" style="font-size: 3rem;"></i>
+                                <h6 class="text-muted mt-2">No layouts found</h6>
+                                <p class="text-muted">This device doesn't have any layouts configured yet.</p>
+                                <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_layout_management">
+                                    <i class="ti ti-plus me-1"></i>Add First Layout
+                                </button>
+                            </div>`;
+                        cardBody.html(emptyHtml);
+                        return;
+                    }
+
+                    // Build table rows
+                    const statusMap = {
+                        0: { class: 'badge-soft-secondary', icon: 'ti-trash', text: 'Delete' },
+                        1: { class: 'badge-soft-success', icon: 'ti-check', text: 'Active' },
+                        2: { class: 'badge-soft-warning', icon: 'ti-player-pause', text: 'Inactive' },
+                        3: { class: 'badge-soft-danger', icon: 'ti-lock', text: 'Block' }
+                    };
+
+                    const layoutTypeName = function (t) {
+                        if (t === 0) return 'Full Screen';
+                        if (t === 1) return 'Split Screen';
+                        if (t === 2) return 'Three Grid Screen';
+                        if (t === 3) return 'Four Grid Screen';
+                        return 'Unknown';
+                    };
+
+                    let rowsHtml = '';
+                    layouts.forEach(function (l) {
+                        const st = statusMap[l.status] || statusMap[0];
+                        const createdAt = l.created_at ? new Date(l.created_at).toLocaleString() : '';
+                        rowsHtml += `
+                            <tr>
+                                <td>${l.layout_name || ''}</td>
+                                <td><span class="badge badge-soft-info">${layoutTypeName(l.layout_type)}</span></td>
+                                <td><span class="badge ${st.class}"><i class="ti ${st.icon} me-1"></i>${st.text}</span></td>
+                                <td>${createdAt}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary edit-layout-btn" data-layout-id="${l.id}" data-layout-name="${l.layout_name}" data-layout-type="${l.layout_type}" data-layout-status="${l.status}">
+                                            <i class="ti ti-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-layout-btn" data-layout-id="${l.id}">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                    });
+
+                    const tableHtml = `
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Layout Name</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Created At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rowsHtml}</tbody>
+                            </table>
+                        </div>`;
+
+                    cardBody.html(tableHtml);
+                },
+                error: function () {
+                    console.error('Error fetching device layouts');
+                }
+            });
+        } catch (e) {
+            console.error('Failed to load device layouts:', e);
+        }
+    }
+
+    // Function to show alerts
+    function showAlert(type, message) {
+        const alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert" style="min-width: 300px; max-width: 500px;">
+                <i class="ti ti-${type === 'success' ? 'check-circle' : type === 'danger' ? 'alert-circle' : type === 'warning' ? 'alert-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+
+        // Remove existing alerts from alert container
+        $('#alert-container .alert').remove();
+
+        // Add new alert to the alert container
+        $('#alert-container').html(alertHtml);
+
+        // Auto-hide after 5 seconds
+        setTimeout(function () {
+            $('#alert-container .alert').fadeOut(500, function () {
+                $(this).remove();
+            });
+        }, 5000);
+    }
 });

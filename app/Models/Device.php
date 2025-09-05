@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Device extends Model
@@ -40,6 +41,14 @@ class Device extends Model
      */
     protected $casts = [
         'status' => 'integer',
+    ];
+
+    /**
+     * Append computed attributes when serializing the model.
+     */
+    protected $appends = [
+        'layouts_count',
+        'active_layouts_count',
     ];
 
     /**
@@ -80,5 +89,37 @@ class Device extends Model
     public function updatedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**
+     * Device layouts relation.
+     */
+    public function deviceLayouts(): HasMany
+    {
+        return $this->hasMany(DeviceLayout::class);
+    }
+
+    /**
+     * Get the count of active layouts for this device.
+     */
+    public function getActiveLayoutsCountAttribute(): int
+    {
+        return $this->deviceLayouts()->where('status', DeviceLayout::STATUS_ACTIVE)->count();
+    }
+
+    /**
+     * Get the count of all layouts for this device.
+     */
+    public function getLayoutsCountAttribute(): int
+    {
+        return $this->deviceLayouts()->count();
+    }
+
+    /**
+     * Get layouts by status.
+     */
+    public function getLayoutsByStatus(int $status): int
+    {
+        return $this->deviceLayouts()->where('status', $status)->count();
     }
 }

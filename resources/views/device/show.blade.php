@@ -23,12 +23,12 @@
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">User Details</h4>
+                    <h4 class="mb-1">Device Details</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('user.index') }}">Users</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">User Details</li>
+                            <li class="breadcrumb-item"><a href="{{ route('device.index') }}">Devices</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Device Details</li>
                         </ol>
                     </nav>
                 </div>
@@ -62,22 +62,22 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="mb-3">
-                        <a href="{{ route('user.index') }}"><i class="ti ti-arrow-narrow-left me-1"></i>Back to
-                            Users</a>
+                        <a href="{{ route('device.index') }}"><i class="ti ti-arrow-narrow-left me-1"></i>Back to
+                            Devices</a>
                     </div>
 
-                    <!-- User Header Card -->
+                    <!-- Device Header Card -->
                     <div class="card">
                         <div class="card-body pb-2">
                             <div class="d-flex align-items-center justify-content-between flex-wrap">
                                 <div class="d-flex align-items-center mb-2">
                                     <div class="avatar avatar-xxl avatar-rounded me-3 flex-shrink-0 bg-primary">
-                                        <span class="avatar-text">{{ substr($user->first_name, 0, 1) }}</span>
-                                        <span class="status {{ $user->status == 1 ? 'online' : 'offline' }}"></span>
+                                        <i class="ti ti-device-laptop"></i>
+                                        <span class="status {{ $device->status == 1 ? 'online' : 'offline' }}"></span>
                                     </div>
                                     <div>
-                                        <h5 class="mb-1">{{ $user->full_name }}</h5>
-                                        <p class="mb-2">{{ $user->username }}</p>
+                                        <h5 class="mb-1">{{ $device->name }}</h5>
+                                        <p class="mb-2">{{ $device->unique_id }}</p>
                                         <div class="d-flex align-items-center flex-wrap gap-2">
                                             @php
                                                 $statusMap = [
@@ -92,7 +92,7 @@
                                                         'icon' => 'ti-check',
                                                     ],
                                                     2 => [
-                                                        'text' => 'Deactivate',
+                                                        'text' => 'Inactive',
                                                         'class' => 'badge-soft-warning',
                                                         'icon' => 'ti-player-pause',
                                                     ],
@@ -102,7 +102,7 @@
                                                         'icon' => 'ti-lock',
                                                     ],
                                                 ];
-                                                $s = $statusMap[$user->status] ?? [
+                                                $s = $statusMap[$device->status] ?? [
                                                     'text' => 'Unknown',
                                                     'class' => 'badge-soft-secondary',
                                                     'icon' => 'ti-circle',
@@ -112,19 +112,9 @@
                                                 <i class="ti {{ $s['icon'] }} me-1"></i>
                                                 {{ $s['text'] }}
                                             </span>
-                                            @if ($user->email)
+                                            @if ($device->ip)
                                                 <p class="d-inline-flex align-items-center mb-0 me-3">
-                                                    <i class="ti ti-mail text-info me-1"></i> {{ $user->email }}
-                                                </p>
-                                            @endif
-                                            @if ($user->mobile)
-                                                <p class="d-inline-flex align-items-center mb-0 me-3">
-                                                    <i class="ti ti-phone text-success me-1"></i> {{ $user->mobile }}
-                                                </p>
-                                            @endif
-                                            @if ($user->employee_id)
-                                                <p class="d-inline-flex align-items-center mb-0">
-                                                    <i class="ti ti-id text-warning me-1"></i> {{ $user->employee_id }}
+                                                    <i class="ti ti-network text-info me-1"></i> {{ $device->ip }}
                                                 </p>
                                             @endif
                                         </div>
@@ -133,13 +123,14 @@
                                 <div class="d-flex align-items-center flex-wrap gap-2">
                                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                                         data-bs-target="#offcanvas_edit">
-                                        <i class="ti ti-edit me-1"></i>Edit User
+                                        <i class="ti ti-edit me-1"></i>Edit Device
                                     </a>
-                                    <form action="{{ route('user.destroy', $user->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('device.destroy', $device->id) }}" method="POST"
+                                        class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger"
-                                            onclick="return confirm('Are you sure you want to delete this user?')">
+                                            onclick="return confirm('Are you sure you want to delete this device?')">
                                             <i class="ti ti-trash me-1"></i>Delete
                                         </button>
                                     </form>
@@ -150,43 +141,43 @@
                 </div>
             </div>
 
-            <!-- User Information Cards -->
+            <!-- Device Information Cards -->
             <div class="row">
-                <!-- User Overview -->
+                <!-- Device Overview -->
                 <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">User Overview</h5>
+                            <h5 class="card-title mb-0">Device Overview</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">Full Name</h6>
-                                        <p>{{ $user->full_name }}</p>
+                                        <h6 class="fw-semibold">Device Name</h6>
+                                        <p>{{ $device->name }}</p>
                                     </div>
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">Email Address</h6>
-                                        <p><a href="mailto:{{ $user->email }}">{{ $user->email }}</a></p>
+                                        <h6 class="fw-semibold">Unique ID</h6>
+                                        <p>{{ $device->unique_id }}</p>
                                     </div>
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">Username</h6>
-                                        <p>{{ $user->username }}</p>
+                                        <h6 class="fw-semibold">IP Address</h6>
+                                        <p>{{ $device->ip ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">Employee ID</h6>
-                                        <p>{{ $user->employee_id ?? 'N/A' }}</p>
+                                        <h6 class="fw-semibold">Company</h6>
+                                        <p>{{ $device->company ? $device->company->name : 'N/A' }}</p>
                                     </div>
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">Mobile</h6>
-                                        <p>{{ $user->mobile ?? 'N/A' }}</p>
+                                        <h6 class="fw-semibold">Location</h6>
+                                        <p>{{ $device->location ? $device->location->name : 'N/A' }}</p>
                                     </div>
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">Status</h6>
                                         @php
-                                            $s2 = $statusMap[$user->status] ?? [
+                                            $s2 = $statusMap[$device->status] ?? [
                                                 'text' => 'Unknown',
                                                 'class' => 'badge-soft-secondary',
                                             ];
@@ -200,43 +191,46 @@
                     </div>
                 </div>
 
-                <!-- User Statistics -->
+                <!-- Device Statistics -->
                 <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">User Statistics</h5>
+                            <h5 class="card-title mb-0">Device Information</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">Companies</h6>
-                                        <p class="h4 text-primary">{{ $user->companies->count() }}</p>
+                                        <h6 class="fw-semibold">Area</h6>
+                                        <p class="h4 text-primary">{{ $device->area ? $device->area->name : 'N/A' }}</p>
                                     </div>
+                                    {{-- <div class="mb-4">
+                                        <h6 class="fw-semibold">Layouts Count</h6>
+                                        <div class="d-flex gap-2">
+                                            <span class="badge badge-soft-primary fs-6">Total: {{ $device->layouts_count }}</span>
+                                            <span class="badge badge-soft-success fs-6">Active: {{ $device->active_layouts_count }}</span>
+                                        </div>
+                                    </div> --}}
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">Locations</h6>
-                                        <p class="h4 text-success">{{ $user->locations->count() }}</p>
+                                        <h6 class="fw-semibold">Created By</h6>
+                                        <p class="h4 text-success">
+                                            {{ $device->createdByUser ? $device->createdByUser->full_name : 'N/A' }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-4">
-                                        <h6 class="fw-semibold">Areas</h6>
-                                        <p class="h4 text-warning">{{ $user->areas->count() }}</p>
-                                    </div>
-                                    <div class="mb-4">
-                                        <h6 class="fw-semibold">Last Login</h6>
-                                        <p class="h4 text-info">
-                                            {{ $user->last_login_at ? $user->last_login_at->format('d M Y') : 'Never' }}
-                                        </p>
+                                        <h6 class="fw-semibold">Updated By</h6>
+                                        <p class="h4 text-warning">
+                                            {{ $device->updatedByUser ? $device->updatedByUser->full_name : 'N/A' }}</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="mt-3">
                                 <h6 class="fw-semibold">Created</h6>
-                                <p class="text-muted">{{ $user->created_at->format('d M Y, h:i A') }}</p>
-                                @if ($user->updated_at)
+                                <p class="text-muted">{{ $device->created_at->format('d M Y, h:i A') }}</p>
+                                @if ($device->updated_at)
                                     <h6 class="fw-semibold">Last Updated</h6>
-                                    <p class="text-muted">{{ $user->updated_at->format('d M Y, h:i A') }}</p>
+                                    <p class="text-muted">{{ $device->updated_at->format('d M Y, h:i A') }}</p>
                                 @endif
                             </div>
                         </div>
@@ -244,97 +238,205 @@
                 </div>
             </div>
 
-            <!-- User Details Sections -->
+            <!-- Device Layouts Section -->
             <div class="row">
-                <!-- Companies -->
-                @if ($user->companies->count() > 0)
-                    <div class="col-md-12 mb-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Companies ({{ $user->companies->count() }})</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    @foreach ($user->companies as $company)
-                                        <div class="col-md-6 mb-3">
-                                            <div class="border rounded p-3">
-                                                <h6 class="fw-semibold">{{ $company->name }}</h6>
-                                                <p class="mb-1"><i
-                                                        class="ti ti-building text-info me-2"></i>{{ $company->industry }}
-                                                </p>
-                                                @if ($company->email)
-                                                    <p class="mb-1"><i
-                                                            class="ti ti-mail text-warning me-2"></i>{{ $company->email }}
-                                                    </p>
-                                                @endif
-                                                @if ($company->phone)
-                                                    <p class="mb-0"><i
-                                                            class="ti ti-phone text-success me-2"></i>{{ $company->phone }}
-                                                    </p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5 class="card-title mb-0">Device Layouts</h5>
+                                <div class="d-flex gap-2 mt-1">
+                                    <span class="badge badge-soft-primary">Total: {{ $device->layouts_count }}</span>
+                                    <span class="badge badge-soft-success">Active: {{ $device->active_layouts_count }}</span>
+                                    <span class="badge badge-soft-warning">Inactive: {{ $device->getLayoutsByStatus(2) }}</span>
+                                    <span class="badge badge-soft-danger">Blocked: {{ $device->getLayoutsByStatus(3) }}</span>
                                 </div>
                             </div>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvas_layout_management">
+                                <i class="ti ti-plus me-1"></i>Add Layout
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            @if ($device->deviceLayouts->count() > 0)
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Layout Name</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Created At</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($device->deviceLayouts as $layout)
+                                                <tr>
+                                                    <td>{{ $layout->layout_name }}</td>
+                                                    <td>
+                                                        <span class="badge badge-soft-info">
+                                                            {{ $layout->layout_type_name }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $statusMap = [
+                                                                0 => [
+                                                                    'class' => 'badge-soft-secondary',
+                                                                    'icon' => 'ti-trash',
+                                                                    'text' => 'Delete',
+                                                                ],
+                                                                1 => [
+                                                                    'class' => 'badge-soft-success',
+                                                                    'icon' => 'ti-check',
+                                                                    'text' => 'Active',
+                                                                ],
+                                                                2 => [
+                                                                    'class' => 'badge-soft-warning',
+                                                                    'icon' => 'ti-player-pause',
+                                                                    'text' => 'Inactive',
+                                                                ],
+                                                                3 => [
+                                                                    'class' => 'badge-soft-danger',
+                                                                    'icon' => 'ti-lock',
+                                                                    'text' => 'Block',
+                                                                ],
+                                                            ];
+                                                            $s = $statusMap[$layout->status] ?? [
+                                                                'class' => 'badge-soft-secondary',
+                                                                'icon' => 'ti-circle',
+                                                                'text' => 'Unknown',
+                                                            ];
+                                                        @endphp
+                                                        <span class="badge {{ $s['class'] }}">
+                                                            <i
+                                                                class="ti {{ $s['icon'] }} me-1"></i>{{ $s['text'] }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ $layout->created_at->format('d M Y, h:i A') }}</td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <button class="btn btn-sm btn-outline-primary edit-layout-btn"
+                                                                data-layout-id="{{ $layout->id }}"
+                                                                data-layout-name="{{ $layout->layout_name }}"
+                                                                data-layout-type="{{ $layout->layout_type }}"
+                                                                data-layout-status="{{ $layout->status }}">
+                                                                <i class="ti ti-edit"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger delete-layout-btn"
+                                                                data-layout-id="{{ $layout->id }}">
+                                                                <i class="ti ti-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center py-4">
+                                    <i class="ti ti-layout-grid text-muted" style="font-size: 3rem;"></i>
+                                    <h6 class="text-muted mt-2">No layouts found</h6>
+                                    <p class="text-muted">This device doesn't have any layouts configured yet.</p>
+                                    <button class="btn btn-primary" data-bs-toggle="offcanvas"
+                                        data-bs-target="#offcanvas_layout_management">
+                                        <i class="ti ti-plus me-1"></i>Add First Layout
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     </div>
-                @endif
+                </div>
+            </div>
 
-                <!-- Locations -->
-                @if ($user->locations->count() > 0)
+            <!-- Device Details Sections -->
+            <div class="row">
+                <!-- Company Details -->
+                @if ($device->company)
                     <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Locations ({{ $user->locations->count() }})</h5>
+                                <h5 class="card-title mb-0">Company Details</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    @foreach ($user->locations as $location)
-                                        <div class="col-md-6 mb-3">
-                                            <div class="border rounded p-3">
-                                                <h6 class="fw-semibold">{{ $location->name }}</h6>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="border rounded p-3">
+                                            <h6 class="fw-semibold">{{ $device->company->name }}</h6>
+                                            <p class="mb-1"><i
+                                                    class="ti ti-building text-info me-2"></i>{{ $device->company->industry }}
+                                            </p>
+                                            @if ($device->company->email)
                                                 <p class="mb-1"><i
-                                                        class="ti ti-mail text-info me-2"></i>{{ $location->email }}</p>
-                                                <p class="mb-1"><i
-                                                        class="ti ti-map-pin text-warning me-2"></i>{{ $location->address }}
+                                                        class="ti ti-mail text-warning me-2"></i>{{ $device->company->email }}
                                                 </p>
+                                            @endif
+                                            @if ($device->company->phone)
                                                 <p class="mb-0"><i
-                                                        class="ti ti-building text-success me-2"></i>{{ $location->city }},
-                                                    {{ $location->state }}, {{ $location->country }}</p>
-                                            </div>
+                                                        class="ti ti-phone text-success me-2"></i>{{ $device->company->phone }}
+                                                </p>
+                                            @endif
                                         </div>
-                                    @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 @endif
 
-                <!-- Areas -->
-                @if ($user->areas->count() > 0)
+                <!-- Location Details -->
+                @if ($device->location)
                     <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Areas ({{ $user->areas->count() }})</h5>
+                                <h5 class="card-title mb-0">Location Details</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    @foreach ($user->areas as $area)
-                                        <div class="col-md-6 mb-3">
-                                            <div class="border rounded p-3">
-                                                <h6 class="fw-semibold">{{ $area->name }}</h6>
-                                                <p class="mb-1"><i
-                                                        class="ti ti-map-pin text-info me-2"></i>{{ $area->city }},
-                                                    {{ $area->state }}</p>
-                                                @if ($area->description)
-                                                    <p class="mb-0"><i
-                                                            class="ti ti-note text-warning me-2"></i>{{ $area->description }}
-                                                    </p>
-                                                @endif
-                                            </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="border rounded p-3">
+                                            <h6 class="fw-semibold">{{ $device->location->name }}</h6>
+                                            <p class="mb-1"><i
+                                                    class="ti ti-mail text-info me-2"></i>{{ $device->location->email }}
+                                            </p>
+                                            <p class="mb-1"><i
+                                                    class="ti ti-map-pin text-warning me-2"></i>{{ $device->location->address }}
+                                            </p>
+                                            <p class="mb-0"><i
+                                                    class="ti ti-building text-success me-2"></i>{{ $device->location->city }},
+                                                {{ $device->location->state }}, {{ $device->location->country }}</p>
                                         </div>
-                                    @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Area Details -->
+                @if ($device->area)
+                    <div class="col-md-12 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Area Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="border rounded p-3">
+                                            <h6 class="fw-semibold">{{ $device->area->name }}</h6>
+                                            <p class="mb-1"><i
+                                                    class="ti ti-map-pin text-info me-2"></i>{{ $device->area->city }},
+                                                {{ $device->area->state }}</p>
+                                            @if ($device->area->description)
+                                                <p class="mb-0"><i
+                                                        class="ti ti-note text-warning me-2"></i>{{ $device->area->description }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -345,17 +447,21 @@
     </div>
     <!-- End Content -->
 
-    <!-- Edit User Offcanvas -->
+    <!-- Edit Device Offcanvas -->
     <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_edit"
         aria-labelledby="offcanvas_edit_label">
         <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="offcanvas_edit_label">Edit User</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <h5 class="offcanvas-title" id="offcanvas_edit_label">Edit Device</h5>
+            <button type="button"
+                class="btn-close custom-btn-close border p-1 me-0 d-flex align-items-center justify-content-center rounded-circle"
+                data-bs-dismiss="offcanvas" aria-label="Close">
+                <i class="ti ti-x"></i>
+            </button>
         </div>
         <div class="offcanvas-body">
             <div class="card">
                 <div class="card-body">
-                    <form id="edit-user-form" method="POST" action="{{ route('user.update', $user->id) }}">
+                    <form id="edit-device-form" method="POST" action="{{ route('device.update', $device->id) }}">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="from_show" value="1">
@@ -365,8 +471,9 @@
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
                                         data-bs-toggle="collapse" data-bs-target="#basic">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-user-plus"></i></span>
-                                        Basic Info
+                                        <span class="avatar avatar-md rounded me-1"><i
+                                                class="ti ti-device-laptop"></i></span>
+                                        Device Info
                                     </a>
                                 </div>
                                 <div class="accordion-collapse collapse show" id="basic"
@@ -375,135 +482,51 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">First Name <span
+                                                    <label class="form-label">Name <span
                                                             class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" name="first_name"
-                                                        id="edit-first_name" value="{{ $user->first_name }}" required>
+                                                    <input type="text" class="form-control" name="name"
+                                                        id="edit-name" value="{{ $device->name }}" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Middle Name</label>
-                                                    <input type="text" class="form-control" name="middle_name"
-                                                        id="edit-middle_name" value="{{ $user->middle_name }}">
+                                                    <label class="form-label">Unique ID <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" name="unique_id"
+                                                        id="edit-unique_id" value="{{ $device->unique_id }}" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Last Name <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" name="last_name"
-                                                        id="edit-last_name" value="{{ $user->last_name }}" required>
+                                                    <label class="form-label">IP</label>
+                                                    <input type="text" class="form-control" name="ip"
+                                                        id="edit-ip" value="{{ $device->ip }}">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Email <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="email" class="form-control" name="email"
-                                                        id="edit-email" value="{{ $user->email }}" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Password</label>
-                                                    <input type="password" class="form-control" name="password"
-                                                        id="edit-password"
-                                                        placeholder="Leave blank to keep current password">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Mobile</label>
-                                                    <input type="text" class="form-control" name="mobile"
-                                                        id="edit-mobile" value="{{ $user->mobile }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Phone</label>
-                                                    <input type="text" class="form-control" name="phone"
-                                                        id="edit-phone" value="{{ $user->phone }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Employee ID</label>
-                                                    <input type="text" class="form-control" name="employee_id"
-                                                        id="edit-employee_id" value="{{ $user->employee_id }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Gender</label>
-                                                    <select class="form-select" name="gender" id="edit-gender">
-                                                        <option value="">Select Gender</option>
-                                                        <option value="1" {{ $user->gender == 1 ? 'selected' : '' }}>
-                                                            Male</option>
-                                                        <option value="2" {{ $user->gender == 2 ? 'selected' : '' }}>
-                                                            Female</option>
-                                                        <option value="3" {{ $user->gender == 3 ? 'selected' : '' }}>
-                                                            Other</option>
+                                                    <label class="form-label">Company</label>
+                                                    <select class="form-control select2" name="company_id"
+                                                        id="edit-company_id" data-toggle="select2">
+                                                        <option value="">Select company...</option>
+                                                        @foreach (\App\Models\Company::where('status', 1)->get() as $company)
+                                                            <option value="{{ $company->id }}"
+                                                                {{ $device->company_id == $company->id ? 'selected' : '' }}>
+                                                                {{ $company->name }} - {{ $company->industry }}
+                                                            </option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Date of Birth</label>
-                                                    <input type="date" class="form-control" name="date_of_birth"
-                                                        id="edit-date_of_birth" value="{{ $user->date_of_birth }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Date of Joining</label>
-                                                    <input type="date" class="form-control" name="date_of_joining"
-                                                        id="edit-date_of_joining" value="{{ $user->date_of_joining }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Status</label>
-                                                    <select class="form-select" name="status" id="edit-status">
-                                                        <option value="0" {{ $user->status == 0 ? 'selected' : '' }}>
-                                                            Delete</option>
-                                                        <option value="1" {{ $user->status == 1 ? 'selected' : '' }}>
-                                                            Active</option>
-                                                        <option value="2" {{ $user->status == 2 ? 'selected' : '' }}>
-                                                            Deactivate</option>
-                                                        <option value="3" {{ $user->status == 3 ? 'selected' : '' }}>
-                                                            Block</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Locations --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#locations">
-                                        <span class="avatar avatar-md rounded me-1"><i
-                                                class="ti ti-map-pin-cog"></i></span>
-                                        Locations
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="locations" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Locations</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="location_ids[]" id="edit-location_ids"
-                                                        data-toggle="select2" multiple="multiple"
-                                                        data-placeholder="Choose locations...">
+                                                    <label class="form-label">Location</label>
+                                                    <select class="form-control select2" name="location_id"
+                                                        id="edit-location_id" data-toggle="select2">
+                                                        <option value="">Select location...</option>
                                                         @foreach (\App\Models\Location::where('status', 1)->get() as $location)
                                                             <option value="{{ $location->id }}"
-                                                                {{ $user->locations->contains($location->id) ? 'selected' : '' }}>
+                                                                {{ $device->location_id == $location->id ? 'selected' : '' }}>
                                                                 {{ $location->name }} - {{ $location->city }},
                                                                 {{ $location->country }}
                                                             </option>
@@ -511,64 +534,15 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Companies --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#companies">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-building"></i></span>
-                                        Companies
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="companies" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
+                                            <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Companies</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="company_ids[]" id="edit-company_ids" data-toggle="select2"
-                                                        multiple="multiple" data-placeholder="Choose companies...">
-                                                        @foreach (\App\Models\Company::where('status', 1)->get() as $company)
-                                                            <option value="{{ $company->id }}"
-                                                                {{ $user->companies->contains($company->id) ? 'selected' : '' }}>
-                                                                {{ $company->name }} - {{ $company->industry }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Areas --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#areas">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-map-pin"></i></span>
-                                        Areas
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="areas" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Areas</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="area_ids[]" id="edit-area_ids" data-toggle="select2"
-                                                        multiple="multiple" data-placeholder="Choose areas...">
+                                                    <label class="form-label">Area</label>
+                                                    <select class="form-control select2" name="area_id" id="edit-area_id"
+                                                        data-toggle="select2">
+                                                        <option value="">Select area...</option>
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
                                                             <option value="{{ $area->id }}"
-                                                                {{ $user->areas->contains($area->id) ? 'selected' : '' }}>
+                                                                {{ $device->area_id == $area->id ? 'selected' : '' }}>
                                                                 {{ $area->name }} - {{ $area->city }},
                                                                 {{ $area->state }}
                                                             </option>
@@ -576,16 +550,29 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Status</label>
+                                                    <select class="form-select" name="status" id="edit-status">
+                                                        <option value="0"
+                                                            {{ $device->status == 0 ? 'selected' : '' }}>Delete</option>
+                                                        <option value="1"
+                                                            {{ $device->status == 1 ? 'selected' : '' }}>Active</option>
+                                                        <option value="2"
+                                                            {{ $device->status == 2 ? 'selected' : '' }}>Inactive</option>
+                                                        <option value="3"
+                                                            {{ $device->status == 3 ? 'selected' : '' }}>Block</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-
-
                             <div id="edit-form-alert" class="col-12" style="display: none;">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    User updated successfully!
+                                    Device updated successfully!
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                                         aria-label="Close"></button>
                                 </div>
@@ -594,10 +581,62 @@
                         <div class="d-flex align-items-center justify-content-end">
                             <button type="button" data-bs-dismiss="offcanvas"
                                 class="btn btn-sm btn-light me-2">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-primary">Update User</button>
+                            <button type="submit" class="btn btn-sm btn-primary">Update Device</button>
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Layout Management Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas_layout_management">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Device Layout Management</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Add/Edit Layout Form -->
+            <div class="mb-4">
+                <h6 id="layout-form-title">Add New Layout</h6>
+                <form id="layout-form">
+                    @csrf
+                    <input type="hidden" id="layout-id" name="layout_id">
+                    <input type="hidden" id="layout-device-id" name="device_id" value="{{ $device->id }}">
+
+                    <div class="mb-3">
+                        <label for="layout-name" class="form-label">Layout Name</label>
+                        <input type="text" class="form-control" id="layout-name" name="layout_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="layout-type" class="form-label">Layout Type</label>
+                        <select class="form-select" id="layout-type" name="layout_type" required>
+                            <option value="">Select Layout Type</option>
+                            <option value="0">Full Screen</option>
+                            <option value="1">Split Screen</option>
+                            <option value="2">Three Grid Screen</option>
+                            <option value="3">Four Grid Screen</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="layout-status" class="form-label">Status</label>
+                        <select class="form-select" id="layout-status" name="status" required>
+                            <option value="">Select Status</option>
+                            <option value="0">Delete</option>
+                            <option value="1">Active</option>
+                            <option value="2">Inactive</option>
+                            <option value="3">Block</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="layout-submit-btn">Add Layout</button>
+                        <button type="button" class="btn btn-secondary" id="layout-cancel-btn"
+                            style="display: none;">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -605,141 +644,56 @@
 
 @push('js')
     <!-- Select2 CSS and JS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
+    <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}"></script>
 
-    <!-- User Show JS -->
-    <script src="{{ asset('assets/js/datatable/user-show.js') }}" type="text/javascript"></script>
+    <!-- Device Show JS -->
+    <script src="{{ asset('assets/js/datatable/device-show.js') }}" type="text/javascript"></script>
 
     <style>
-        /* Select2 Custom Styles - Perfect Design Match */
+        /* Select2 Custom Styles */
         .select2-container {
             width: 100% !important;
-            font-family: inherit !important;
         }
 
-        .select2-container--default .select2-selection--multiple {
+        .select2-container--default .select2-selection--single {
+            height: 38px !important;
             border: 1px solid #d1d3e2 !important;
             border-radius: 0.375rem !important;
-            min-height: 38px !important;
             padding: 0.375rem 0.75rem !important;
             background-color: #fff !important;
-            box-sizing: border-box !important;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
         }
 
-        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 6px !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            line-height: normal !important;
-            align-items: center !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            position: relative !important;
-            background-color: #f8f9fa !important;
-            border: 1px solid #dee2e6 !important;
-            border-radius: 0.25rem !important;
-            padding: 0.25rem 0.5rem !important;
-            margin: 0 !important;
-            font-size: 0.875rem !important;
-            line-height: 1.5 !important;
-            color: #495057 !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            font-weight: 400 !important;
-        }
-
-        /* Fix for duplicate cross symbols - hide default Select2 remove button */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            position: relative !important;
-            right: auto !important;
-            top: auto !important;
-            transform: none !important;
-            color: #6c757d !important;
-            font-weight: bold !important;
-            font-size: 0 !important;
-            /* Hide the default text */
-            line-height: 0 !important;
-            cursor: pointer !important;
-            border: none !important;
-            background: none !important;
-            padding: 0 !important;
-            margin: 0 0 0 0.25rem !important;
-            width: 16px !important;
-            height: 16px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            float: none !important;
-            text-decoration: none !important;
-            font-family: inherit !important;
-            overflow: hidden !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-            color: #dc3545 !important;
-        }
-
-        /* Show only our custom × symbol */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:before {
-            content: "×" !important;
-            font-size: 1.125rem !important;
-            line-height: 1 !important;
-            color: #6c757d !important;
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-        }
-
-        /* Hide any other potential × symbols or text */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:after,
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove span,
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove i {
-            display: none !important;
-            content: "" !important;
-        }
-
-        .select2-container--default .select2-search--inline {
-            margin: 0 !important;
-            padding: 0 !important;
-            flex: 1 !important;
-            min-width: 120px !important;
-        }
-
-        .select2-container--default .select2-search--inline .select2-search__field {
-            margin: 0 !important;
-            padding: 0 !important;
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
-            font-size: 0.875rem !important;
-            line-height: 1.5 !important;
-            width: 100% !important;
-            background: transparent !important;
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 26px !important;
+            padding-left: 0 !important;
+            padding-right: 20px !important;
             color: #495057 !important;
         }
 
-        .select2-container--default .select2-dropdown {
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #6c757d !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+            right: 8px !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #86b7fe !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        }
+
+        .select2-dropdown {
             border: 1px solid #d1d3e2 !important;
             border-radius: 0.375rem !important;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-            background-color: #fff !important;
-            z-index: 9999 !important;
-            margin-top: 2px !important;
         }
 
         .select2-container--default .select2-results__option {
             padding: 0.5rem 0.75rem !important;
             font-size: 0.875rem !important;
-            line-height: 1.5 !important;
-            color: #495057 !important;
         }
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
@@ -747,31 +701,50 @@
             color: white !important;
         }
 
-        .select2-container--default .select2-results__group {
-            font-weight: 600 !important;
-            color: #6c757d !important;
-            padding: 0.5rem 0.75rem 0.25rem !important;
-            font-size: 0.875rem !important;
-            background-color: #f8f9fa !important;
-        }
-
         .select2-container--default .select2-results__option[aria-selected=true] {
             background-color: #e9ecef !important;
             color: #495057 !important;
         }
-
-        /* Focus state */
-        .select2-container--default.select2-container--focus .select2-selection--multiple {
-            border-color: #86b7fe !important;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-        }
-
-        /* Placeholder styling */
-        .select2-container--default .select2-selection--multiple .select2-selection__placeholder {
-            color: #6c757d !important;
-            font-size: 0.875rem !important;
-        }
     </style>
 
-    <!-- The inline script has been moved to user-show.js -->
+    <script>
+        $(document).ready(function() {
+            console.log('jQuery loaded:', typeof $ !== 'undefined');
+            console.log('Select2 loaded:', typeof $.fn.select2 !== 'undefined');
+            console.log('Initializing Select2...');
+
+            // Initialize Select2 for single select elements
+            function initializeSelect2() {
+                $('select[data-toggle="select2"]').each(function() {
+                    if (!$(this).hasClass('select2-initialized')) {
+                        console.log('Initializing Select2 for:', this);
+                        $(this).select2({
+                            placeholder: 'Select...',
+                            allowClear: true,
+                            width: '100%',
+                            dropdownParent: $(this).closest('.offcanvas-body, .modal-body, body')
+                        });
+                        $(this).addClass('select2-initialized');
+                    }
+                });
+            }
+
+            // Initialize Select2 on page load
+            initializeSelect2();
+
+            // Re-initialize Select2 after dynamic content is added
+            $(document).on('shown.bs.offcanvas', function() {
+                console.log('Offcanvas shown, re-initializing Select2...');
+                setTimeout(function() {
+                    initializeSelect2();
+                }, 100);
+            });
+
+            // Force re-initialization after a short delay
+            setTimeout(function() {
+                console.log('Force re-initializing Select2...');
+                initializeSelect2();
+            }, 1000);
+        });
+    </script>
 @endpush

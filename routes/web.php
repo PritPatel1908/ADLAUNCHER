@@ -7,6 +7,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DeviceLayoutController;
 use App\Http\Controllers\ShowColumnController;
 
 // Authentication Routes
@@ -39,6 +40,12 @@ Route::get('/users/data', [UserController::class, 'getData'])->name('users.data'
 // Device Routes
 Route::resource('device', DeviceController::class)->middleware('auth');
 Route::get('/devices/data', [DeviceController::class, 'getData'])->name('devices.data')->middleware('auth');
+
+// Device Layout Routes
+Route::resource('device-layout', DeviceLayoutController::class)->middleware('auth');
+Route::get('/device-layouts', [DeviceLayoutController::class, 'index'])->name('device-layouts.index')->middleware('auth');
+Route::get('/device/{device}/layouts', [DeviceLayoutController::class, 'getDeviceLayouts'])->name('device.layouts')->middleware('auth');
+Route::get('/device-layout-stats', [DeviceLayoutController::class, 'getLayoutStats'])->name('device-layout.stats')->middleware('auth');
 
 // Column Visibility Routes
 Route::get('/columns', [ShowColumnController::class, 'getColumns'])->name('columns.get')->middleware('auth');

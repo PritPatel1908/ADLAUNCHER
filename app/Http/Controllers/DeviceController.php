@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\Device;
 use App\Models\Company;
 use App\Models\Location;
+use App\Models\DeviceLayout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -45,8 +46,8 @@ class DeviceController extends Controller
                 'location_id' => $request->location_id,
                 'area_id' => $request->area_id,
                 'status' => $request->status === 'delete' ? Device::STATUS_DELETE : ($request->status === 'active' ? Device::STATUS_ACTIVATE : ($request->status === 'deactivate' ? Device::STATUS_INACTIVE : Device::STATUS_BLOCK)),
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
+                'created_by' => auth()->user()->id,
+                'updated_by' => auth()->user()->id,
             ]);
 
             DB::commit();
@@ -70,7 +71,7 @@ class DeviceController extends Controller
      */
     public function show(Device $device)
     {
-        $device->load(['company', 'location', 'area']);
+        $device->load(['company', 'location', 'area', 'deviceLayouts']);
         return view('device.show', compact('device'));
     }
 
@@ -112,7 +113,7 @@ class DeviceController extends Controller
                 'location_id' => $request->location_id,
                 'area_id' => $request->area_id,
                 'status' => $request->status === 'delete' ? Device::STATUS_DELETE : ($request->status === 'active' ? Device::STATUS_ACTIVATE : ($request->status === 'deactivate' ? Device::STATUS_INACTIVE : Device::STATUS_BLOCK)),
-                'updated_by' => auth()->id(),
+                'updated_by' => auth()->user()->id,
             ]);
 
             DB::commit();
@@ -155,7 +156,7 @@ class DeviceController extends Controller
      */
     public function getData(Request $request)
     {
-        $query = Device::with(['company', 'location', 'area']);
+        $query = Device::with(['company', 'location', 'area', 'deviceLayouts']);
 
         // Filters
         if ($request->filled('name_filter')) {
@@ -237,6 +238,17 @@ class DeviceController extends Controller
                 'location' => $device->location ? $device->location->name : null,
                 'area' => $device->area ? $device->area->name : null,
                 'ip' => $device->ip,
+                'layouts' => $device->deviceLayouts->map(function ($layout) {
+                    return [
+                        'id' => $layout->id,
+                        'layout_name' => $layout->layout_name,
+                        'layout_type' => $layout->layout_type,
+                        'status' => $layout->status,
+                        'created_at' => $layout->created_at,
+                    ];
+                }),
+                'layouts_count' => $device->layouts_count,
+                'active_layouts_count' => $device->active_layouts_count,
                 'status' => $device->status,
                 'created_at' => $device->created_at,
                 'updated_at' => $device->updated_at,
@@ -249,5 +261,107 @@ class DeviceController extends Controller
             'recordsFiltered' => $recordsFiltered,
             'data' => $data,
         ]);
+    }
+
+    /**
+     * Store a newly created device layout.
+     */
+    public function storeLayout(Request $request)
+    {
+        $request->validate([
+            'layout_name' => 'required|string|max:255',
+            'layout_type' => 'required|integer|in:0,1,2,3',
+            'device_id' => 'required|exists:devices,id',
+            'status' => 'required|integer|in:0,1,2,3',
+        ]);
+
+        try {
+            $deviceLayout = DeviceLayout::create([
+                'layout_name' => $request->layout_name,
+                'layout_type' => $request->layout_type,
+                'device_id' => $request->device_id,
+                'status' => $request->status,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Device layout created successfully',
+                'layout' => $deviceLayout
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create device layout: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the specified device layout.
+     */
+    public function updateLayout(Request $request, DeviceLayout $deviceLayout)
+    {
+        $request->validate([
+            'layout_name' => 'required|string|max:255',
+            'layout_type' => 'required|integer|in:0,1,2,3',
+            'status' => 'required|integer|in:0,1,2,3',
+        ]);
+
+        try {
+            $deviceLayout->update([
+                'layout_name' => $request->layout_name,
+                'layout_type' => $request->layout_type,
+                'status' => $request->status,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Device layout updated successfully',
+                'layout' => $deviceLayout
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update device layout: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove the specified device layout.
+     */
+    public function destroyLayout(DeviceLayout $deviceLayout)
+    {
+        try {
+            $deviceLayout->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Device layout deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete device layout: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get all device layouts.
+     */
+    public function getLayouts()
+    {
+        try {
+            $layouts = DeviceLayout::with('device')->get();
+            return response()->json([
+                'success' => true,
+                'layouts' => $layouts
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load device layouts: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

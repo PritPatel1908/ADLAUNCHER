@@ -70,6 +70,12 @@
                 Start Page Content
             ========================= -->
 
+        <!-- Alert Container -->
+        <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x"
+            style="z-index: 9999; margin-top: 80px;">
+            <!-- Alerts will be dynamically inserted here -->
+        </div>
+
         <div class="page-wrapper">
             <!-- Start Content -->
             @yield('content')
@@ -139,6 +145,46 @@
     <script src="{{ asset('assets/plugins/theia-sticky-sidebar/ResizeSensor.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js') }}" type="text/javascript">
     </script>
+
+    <!-- Alert Container Styles -->
+    <style>
+        #alert-container {
+            pointer-events: none;
+        }
+
+        #alert-container .alert {
+            pointer-events: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        #alert-container .alert-success {
+            background-color: #d1edff;
+            color: #0c5460;
+            border-left: 4px solid #28a745;
+        }
+
+        #alert-container .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        #alert-container .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        #alert-container .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+    </style>
+
     @stack('js')
 </body>
 

@@ -184,55 +184,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Employee ID Filter -->
-                                            <div class="filter-set-content">
-                                                <div class="filter-set-content-head">
-                                                    <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseEmployeeId" aria-expanded="false"
-                                                        aria-controls="collapseEmployeeId">Employee ID</a>
-                                                </div>
-                                                <div class="filter-set-contents accordion-collapse collapse"
-                                                    id="collapseEmployeeId" data-bs-parent="#accordionExample">
-                                                    <div
-                                                        class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                        <div class="mb-2">
-                                                            <div class="input-icon-start input-icon position-relative">
-                                                                <span class="input-icon-addon fs-12">
-                                                                    <i class="ti ti-search"></i>
-                                                                </span>
-                                                                <input type="text"
-                                                                    class="form-control form-control-md user-filter"
-                                                                    placeholder="Search" data-column="employee_id">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Mobile Filter -->
-                                            <div class="filter-set-content">
-                                                <div class="filter-set-content-head">
-                                                    <a href="#" class="collapsed" data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseMobile" aria-expanded="false"
-                                                        aria-controls="collapseMobile">Mobile</a>
-                                                </div>
-                                                <div class="filter-set-contents accordion-collapse collapse"
-                                                    id="collapseMobile" data-bs-parent="#accordionExample">
-                                                    <div
-                                                        class="filter-content-list bg-light rounded border p-2 shadow mt-2">
-                                                        <div class="mb-2">
-                                                            <div class="input-icon-start input-icon position-relative">
-                                                                <span class="input-icon-addon fs-12">
-                                                                    <i class="ti ti-search"></i>
-                                                                </span>
-                                                                <input type="text"
-                                                                    class="form-control form-control-md user-filter"
-                                                                    placeholder="Search" data-column="mobile">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
 
                                             <!-- Status Filter -->
                                             <div class="filter-set-content">
@@ -354,118 +305,24 @@
                                                 </label>
                                             </div>
                                         </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                        {{-- <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
                                                 <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Employee ID</span>
+                                                    <span>Layouts</span>
                                                     <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="employee_id">
+                                                        type="checkbox" role="switch" checked data-column="layouts">
                                                 </label>
                                             </div>
-                                        </li>
+                                        </li> --}}
                                         <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
                                                 <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Gender</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="gender">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Date of Birth</span>
+                                                    <span>Layouts Count</span>
                                                     <input class="form-check-input column-visibility-toggle ms-auto"
                                                         type="checkbox" role="switch" checked
-                                                        data-column="date_of_birth">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Date of Joining</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked
-                                                        data-column="date_of_joining">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Companies</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked
-                                                        data-column="companies_count">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Locations</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked
-                                                        data-column="locations_count">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Areas</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="areas_count">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Is Admin</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="is_admin">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Is Client</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="is_client">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Is User</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="is_user">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Last Login</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked
-                                                        data-column="last_login_at">
+                                                        data-column="layouts_count">
                                                 </label>
                                             </div>
                                         </li>
@@ -541,6 +398,8 @@
                                     <th>location</th>
                                     <th>area</th>
                                     <th>ip</th>
+                                    {{-- <th>layouts</th> --}}
+                                    <th>layouts_count</th>
                                     <th>created_at</th>
                                     <th>updated_at</th>
                                     <th>status</th>
@@ -630,7 +489,8 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Company</label>
-                                                    <select class="form-control select2" name="company_id" data-toggle="select2">
+                                                    <select class="form-control select2" name="company_id"
+                                                        data-toggle="select2">
                                                         <option value="">Select company...</option>
                                                         @foreach (\App\Models\Company::where('status', 1)->get() as $company)
                                                             <option value="{{ $company->id }}">{{ $company->name }} -
@@ -642,7 +502,8 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Location</label>
-                                                    <select class="form-control select2" name="location_id" data-toggle="select2">
+                                                    <select class="form-control select2" name="location_id"
+                                                        data-toggle="select2">
                                                         <option value="">Select location...</option>
                                                         @foreach (\App\Models\Location::where('status', 1)->get() as $location)
                                                             <option value="{{ $location->id }}">{{ $location->name }} -
@@ -654,7 +515,8 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Area</label>
-                                                    <select class="form-control select2" name="area_id" data-toggle="select2">
+                                                    <select class="form-control select2" name="area_id"
+                                                        data-toggle="select2">
                                                         <option value="">Select area...</option>
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
                                                             <option value="{{ $area->id }}">{{ $area->name }} -
@@ -674,6 +536,33 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Layout Management Section -->
+                            <div class="accordion-item rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded collapsed"
+                                        data-bs-toggle="collapse" data-bs-target="#layouts">
+                                        <span class="avatar avatar-md rounded me-1"><i
+                                                class="ti ti-layout-grid"></i></span>
+                                        Device Layouts (One-to-Many)
+                                        <span class="badge badge-soft-info ms-2" id="layout-count-badge">0 layouts</span>
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="layouts" data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="alert alert-info">
+                                            <i class="ti ti-info-circle me-2"></i>
+                                            <strong>One-to-Many Relationship:</strong> A device can have multiple layouts.
+                                            You can add layouts after creating the device.
+                                        </div>
+                                        <div id="device-layouts-preview" class="text-center text-muted py-3">
+                                            <i class="ti ti-layout-grid fs-1"></i>
+                                            <p class="mt-2">No layouts added yet. Add layouts after creating the device.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -700,18 +589,22 @@
     </div>
 
     {{-- Start Edit Device --}}
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas_edit" aria-labelledby="offcanvas_edit_label">
+    <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_edit"
+        aria-labelledby="offcanvas_edit_label">
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title" id="offcanvas_edit_label">Edit Device</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <button type="button"
+                class="btn-close custom-btn-close border p-1 me-0 d-flex align-items-center justify-content-center rounded-circle"
+                data-bs-dismiss="offcanvas" aria-label="Close">
+                <i class="ti ti-x"></i>
+            </button>
         </div>
         <div class="offcanvas-body">
-            <div class="row">
-                <div class="col-12">
+            <div class="card">
+                <div class="card-body">
                     <form id="edit-device-form" method="POST">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="from_index" value="1">
                         <div class="accordion accordion-bordered" id="main_accordion">
                             <!-- Basic Info -->
                             <div class="accordion-item rounded mb-3">
@@ -719,8 +612,7 @@
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
                                         data-bs-toggle="collapse" data-bs-target="#basic">
                                         <span class="avatar avatar-md rounded me-1"><i
-                                                class="ti
-ti-device-laptop"></i></span>
+                                                class="ti ti-device-laptop"></i></span>
                                         Device Info
                                     </a>
                                 </div>
@@ -738,9 +630,10 @@ ti-device-laptop"></i></span>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Unique ID</label>
+                                                    <label class="form-label">Unique ID <span
+                                                            class="text-danger">*</span></label>
                                                     <input type="text" class="form-control" name="unique_id"
-                                                        id="edit-unique_id">
+                                                        id="edit-unique_id" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -779,8 +672,8 @@ ti-device-laptop"></i></span>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Area</label>
-                                                    <select class="form-control select2" name="area_id"
-                                                        id="edit-area_id" data-toggle="select2">
+                                                    <select class="form-control select2" name="area_id" id="edit-area_id"
+                                                        data-toggle="select2">
                                                         <option value="">Select area...</option>
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
                                                             <option value="{{ $area->id }}">{{ $area->name }} -
@@ -793,53 +686,10 @@ ti-device-laptop"></i></span>
                                                 <div class="mb-3">
                                                     <label class="form-label">Status</label>
                                                     <select class="form-select" name="status" id="edit-status">
-                                                        <option value="delete">Delete</option>
-                                                        <option value="active">Active</option>
-                                                        <option value="deactivate">Inactive</option>
-                                                        <option value="block">Block</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Employee ID</label>
-                                                    <input type="text" class="form-control" name="employee_id"
-                                                        id="edit-employee_id">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Gender</label>
-                                                    <select class="form-select" name="gender" id="edit-gender">
-                                                        <option value="">Select Gender</option>
-                                                        <option value="1">Male</option>
-                                                        <option value="2">Female</option>
-                                                        <option value="3">Other</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Date of Birth</label>
-                                                    <input type="date" class="form-control" name="date_of_birth"
-                                                        id="edit-date_of_birth">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Date of Joining</label>
-                                                    <input type="date" class="form-control" name="date_of_joining"
-                                                        id="edit-date_of_joining">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Status</label>
-                                                    <select class="form-select" name="status" id="edit-status">
-                                                        <option value="delete">Delete</option>
-                                                        <option value="active">Active</option>
-                                                        <option value="deactivate">Deactivate</option>
-                                                        <option value="block">Block</option>
+                                                        <option value="0">Delete</option>
+                                                        <option value="1">Active</option>
+                                                        <option value="2">Inactive</option>
+                                                        <option value="3">Block</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -848,6 +698,41 @@ ti-device-laptop"></i></span>
                                 </div>
                             </div>
 
+                            <!-- Layout Management Section for Edit -->
+                            <div class="accordion-item rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded collapsed"
+                                        data-bs-toggle="collapse" data-bs-target="#edit-layouts">
+                                        <span class="avatar avatar-md rounded me-1"><i
+                                                class="ti ti-layout-grid"></i></span>
+                                        Device Layouts (One-to-Many)
+                                        <span class="badge badge-soft-info ms-2" id="edit-layout-count-badge">0
+                                            layouts</span>
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="edit-layouts"
+                                    data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="alert alert-info">
+                                            <i class="ti ti-info-circle me-2"></i>
+                                            <strong>One-to-Many Relationship:</strong> This device can have multiple
+                                            layouts.
+                                            Use the "Manage Layouts" button to add or edit layouts.
+                                        </div>
+                                        <div id="edit-device-layouts-preview" class="text-center text-muted py-3">
+                                            <i class="ti ti-layout-grid fs-1"></i>
+                                            <p class="mt-2">Loading layouts...</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                data-bs-toggle="offcanvas" data-bs-target="#offcanvas_layout_management"
+                                                data-device-id="">
+                                                <i class="ti ti-layout-grid me-1"></i>Manage Layouts
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div id="edit-form-alert" class="col-12" style="display: none;">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -856,12 +741,11 @@ ti-device-laptop"></i></span>
                                         aria-label="Close"></button>
                                 </div>
                             </div>
-
-                            <div class="d-flex align-items-center justify-content-end">
-                                <button type="button" data-bs-dismiss="offcanvas"
-                                    class="btn btn-sm btn-light me-2">Cancel</button>
-                                <button type="submit" class="btn btn-sm btn-primary">Update Device</button>
-                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-end">
+                            <button type="button" data-bs-dismiss="offcanvas"
+                                class="btn btn-sm btn-light me-2">Cancel</button>
+                            <button type="submit" class="btn btn-sm btn-primary">Update Device</button>
                         </div>
                     </form>
                 </div>
@@ -965,6 +849,80 @@ ti-device-laptop"></i></span>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Layout Management Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas_layout_management">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Device Layout Management</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Layout List -->
+            <div class="mb-4">
+                <h6>Device Layouts</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm" id="layout-table">
+                        <thead>
+                            <tr>
+                                <th>Layout Name</th>
+                                <th>Type</th>
+                                <th>Device</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Layout data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add/Edit Layout Form -->
+            <div class="border-top pt-3">
+                <h6 id="layout-form-title">Add New Layout</h6>
+                <div id="layout-form-alert" class="mt-2" style="display: none;"></div>
+                <form id="layout-form">
+                    @csrf
+                    <input type="hidden" id="layout-id" name="layout_id">
+                    <input type="hidden" id="layout-device-id" name="device_id">
+
+                    <div class="mb-3">
+                        <label for="layout-name" class="form-label">Layout Name</label>
+                        <input type="text" class="form-control" id="layout-name" name="layout_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="layout-type" class="form-label">Layout Type</label>
+                        <select class="form-select" id="layout-type" name="layout_type" required>
+                            <option value="">Select Layout Type</option>
+                            <option value="0">Full Screen</option>
+                            <option value="1">Split Screen</option>
+                            <option value="2">Three Grid Screen</option>
+                            <option value="3">Four Grid Screen</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="layout-status" class="form-label">Status</label>
+                        <select class="form-select" id="layout-status" name="status" required>
+                            <option value="">Select Status</option>
+                            <option value="0">Delete</option>
+                            <option value="1">Active</option>
+                            <option value="2">Inactive</option>
+                            <option value="3">Block</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="layout-submit-btn">Add Layout</button>
+                        <button type="button" class="btn btn-secondary" id="layout-cancel-btn"
+                            style="display: none;">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
