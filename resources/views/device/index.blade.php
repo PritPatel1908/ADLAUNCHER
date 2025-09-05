@@ -630,7 +630,7 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Company</label>
-                                                    <select class="select2-multiple form-control" name="company_id">
+                                                    <select class="form-control select2" name="company_id" data-toggle="select2">
                                                         <option value="">Select company...</option>
                                                         @foreach (\App\Models\Company::where('status', 1)->get() as $company)
                                                             <option value="{{ $company->id }}">{{ $company->name }} -
@@ -642,7 +642,7 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Location</label>
-                                                    <select class="select2-multiple form-control" name="location_id">
+                                                    <select class="form-control select2" name="location_id" data-toggle="select2">
                                                         <option value="">Select location...</option>
                                                         @foreach (\App\Models\Location::where('status', 1)->get() as $location)
                                                             <option value="{{ $location->id }}">{{ $location->name }} -
@@ -654,7 +654,7 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Area</label>
-                                                    <select class="select2-multiple form-control" name="area_id">
+                                                    <select class="form-control select2" name="area_id" data-toggle="select2">
                                                         <option value="">Select area...</option>
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
                                                             <option value="{{ $area->id }}">{{ $area->name }} -
@@ -679,99 +679,6 @@
                                 </div>
                             </div>
 
-                            {{-- Locations --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#locations">
-                                        <span class="avatar avatar-md rounded me-1"><i
-                                                class="ti ti-map-pin-cog"></i></span>
-                                        Locations
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="locations" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Locations</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="location_ids[]" data-toggle="select2" multiple="multiple"
-                                                        data-placeholder="Choose locations...">
-                                                        <option value="">Select locations...</option>
-                                                        @foreach (\App\Models\Location::where('status', 1)->get() as $location)
-                                                            <option value="{{ $location->id }}">{{ $location->name }} -
-                                                                {{ $location->city }}, {{ $location->country }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Companies --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#companies">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-building"></i></span>
-                                        Companies
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="companies" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Companies</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="company_ids[]" data-toggle="select2" multiple="multiple"
-                                                        data-placeholder="Choose companies...">
-                                                        <option value="">Select companies...</option>
-                                                        @foreach (\App\Models\Company::where('status', 1)->get() as $company)
-                                                            <option value="{{ $company->id }}">{{ $company->name }} -
-                                                                {{ $company->industry }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Areas --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#areas">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-map-pin"></i></span>
-                                        Areas
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="areas" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Areas</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="area_ids[]" data-toggle="select2" multiple="multiple"
-                                                        data-placeholder="Choose areas...">
-                                                        <option value="">Select areas...</option>
-                                                        @foreach (\App\Models\Area::where('status', 1)->get() as $area)
-                                                            <option value="{{ $area->id }}">{{ $area->name }} -
-                                                                {{ $area->city }}, {{ $area->state }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
                             <div id="create-form-alert" class="col-12" style="display: none;">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -812,7 +719,7 @@
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
                                         data-bs-toggle="collapse" data-bs-target="#basic">
                                         <span class="avatar avatar-md rounded me-1"><i
-                                                class="ti 
+                                                class="ti
 ti-device-laptop"></i></span>
                                         Device Info
                                     </a>
@@ -846,8 +753,9 @@ ti-device-laptop"></i></span>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Company</label>
-                                                    <select class="select2-multiple form-control" name="company_id"
-                                                        id="edit-company_id">
+                                                    <select class="form-control select2" name="company_id"
+                                                        id="edit-company_id" data-toggle="select2">
+                                                        <option value="">Select company...</option>
                                                         @foreach (\App\Models\Company::where('status', 1)->get() as $company)
                                                             <option value="{{ $company->id }}">{{ $company->name }} -
                                                                 {{ $company->industry }}</option>
@@ -858,8 +766,9 @@ ti-device-laptop"></i></span>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Location</label>
-                                                    <select class="select2-multiple form-control" name="location_id"
-                                                        id="edit-location_id">
+                                                    <select class="form-control select2" name="location_id"
+                                                        id="edit-location_id" data-toggle="select2">
+                                                        <option value="">Select location...</option>
                                                         @foreach (\App\Models\Location::where('status', 1)->get() as $location)
                                                             <option value="{{ $location->id }}">{{ $location->name }} -
                                                                 {{ $location->city }}, {{ $location->country }}</option>
@@ -870,8 +779,9 @@ ti-device-laptop"></i></span>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Area</label>
-                                                    <select class="select2-multiple form-control" name="area_id"
-                                                        id="edit-area_id">
+                                                    <select class="form-control select2" name="area_id"
+                                                        id="edit-area_id" data-toggle="select2">
+                                                        <option value="">Select area...</option>
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
                                                             <option value="{{ $area->id }}">{{ $area->name }} -
                                                                 {{ $area->city }}, {{ $area->state }}</option>
@@ -938,97 +848,6 @@ ti-device-laptop"></i></span>
                                 </div>
                             </div>
 
-                            {{-- Locations --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#locations">
-                                        <span class="avatar avatar-md rounded me-1"><i
-                                                class="ti ti-map-pin-cog"></i></span>
-                                        Locations
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="locations" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Locations</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="location_ids[]" id="edit-location_ids"
-                                                        data-toggle="select2" multiple="multiple"
-                                                        data-placeholder="Choose locations...">
-                                                        @foreach (\App\Models\Location::where('status', 1)->get() as $location)
-                                                            <option value="{{ $location->id }}">{{ $location->name }} -
-                                                                {{ $location->city }}, {{ $location->country }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Companies --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#companies">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-building"></i></span>
-                                        Companies
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="companies" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Companies</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="company_ids[]" id="edit-company_ids" data-toggle="select2"
-                                                        multiple="multiple" data-placeholder="Choose companies...">
-                                                        @foreach (\App\Models\Company::where('status', 1)->get() as $company)
-                                                            <option value="{{ $company->id }}">{{ $company->name }} -
-                                                                {{ $company->industry }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Areas --}}
-                            <div class="accordion-item border-top rounded mb-3">
-                                <div class="accordion-header">
-                                    <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#areas">
-                                        <span class="avatar avatar-md rounded me-1"><i class="ti ti-map-pin"></i></span>
-                                        Areas
-                                    </a>
-                                </div>
-                                <div class="accordion-collapse collapse" id="areas" data-bs-parent="#main_accordion">
-                                    <div class="accordion-body border-top">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Areas</label>
-                                                    <select class="select2 form-control select2-multiple"
-                                                        name="area_ids[]" id="edit-area_ids" data-toggle="select2"
-                                                        multiple="multiple" data-placeholder="Choose areas...">
-                                                        @foreach (\App\Models\Area::where('status', 1)->get() as $area)
-                                                            <option value="{{ $area->id }}">{{ $area->name }} -
-                                                                {{ $area->city }}, {{ $area->state }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
                             <div id="edit-form-alert" class="col-12" style="display: none;">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -1153,8 +972,8 @@ ti-device-laptop"></i></span>
 
 @push('js')
     <!-- Select2 CSS and JS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
+    <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}"></script>
 
     <!-- Device DataTable JS -->
     <script src="{{ asset('assets/js/datatable/device-datatable.js') }}" type="text/javascript"></script>
@@ -1174,141 +993,49 @@ ti-device-laptop"></i></span>
             }
         }
 
-        /* Select2 Custom Styles - Perfect Design Match */
+        /* Select2 Custom Styles */
         .select2-container {
             width: 100% !important;
-            font-family: inherit !important;
         }
 
-        .select2-container--default .select2-selection--multiple {
+        .select2-container--default .select2-selection--single {
+            height: 38px !important;
             border: 1px solid #d1d3e2 !important;
             border-radius: 0.375rem !important;
-            min-height: 38px !important;
             padding: 0.375rem 0.75rem !important;
             background-color: #fff !important;
-            box-sizing: border-box !important;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
         }
 
-        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 6px !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            line-height: normal !important;
-            align-items: center !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            position: relative !important;
-            background-color: #f8f9fa !important;
-            border: 1px solid #dee2e6 !important;
-            border-radius: 0.25rem !important;
-            padding: 0.25rem 0.5rem !important;
-            margin: 0 !important;
-            font-size: 0.875rem !important;
-            line-height: 1.5 !important;
-            color: #495057 !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            font-weight: 400 !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            position: relative !important;
-            right: auto !important;
-            top: auto !important;
-            transform: none !important;
-            color: #6c757d !important;
-            font-weight: bold !important;
-            font-size: 1rem !important;
-            line-height: 1 !important;
-            cursor: pointer !important;
-            border: none !important;
-            background: none !important;
-            padding: 0 !important;
-            margin: 0 0 0 0.25rem !important;
-            width: 16px !important;
-            height: 16px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            float: none !important;
-            text-decoration: none !important;
-            font-family: inherit !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-            color: #dc3545 !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:before {
-            content: "×" !important;
-            font-size: 1.125rem !important;
-            line-height: 1 !important;
-        }
-
-        /* Remove any duplicate × symbols */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:after {
-            content: "" !important;
-        }
-
-        /* Hide any default Select2 remove button text */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            text-indent: -9999px !important;
-            overflow: hidden !important;
-        }
-
-        /* Show only our custom × */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:before {
-            content: "×" !important;
-            font-size: 1.125rem !important;
-            line-height: 1 !important;
-            text-indent: 0 !important;
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            color: #6c757d !important;
-        }
-
-        .select2-container--default .select2-search--inline {
-            margin: 0 !important;
-            padding: 0 !important;
-            flex: 1 !important;
-            min-width: 120px !important;
-        }
-
-        .select2-container--default .select2-search--inline .select2-search__field {
-            margin: 0 !important;
-            padding: 0 !important;
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
-            font-size: 0.875rem !important;
-            line-height: 1.5 !important;
-            width: 100% !important;
-            background: transparent !important;
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 26px !important;
+            padding-left: 0 !important;
+            padding-right: 20px !important;
             color: #495057 !important;
         }
 
-        .select2-container--default .select2-dropdown {
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #6c757d !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+            right: 8px !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #86b7fe !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        }
+
+        .select2-dropdown {
             border: 1px solid #d1d3e2 !important;
             border-radius: 0.375rem !important;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-            background-color: #fff !important;
-            z-index: 9999 !important;
-            margin-top: 2px !important;
         }
 
         .select2-container--default .select2-results__option {
             padding: 0.5rem 0.75rem !important;
             font-size: 0.875rem !important;
-            line-height: 1.5 !important;
-            color: #495057 !important;
         }
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
@@ -1316,77 +1043,9 @@ ti-device-laptop"></i></span>
             color: white !important;
         }
 
-        .select2-container--default .select2-results__group {
-            font-weight: 600 !important;
-            color: #6c757d !important;
-            padding: 0.5rem 0.75rem 0.25rem !important;
-            font-size: 0.875rem !important;
-            background-color: #f8f9fa !important;
-        }
-
         .select2-container--default .select2-results__option[aria-selected=true] {
             background-color: #e9ecef !important;
             color: #495057 !important;
-        }
-
-        /* Focus state */
-        .select2-container--default.select2-container--focus .select2-selection--multiple {
-            border-color: #86b7fe !important;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-        }
-
-        /* Placeholder styling */
-        .select2-container--default .select2-selection--multiple .select2-selection__placeholder {
-            color: #6c757d !important;
-            font-size: 0.875rem !important;
-        }
-
-        /* Ensure proper spacing */
-        .select2-container--default .select2-selection--multiple .select2-selection__rendered li {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        /* Remove default Select2 styling that might interfere */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            float: none !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            float: none !important;
-        }
-
-        /* Additional styling for better appearance */
-        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-            min-height: 20px !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-
-        /* Force single × symbol - override all default Select2 styling */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            font-size: 0 !important;
-            line-height: 0 !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:before {
-            content: "×" !important;
-            font-size: 1.125rem !important;
-            line-height: 1 !important;
-            color: #6c757d !important;
-            font-weight: bold !important;
-        }
-
-        /* Remove any other potential × symbols */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:after,
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove span,
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove i {
-            display: none !important;
-            content: "" !important;
         }
     </style>
 
@@ -1396,70 +1055,37 @@ ti-device-laptop"></i></span>
             console.log('Select2 loaded:', typeof $.fn.select2 !== 'undefined');
             console.log('Initializing Select2...');
 
-            // Initialize Select2 with proper configuration
-            $('.select2-multiple').each(function() {
-                console.log('Initializing Select2 for:', this);
-                $(this).select2({
-                    theme: 'default',
-                    width: '100%',
-                    placeholder: 'Choose companies...',
-                    allowClear: true,
-                    closeOnSelect: false,
-                    tags: false,
-                    tokenSeparators: [',', ' '],
-                    language: {
-                        noResults: function() {
-                            return "No companies found";
-                        },
-                        searching: function() {
-                            return "Searching...";
-                        }
-                    },
-                    templateResult: function(data) {
-                        if (data.loading) return data.text;
-                        return data.text;
-                    },
-                    templateSelection: function(data) {
-                        return data.text;
+            // Initialize Select2 for single select elements
+            function initializeSelect2() {
+                $('select[data-toggle="select2"]').each(function() {
+                    if (!$(this).hasClass('select2-initialized')) {
+                        console.log('Initializing Select2 for:', this);
+                        $(this).select2({
+                            placeholder: 'Select...',
+                            allowClear: true,
+                            width: '100%',
+                            dropdownParent: $(this).closest('.offcanvas-body, .modal-body, body')
+                        });
+                        $(this).addClass('select2-initialized');
                     }
                 });
-            });
+            }
+
+            // Initialize Select2 on page load
+            initializeSelect2();
 
             // Re-initialize Select2 after dynamic content is added
             $(document).on('shown.bs.offcanvas', function() {
                 console.log('Offcanvas shown, re-initializing Select2...');
-                $('.select2-multiple').each(function() {
-                    if (!$(this).hasClass('select2-hidden-accessible')) {
-                        console.log('Re-initializing Select2 for:', this);
-                        $(this).select2({
-                            theme: 'default',
-                            width: '100%',
-                            placeholder: 'Choose companies...',
-                            allowClear: true,
-                            closeOnSelect: false,
-                            tags: false,
-                            tokenSeparators: [',', ' ']
-                        });
-                    }
-                });
+                setTimeout(function() {
+                    initializeSelect2();
+                }, 100);
             });
 
             // Force re-initialization after a short delay
             setTimeout(function() {
                 console.log('Force re-initializing Select2...');
-                $('.select2-multiple').each(function() {
-                    if (!$(this).hasClass('select2-hidden-accessible')) {
-                        $(this).select2({
-                            theme: 'default',
-                            width: '100%',
-                            placeholder: 'Choose companies...',
-                            allowClear: true,
-                            closeOnSelect: false,
-                            tags: false,
-                            tokenSeparators: [',', ' ']
-                        });
-                    }
-                });
+                initializeSelect2();
             }, 1000);
         });
     </script>

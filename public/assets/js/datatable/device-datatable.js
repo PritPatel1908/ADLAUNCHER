@@ -177,7 +177,7 @@ $(document).ready(function () {
 
     function initializeDataTable() {
         // Show loading indicator
-        $('.data-loading').show();
+        // // $('.data-loading').show();
         $('#error-container').hide();
 
         // Initialize the DataTable - use window scope to ensure it's accessible everywhere
@@ -453,21 +453,21 @@ $(document).ready(function () {
 
         // Add event listeners for live filtering
         $('.user-filter').on('keyup', function () {
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
 
         // Add event listeners for status checkbox filtering
         $('.status-filter').on('change', function () {
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
 
         // Add event listener for date range picker
         $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
@@ -482,7 +482,7 @@ $(document).ready(function () {
             $('.dropdown-toggle.btn-outline-light').first().html(`<i class="ti ti-sort-ascending-2 me-2"></i>${sortText}`);
 
             // Show loading and reload the DataTable with the new sort option
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
@@ -502,17 +502,17 @@ $(document).ready(function () {
 
         // Handle retry button click
         $(document).on('click', '#retry-load', function () {
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
 
-        // Handle delete user
-        $(document).on('click', '.delete-user', function () {
-            const userId = $(this).data('id');
-            if (confirm('Are you sure you want to delete this user?')) {
+        // Handle delete device
+        $(document).on('click', '.delete-device', function () {
+            const deviceId = $(this).data('id');
+            if (confirm('Are you sure you want to delete this device?')) {
                 $.ajax({
-                    url: `/user/${userId}`,
+                    url: `/device/${deviceId}`,
                     type: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -522,104 +522,86 @@ $(document).ready(function () {
                             // Reload the DataTable
                             dataTable.ajax.reload();
                             // Show success message
-                            alert('User deleted successfully!');
+                            alert('Device deleted successfully!');
                         } else {
-                            alert(response.message || 'Failed to delete user.');
+                            alert(response.message || 'Failed to delete device.');
                         }
                     },
                     error: function (xhr) {
-                        console.error('Error deleting user:', xhr);
-                        alert('Failed to delete user. Please try again.');
+                        console.error('Error deleting device:', xhr);
+                        alert('Failed to delete device. Please try again.');
                     }
                 });
             }
         });
 
-        // Handle edit user
+        // Handle edit device
         $(document).on('click', '[data-bs-target="#offcanvas_edit"]', function () {
-            const userId = $(this).data('id');
+            const deviceId = $(this).data('id');
 
-            // Set the user ID to the form
-            $('#edit-user-form').data('user-id', userId);
-            $('#edit-user-form').attr('action', `/user/${userId}`);
+            // Set the device ID to the form
+            $('#edit-device-form').data('device-id', deviceId);
+            $('#edit-device-form').attr('action', `/device/${deviceId}`);
 
-            // Fetch user data via AJAX
+            // Fetch device data via AJAX
             $.ajax({
-                url: `/user/${userId}/edit`,
+                url: `/device/${deviceId}/edit`,
                 type: 'GET',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (response) {
-                    if (response.success && response.user) {
-                        const user = response.user;
+                    if (response.success && response.device) {
+                        const device = response.device;
 
                         // Populate form fields
-                        $('#edit-first_name').val(user.first_name);
-                        $('#edit-middle_name').val(user.middle_name);
-                        $('#edit-last_name').val(user.last_name);
-                        $('#edit-email').val(user.email);
-                        $('#edit-mobile').val(user.mobile);
-                        $('#edit-phone').val(user.phone);
-                        $('#edit-employee_id').val(user.employee_id);
-                        $('#edit-gender').val(user.gender);
-                        $('#edit-date_of_birth').val(user.date_of_birth);
-                        $('#edit-date_of_joining').val(user.date_of_joining);
+                        $('#edit-name').val(device.name);
+                        $('#edit-unique_id').val(device.unique_id);
+                        $('#edit-ip').val(device.ip);
+                        $('#edit-employee_id').val(device.employee_id);
+                        $('#edit-gender').val(device.gender);
+                        $('#edit-date_of_birth').val(device.date_of_birth);
+                        $('#edit-date_of_joining').val(device.date_of_joining);
+
                         // Convert status integer to string
                         let statusValue = 'active';
-                        if (user.status == 0) statusValue = 'delete';
-                        else if (user.status == 1) statusValue = 'active';
-                        else if (user.status == 2) statusValue = 'deactivate';
-                        else if (user.status == 3) statusValue = 'block';
+                        if (device.status == 0) statusValue = 'delete';
+                        else if (device.status == 1) statusValue = 'active';
+                        else if (device.status == 2) statusValue = 'deactivate';
+                        else if (device.status == 3) statusValue = 'block';
                         $('#edit-status').val(statusValue);
 
-                        // Populate companies
-                        if (user.companies && user.companies.length > 0) {
-                            const companyIds = user.companies.map(company => company.id);
-                            $('#edit-company_ids').val(companyIds).trigger('change');
+                        // Populate single select fields
+                        if (device.company_id) {
+                            $('#edit-company_id').val(device.company_id);
                         } else {
-                            $('#edit-company_ids').val([]).trigger('change');
+                            $('#edit-company_id').val('');
                         }
 
-                        // Populate locations
-                        if (user.locations && user.locations.length > 0) {
-                            const locationIds = user.locations.map(location => location.id);
-                            $('#edit-location_ids').val(locationIds).trigger('change');
+                        if (device.location_id) {
+                            $('#edit-location_id').val(device.location_id);
                         } else {
-                            $('#edit-location_ids').val([]).trigger('change');
+                            $('#edit-location_id').val('');
                         }
 
-                        // Populate areas
-                        if (user.areas && user.areas.length > 0) {
-                            const areaIds = user.areas.map(area => area.id);
-                            $('#edit-area_ids').val(areaIds).trigger('change');
+                        if (device.area_id) {
+                            $('#edit-area_id').val(device.area_id);
                         } else {
-                            $('#edit-area_ids').val([]).trigger('change');
+                            $('#edit-area_id').val('');
                         }
-
-                        // Re-initialize Select2 for edit form
-                        $('#edit-company_ids, #edit-location_ids, #edit-area_ids').select2({
-                            theme: 'default',
-                            width: '100%',
-                            placeholder: 'Choose...',
-                            allowClear: true,
-                            closeOnSelect: false,
-                            tags: false,
-                            tokenSeparators: [',', ' ']
-                        });
 
                         // Show the edit form
                         $('#offcanvas_edit').offcanvas('show');
                     } else {
-                        alert('Failed to load user data. Please try again.');
+                        alert('Failed to load device data. Please try again.');
                     }
                 },
                 error: function (xhr) {
-                    console.error('Error loading user data:', xhr);
+                    console.error('Error loading device data:', xhr);
                     console.error('Response text:', xhr.responseText);
                     console.error('Status:', xhr.status);
 
-                    let errorMessage = 'Failed to load user data. Please try again.';
+                    let errorMessage = 'Failed to load device data. Please try again.';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }
@@ -629,10 +611,10 @@ $(document).ready(function () {
             });
         });
 
-        // Handle form submission for creating user
-        $('#create-user-form').on('submit', function (e) {
+        // Handle form submission for creating device
+        $('#create-device-form').on('submit', function (e) {
             e.preventDefault();
-            console.log('User form submission started');
+            console.log('Device form submission started');
 
             // Disable submit button to prevent double submission
             var submitBtn = $(this).find('button[type="submit"]');
@@ -644,7 +626,7 @@ $(document).ready(function () {
             console.log('CSRF token:', $('meta[name="csrf-token"]').attr('content'));
 
             $.ajax({
-                url: '/user',
+                url: '/device',
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
@@ -663,16 +645,13 @@ $(document).ready(function () {
                             $createAlert = $createAlertWrapper.find('.alert');
                         }
                         $createAlert.removeClass('alert-danger').addClass('alert-success');
-                        $createAlert.html('User created successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                        $createAlert.html('Device created successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
                         $createAlertWrapper.show();
 
                         // Clear the form
-                        $('#create-user-form')[0].reset();
+                        $('#create-device-form')[0].reset();
 
-                        // Reset Select2 dropdowns
-                        $('#create-user-form .select2-multiple').val([]).trigger('change');
-
-                        // Reload the DataTable to show the new user
+                        // Reload the DataTable to show the new device
                         dataTable.ajax.reload();
 
                         // Close the offcanvas after a delay
@@ -687,18 +666,18 @@ $(document).ready(function () {
                             $createAlertErr = $createAlertWrapperErr.find('.alert');
                         }
                         $createAlertErr.removeClass('alert-success').addClass('alert-danger');
-                        $createAlertErr.html(`Failed to create user: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                        $createAlertErr.html(`Failed to create device: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
                         $createAlertWrapperErr.show();
                     }
                 },
                 error: function (xhr, status, error) {
-                    console.error('Error creating user:', xhr.responseText);
+                    console.error('Error creating device:', xhr.responseText);
                     console.error('Status:', status);
                     console.error('Error:', error);
                     console.error('Response status:', xhr.status);
                     console.error('Response headers:', xhr.getAllResponseHeaders());
 
-                    let errorMessage = 'Error creating user. Please try again.';
+                    let errorMessage = 'Error creating device. Please try again.';
                     if (xhr.responseJSON && xhr.responseJSON.errors) {
                         errorMessage = '<ul>';
                         for (const field in xhr.responseJSON.errors) {
@@ -724,21 +703,21 @@ $(document).ready(function () {
             });
         });
 
-        // Handle form submission for editing user
-        $('#edit-user-form').on('submit', function (e) {
+        // Handle form submission for editing device
+        $('#edit-device-form').on('submit', function (e) {
             e.preventDefault();
-            console.log('Edit user form submission started');
+            console.log('Edit device form submission started');
 
             // Disable submit button to prevent double submission
             var submitBtn = $(this).find('button[type="submit"]');
             var originalBtnText = submitBtn.html();
             submitBtn.html('Updating...').prop('disabled', true);
 
-            const userId = $(this).data('user-id');
+            const deviceId = $(this).data('device-id');
             const formData = $(this).serialize();
 
             $.ajax({
-                url: `/user/${userId}`,
+                url: `/device/${deviceId}`,
                 type: 'PUT',
                 data: formData,
                 headers: {
@@ -754,7 +733,7 @@ $(document).ready(function () {
                             $editAlert2 = $editAlertWrapper2.find('.alert');
                         }
                         $editAlert2.removeClass('alert-danger').addClass('alert-success');
-                        $editAlert2.html('User updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
+                        $editAlert2.html('Device updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
                         $editAlertWrapper2.show();
 
                         // Reload the DataTable
@@ -772,14 +751,14 @@ $(document).ready(function () {
                             $editAlert3 = $editAlertWrapper3.find('.alert');
                         }
                         $editAlert3.removeClass('alert-success').addClass('alert-danger');
-                        $editAlert3.html(`Failed to update user: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+                        $editAlert3.html(`Failed to update device: ${response.message} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
                         $editAlertWrapper3.show();
                     }
                 },
                 error: function (xhr) {
-                    console.error('Error updating user:', xhr);
+                    console.error('Error updating device:', xhr);
 
-                    let errorMessage = 'Failed to update user. Please try again.';
+                    let errorMessage = 'Failed to update device. Please try again.';
                     if (xhr.responseJSON && xhr.responseJSON.errors) {
                         errorMessage = '<ul>';
                         for (const field in xhr.responseJSON.errors) {
@@ -807,14 +786,12 @@ $(document).ready(function () {
             });
         });
 
-        // Reset forms once the offcanvas fully closes (mirror company behavior)
+        // Reset forms once the offcanvas fully closes
         $(document).on('hidden.bs.offcanvas', '#offcanvas_add', function () {
-            var $form = $('#create-user-form');
+            var $form = $('#create-device-form');
             if ($form.length) {
                 try {
                     $form[0].reset();
-                    // Reset Select2
-                    $form.find('.select2-multiple').val([]).trigger('change');
                     // Hide alerts
                     $('#create-form-alert').hide();
                 } catch (err) {
@@ -824,13 +801,10 @@ $(document).ready(function () {
         });
 
         $(document).on('hidden.bs.offcanvas', '#offcanvas_edit', function () {
-            var $form = $('#edit-user-form');
+            var $form = $('#edit-device-form');
             if ($form.length) {
                 try {
                     $form[0].reset();
-                    $('#edit-company_ids').val([]).trigger('change');
-                    $('#edit-location_ids').val([]).trigger('change');
-                    $('#edit-area_ids').val([]).trigger('change');
                     $('#edit-form-alert').hide();
                 } catch (err) {
                     console.error('Error resetting edit form after close:', err);

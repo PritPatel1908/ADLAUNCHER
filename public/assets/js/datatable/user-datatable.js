@@ -188,7 +188,7 @@ $(document).ready(function () {
 
     function initializeDataTable() {
         // Show loading indicator
-        $('.data-loading').show();
+        // $('.data-loading').show();
         $('#error-container').hide();
 
         // Initialize the DataTable - use window scope to ensure it's accessible everywhere
@@ -550,21 +550,21 @@ $(document).ready(function () {
 
         // Add event listeners for live filtering
         $('.user-filter').on('keyup', function () {
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
 
         // Add event listeners for status checkbox filtering
         $('.status-filter').on('change', function () {
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
 
         // Add event listener for date range picker
         $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
@@ -579,7 +579,7 @@ $(document).ready(function () {
             $('.dropdown-toggle.btn-outline-light').first().html(`<i class="ti ti-sort-ascending-2 me-2"></i>${sortText}`);
 
             // Show loading and reload the DataTable with the new sort option
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });
@@ -599,7 +599,7 @@ $(document).ready(function () {
 
         // Handle retry button click
         $(document).on('click', '#retry-load', function () {
-            $('.data-loading').show();
+            // $('.data-loading').show();
             $('#error-container').hide();
             dataTable.ajax.reload();
         });

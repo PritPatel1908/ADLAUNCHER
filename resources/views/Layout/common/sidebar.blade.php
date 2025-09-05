@@ -125,6 +125,9 @@
                         <li>
                             <a href="{{ route('user.index') }}"><i class="ti ti-user"></i><span>Users</span></a>
                         </li>
+                        <li>
+                            <a href="{{ route('device.index') }}"><i class="ti ti-device-tablet-plus"></i><span>Devices</span></a>
+                        </li>
                         {{-- <li>
                             <a href="{{ route('dashboard') }}"><i class="ti ti-chart-arcs"></i><span>Leads</span></a>
                         </li>
