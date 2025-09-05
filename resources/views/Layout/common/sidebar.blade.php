@@ -37,8 +37,9 @@
                 <li class="menu-title"><span>Main Menu</span></li>
                 <li>
                     <ul>
-                        <li class="submenu">
-                            <a href="javascript:void(0);" class="active subdrop">
+                        <li>
+                            <a href="{{ route('dashboard') }}"
+                                class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                                 <i class="ti ti-dashboard"></i><span>Dashboard</span>
                             </a>
                         </li>
@@ -111,68 +112,45 @@
                 <li>
                     <ul>
                         <li>
-                            <a href="{{ route('location.index') }}"><i
+                            <a href="{{ route('location.index') }}"
+                                class="{{ request()->routeIs('location.*') ? 'active' : '' }}"><i
                                     class="ti ti-map-pin-pin"></i><span>Locations</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('company.index') }}"><i
+                            <a href="{{ route('company.index') }}"
+                                class="{{ request()->routeIs('company.*') ? 'active' : '' }}"><i
                                     class="ti ti-building-community"></i><span>Companies</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('area.index') }}"><i
+                            <a href="{{ route('area.index') }}"
+                                class="{{ request()->routeIs('area.*') ? 'active' : '' }}"><i
                                     class="ti ti-building-factory"></i><span>Areas</span></a>
                         </li>
+                    </ul>
+                </li>
+                <li class="menu-title"><span>Users</span></li>
+                <li>
+                    <ul>
                         <li>
-                            <a href="{{ route('user.index') }}"><i class="ti ti-user"></i><span>Users</span></a>
+                            <a href="{{ route('user.index') }}"
+                                class="{{ request()->routeIs('user.*') ? 'active' : '' }}"><i
+                                    class="ti ti-user"></i><span>Users</span></a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-title"><span>Devices</span></li>
+                <li>
+                    <ul>
+                        <li>
+                            <a href="{{ route('device.index') }}"
+                                class="{{ request()->routeIs('device.*') ? 'active' : '' }}"><i
+                                    class="ti ti-device-tablet-plus"></i><span>Devices</span></a>
                         </li>
                         <li>
-                            <a href="{{ route('device.index') }}"><i class="ti ti-device-tablet-plus"></i><span>Devices</span></a>
+                            <a href="{{ route('schedule.index') }}"
+                                class="{{ request()->routeIs('schedule.*') ? 'active' : '' }}"><i
+                                    class="ti ti-calendar-event"></i><span>Schedules</span></a>
                         </li>
-                        {{-- <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-chart-arcs"></i><span>Leads</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-timeline-event-exclamation"></i><span>Pipeline</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-brand-campaignmonitor"></i><span>Campaign</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-atom-2"></i><span>Projects</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i class="ti ti-list-check"></i><span>Tasks</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-file-star"></i><span>Proposals</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-file-check"></i><span>Contracts</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-file-report"></i><span>Estimations</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-file-invoice"></i><span>Invoices</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-report-money"></i><span>Payments</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-chart-bar"></i><span>Analytics</span></a>
-                        </li>
-                        <li>
-                            <a href="{{ route('dashboard') }}"><i
-                                    class="ti ti-bounce-right"></i><span>Activities</span></a>
-                        </li> --}}
                     </ul>
                 </li>
                 {{-- <li class="menu-title"><span>Reports</span></li>

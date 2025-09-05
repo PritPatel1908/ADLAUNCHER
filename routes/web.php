@@ -10,6 +10,8 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceLayoutController;
 use App\Http\Controllers\DeviceScreenController;
 use App\Http\Controllers\ShowColumnController;
+use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\ScheduleMediaController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -51,6 +53,13 @@ Route::get('/device-layout-stats', [DeviceLayoutController::class, 'getLayoutSta
 // Device Screen Routes
 Route::resource('device-screen', DeviceScreenController::class)->middleware('auth');
 Route::get('/device/{device}/screens', [DeviceScreenController::class, 'getDeviceScreens'])->name('device.screens')->middleware('auth');
+
+// Schedule Routes
+Route::resource('schedule', ScheduleController::class)->middleware('auth');
+Route::get('/schedules/data', [ScheduleController::class, 'getData'])->name('schedules.data')->middleware('auth');
+// Schedule Media Routes
+Route::resource('schedule-media', ScheduleMediaController::class)->middleware('auth');
+Route::get('/schedule/{schedule}/medias', [ScheduleMediaController::class, 'getScheduleMedias'])->name('schedule.medias')->middleware('auth');
 
 // Column Visibility Routes
 Route::get('/columns', [ShowColumnController::class, 'getColumns'])->name('columns.get')->middleware('auth');

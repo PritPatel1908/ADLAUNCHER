@@ -158,7 +158,13 @@ class DeviceScreenController extends Controller
      */
     public function getDeviceScreens(Device $device)
     {
-        $screens = $device->deviceScreens()->with('layout')->orderBy('screen_no')->get();
+        $query = $device->deviceScreens()->with('layout')->orderBy('screen_no');
+        // Optional filter by layout_id when provided
+        $layoutId = request('layout_id');
+        if ($layoutId !== null && $layoutId !== '') {
+            $query->where('layout_id', (int) $layoutId);
+        }
+        $screens = $query->get();
         return response()->json([
             'success' => true,
             'screens' => $screens,
