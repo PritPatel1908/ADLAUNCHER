@@ -71,7 +71,7 @@ class DeviceController extends Controller
      */
     public function show(Device $device)
     {
-        $device->load(['company', 'location', 'area', 'deviceLayouts']);
+        $device->load(['company', 'location', 'area', 'deviceLayouts', 'deviceScreens']);
         return view('device.show', compact('device'));
     }
 
@@ -156,7 +156,7 @@ class DeviceController extends Controller
      */
     public function getData(Request $request)
     {
-        $query = Device::with(['company', 'location', 'area', 'deviceLayouts']);
+        $query = Device::with(['company', 'location', 'area', 'deviceLayouts', 'deviceScreens']);
 
         // Filters
         if ($request->filled('name_filter')) {
@@ -249,6 +249,7 @@ class DeviceController extends Controller
                 }),
                 'layouts_count' => $device->layouts_count,
                 'active_layouts_count' => $device->active_layouts_count,
+                'screens_count' => $device->screens_count,
                 'status' => $device->status,
                 'created_at' => $device->created_at,
                 'updated_at' => $device->updated_at,

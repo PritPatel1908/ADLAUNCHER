@@ -330,6 +330,17 @@
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
                                                 <label class="form-check-label d-flex align-items-center gap-2 w-100">
+                                                    <span>Screens Count</span>
+                                                    <input class="form-check-input column-visibility-toggle ms-auto"
+                                                        type="checkbox" role="switch" checked
+                                                        data-column="screens_count">
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li class="gap-1 d-flex align-items-center mb-2">
+                                            <i class="ti ti-columns me-1"></i>
+                                            <div class="form-check form-switch w-100 ps-0">
+                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
                                                     <span>Created At</span>
                                                     <input class="form-check-input column-visibility-toggle ms-auto"
                                                         type="checkbox" role="switch" checked data-column="created_at">
@@ -400,6 +411,7 @@
                                     <th>ip</th>
                                     {{-- <th>layouts</th> --}}
                                     <th>layouts_count</th>
+                                    <th>screens_count</th>
                                     <th>created_at</th>
                                     <th>updated_at</th>
                                     <th>status</th>
@@ -920,6 +932,86 @@
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary" id="layout-submit-btn">Add Layout</button>
                         <button type="button" class="btn btn-secondary" id="layout-cancel-btn"
+                            style="display: none;">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Screen Management Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas_screen_management">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Device Screen Management</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Screen List -->
+            <div class="mb-4">
+                <h6>Device Screens</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm" id="screen-table">
+                        <thead>
+                            <tr>
+                                <th>Screen No</th>
+                                <th>Height</th>
+                                <th>Width</th>
+                                <th>Layout</th>
+                                <th>Created At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Screen data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add/Edit Screen Form -->
+            <div class="border-top pt-3">
+                <h6 id="screen-form-title">Add New Screen</h6>
+                <div id="screen-form-alert" class="mt-2" style="display: none;"></div>
+                <form id="screen-form">
+                    @csrf
+                    <input type="hidden" id="screen-id" name="screen_id">
+                    <input type="hidden" id="screen-device-id" name="device_id">
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="screen-no" class="form-label">Screen No</label>
+                                <input type="number" min="1" class="form-control" id="screen-no"
+                                    name="screen_no" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="screen-height" class="form-label">Height</label>
+                                <input type="number" min="1" class="form-control" id="screen-height"
+                                    name="screen_height" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="screen-width" class="form-label">Width</label>
+                                <input type="number" min="1" class="form-control" id="screen-width"
+                                    name="screen_width" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="screen-layout-id" class="form-label">Layout</label>
+                        <select class="form-select" id="screen-layout-id" name="layout_id" required>
+                            <option value="">Select Layout</option>
+                        </select>
+                        <div class="form-text">Layouts for the selected device will appear here.</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="screen-submit-btn">Add Screen</button>
+                        <button type="button" class="btn btn-secondary" id="screen-cancel-btn"
                             style="display: none;">Cancel</button>
                     </div>
                 </form>

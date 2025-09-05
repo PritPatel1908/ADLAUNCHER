@@ -17,6 +17,7 @@ $(document).ready(function () {
             'ip': true,
             // 'layouts': false,
             'layouts_count': true,
+            'screens_count': true,
             'created_at': true,
             'updated_at': true,
             'status': true,
@@ -75,6 +76,7 @@ $(document).ready(function () {
                     'ip': true,
                     // 'layouts': false,
                     'layouts_count': true,
+                    'screens_count': true,
                     'created_at': true,
                     'updated_at': true,
                     'status': true,
@@ -359,6 +361,16 @@ $(document).ready(function () {
                     "className": "column-layouts-count"
                 },
                 {
+                    "data": "screens_count",
+                    "name": "screens_count",
+                    "orderable": true,
+                    "render": function (data, type, row) {
+                        const totalScreens = data || 0;
+                        return `<span class="badge badge-soft-info">Screens: ${totalScreens}</span>`;
+                    },
+                    "className": "column-screens-count"
+                },
+                {
                     "data": "created_at",
                     "name": "created_at",
                     "orderable": true,
@@ -418,6 +430,7 @@ $(document).ready(function () {
                                         <a class="dropdown-item" href="/device/${data}"><i class="ti ti-eye me-2"></i>View</a>
                                         <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_edit" data-id="${data}"><i class="ti ti-edit text-blue"></i> Edit</a>
                                         <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_layout_management" data-device-id="${data}"><i class="ti ti-layout-grid me-2"></i>Manage Layouts</a>
+                                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_screen_management" data-device-id="${data}"><i class="ti ti-device-desktop me-2"></i>Manage Screens</a>
                                         <a class="dropdown-item delete-device" href="javascript:void(0);" data-id="${data}"><i class="ti ti-trash me-2"></i>Delete</a>
                                     </div>
                                 </div>
@@ -990,6 +1003,214 @@ $(document).ready(function () {
                 }
             }
         });
+
+        // ========== Device Screen Management (Index Page) ==========
+        // Set device id and load layouts/screens when opening screen management
+        $(document).on('click', '[data-bs-target="#offcanvas_screen_management"]', function () {
+            const deviceId = $(this).data('device-id');
+            if (!deviceId) {
+                showAlert('warning', 'Please select a device first to manage its screens.');
+                return false;
+            }
+            $('#screen-device-id').val(deviceId);
+            // Actual population happens in offcanvas show handler to avoid duplicate parallel requests
+        });
+
+        // When the offcanvas actually opens, ensure device id is set from trigger and then load
+        $('#offcanvas_screen_management').on('show.bs.offcanvas', function (e) {
+            try {
+                const $trigger = $(e.relatedTarget);
+                const triggeredDeviceId = $trigger && $trigger.data('device-id');
+                if (triggeredDeviceId) {
+                    $('#screen-device-id').val(triggeredDeviceId);
+                    // Populate layout options for the selected device on first open
+                    populateLayoutOptionsForDevice(triggeredDeviceId);
+                }
+            } catch (err) {
+                // no-op
+            }
+
+            loadDeviceScreensForIndex();
+            if ($('#screen-form-alert').length) {
+                $('#screen-form-alert').hide().empty();
+            }
+        });
+
+        // Submit screen form (create/update)
+        $(document).on('submit', '#screen-form', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const screenId = $('#screen-id').val();
+            const isEdit = screenId !== '';
+            const url = isEdit ? `/device-screen/${screenId}` : '/device-screen';
+            if (isEdit) {
+                formData.append('_method', 'PUT');
+            }
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    const $alertWrap = $('#screen-form-alert');
+                    $alertWrap.show().html(`
+                        <div class="alert alert-${response.success ? 'success' : 'danger'} alert-dismissible fade show" role="alert">
+                            ${response.message || (response.success ? 'Success' : 'Failed')}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                    if (response.success) {
+                        $('#screen-form')[0].reset();
+                        $('#screen-id').val('');
+                        $('#screen-submit-btn').text('Add Screen');
+                        $('#screen-cancel-btn').hide();
+                        loadDeviceScreensForIndex();
+                        // Refresh main devices DataTable to update screens_count without full reload
+                        if (window.dataTable) {
+                            window.dataTable.ajax.reload(null, false);
+                        }
+                        setTimeout(function () {
+                            $('#offcanvas_screen_management').offcanvas('hide');
+                            $alertWrap.hide().empty();
+                        }, 1200);
+                    }
+                },
+                error: function (xhr) {
+                    const response = xhr.responseJSON;
+                    $('#screen-form-alert').show().html(`
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            ${(response && (response.message || (response.errors && Object.values(response.errors)[0][0]))) || 'An error occurred'}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                }
+            });
+        });
+
+        // Edit screen from list
+        $(document).on('click', '.edit-screen-btn', function () {
+            const screenId = $(this).data('screen-id');
+            const screenNo = $(this).data('screen-no');
+            const screenHeight = $(this).data('screen-height');
+            const screenWidth = $(this).data('screen-width');
+            const layoutId = $(this).data('layout-id');
+            $('#screen-id').val(screenId);
+            $('#screen-no').val(screenNo);
+            $('#screen-height').val(screenHeight);
+            $('#screen-width').val(screenWidth);
+            $('#screen-layout-id').val(layoutId);
+            $('#screen-submit-btn').text('Update Screen');
+            $('#screen-cancel-btn').show();
+            $('#screen-form-title').text('Edit Screen');
+            $('#offcanvas_screen_management').offcanvas('show');
+        });
+
+        // Delete screen from list
+        $(document).on('click', '.delete-screen-btn', function () {
+            const screenId = $(this).data('screen-id');
+            if (confirm('Are you sure you want to delete this screen?')) {
+                $.ajax({
+                    url: `/device-screen/${screenId}`,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            loadDeviceScreensForIndex();
+                            // Refresh main devices DataTable to update screens_count
+                            if (window.dataTable) {
+                                window.dataTable.ajax.reload(null, false);
+                            }
+                        } else {
+                            alert(response.message || 'Failed to delete screen');
+                        }
+                    },
+                    error: function () {
+                        alert('Failed to delete screen');
+                    }
+                });
+            }
+        });
+
+        // Cancel edit
+        $(document).on('click', '#screen-cancel-btn', function () {
+            $('#screen-form')[0].reset();
+            $('#screen-id').val('');
+            $('#screen-submit-btn').text('Add Screen');
+            $('#screen-cancel-btn').hide();
+            $('#screen-form-title').text('Add New Screen');
+        });
+
+        function populateLayoutOptionsForDevice(deviceId) {
+            const $select = $('#screen-layout-id');
+            $.ajax({
+                // Only fetch Active (status=1) layouts for the selected device
+                url: `/device/${deviceId}/layouts?status=1`,
+                type: 'GET',
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function (response) {
+                    // Clear options on success just before appending to avoid race duplicates
+                    $select.find('option:not(:first)').remove();
+                    if (response && response.success && Array.isArray(response.layouts)) {
+                        response.layouts.forEach(function (layout) {
+                            const typeMap = { 0: 'Full Screen', 1: 'Split Screen', 2: 'Three Grid Screen', 3: 'Four Grid Screen' };
+                            const text = `${layout.layout_name} (${typeMap[layout.layout_type] || 'Unknown'})`;
+                            $select.append(new Option(text, layout.id));
+                        });
+                    }
+                }
+            });
+        }
+
+        function loadDeviceScreensForIndex() {
+            const deviceId = $('#screen-device-id').val();
+            if (!deviceId) return;
+            $.ajax({
+                url: `/device/${deviceId}/screens`,
+                type: 'GET',
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function (response) {
+                    const tbody = $('#screen-table tbody');
+                    tbody.empty();
+                    if (!response || !response.success || !Array.isArray(response.screens) || response.screens.length === 0) {
+                        tbody.append('<tr><td colspan="6" class="text-center text-muted">No screens found</td></tr>');
+                        return;
+                    }
+                    response.screens.forEach(function (s) {
+                        const createdAt = s.created_at ? new Date(s.created_at).toLocaleString() : '';
+                        const row = `
+                            <tr>
+                                <td>${s.screen_no ?? ''}</td>
+                                <td>${s.screen_height ?? ''}</td>
+                                <td>${s.screen_width ?? ''}</td>
+                                <td>${(s.layout && s.layout.layout_name) ? s.layout.layout_name : ''}</td>
+                                <td>${createdAt}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary edit-screen-btn"
+                                            data-screen-id="${s.id}"
+                                            data-screen-no="${s.screen_no}"
+                                            data-screen-height="${s.screen_height}"
+                                            data-screen-width="${s.screen_width}"
+                                            data-layout-id="${s.layout_id}">
+                                            <i class="ti ti-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-screen-btn" data-screen-id="${s.id}">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        tbody.append(row);
+                    });
+                }
+            });
+        }
     }
 });
 

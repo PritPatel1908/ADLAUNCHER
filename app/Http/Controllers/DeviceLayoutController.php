@@ -146,7 +146,13 @@ class DeviceLayoutController extends Controller
      */
     public function getDeviceLayouts(Device $device)
     {
-        $layouts = $device->deviceLayouts()->get();
+        // Optionally filter by status if provided (e.g., status=1 for Active)
+        $query = $device->deviceLayouts();
+        $status = request('status');
+        if ($status !== null && $status !== '') {
+            $query->where('status', (int) $status);
+        }
+        $layouts = $query->get();
         return response()->json([
             'success' => true,
             'layouts' => $layouts,

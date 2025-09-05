@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceLayoutController;
+use App\Http\Controllers\DeviceScreenController;
 use App\Http\Controllers\ShowColumnController;
 
 // Authentication Routes
@@ -46,6 +47,10 @@ Route::resource('device-layout', DeviceLayoutController::class)->middleware('aut
 Route::get('/device-layouts', [DeviceLayoutController::class, 'index'])->name('device-layouts.index')->middleware('auth');
 Route::get('/device/{device}/layouts', [DeviceLayoutController::class, 'getDeviceLayouts'])->name('device.layouts')->middleware('auth');
 Route::get('/device-layout-stats', [DeviceLayoutController::class, 'getLayoutStats'])->name('device-layout.stats')->middleware('auth');
+
+// Device Screen Routes
+Route::resource('device-screen', DeviceScreenController::class)->middleware('auth');
+Route::get('/device/{device}/screens', [DeviceScreenController::class, 'getDeviceScreens'])->name('device.screens')->middleware('auth');
 
 // Column Visibility Routes
 Route::get('/columns', [ShowColumnController::class, 'getColumns'])->name('columns.get')->middleware('auth');

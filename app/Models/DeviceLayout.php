@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DeviceLayout extends Model
@@ -38,6 +39,14 @@ class DeviceLayout extends Model
     public function device(): BelongsTo
     {
         return $this->belongsTo(Device::class);
+    }
+
+    /**
+     * Screens under this layout.
+     */
+    public function screens(): HasMany
+    {
+        return $this->hasMany(DeviceScreen::class, 'layout_id');
     }
 
     /**

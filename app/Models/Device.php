@@ -49,6 +49,7 @@ class Device extends Model
     protected $appends = [
         'layouts_count',
         'active_layouts_count',
+        'screens_count',
     ];
 
     /**
@@ -100,6 +101,14 @@ class Device extends Model
     }
 
     /**
+     * Device screens relation.
+     */
+    public function deviceScreens(): HasMany
+    {
+        return $this->hasMany(DeviceScreen::class);
+    }
+
+    /**
      * Get the count of active layouts for this device.
      */
     public function getActiveLayoutsCountAttribute(): int
@@ -113,6 +122,14 @@ class Device extends Model
     public function getLayoutsCountAttribute(): int
     {
         return $this->deviceLayouts()->count();
+    }
+
+    /**
+     * Get the count of all screens for this device.
+     */
+    public function getScreensCountAttribute(): int
+    {
+        return $this->deviceScreens()->count();
     }
 
     /**

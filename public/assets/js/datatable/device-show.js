@@ -724,3 +724,211 @@ $(document).ready(function () {
         }, 5000);
     }
 });
+
+// Device Screen Management Functions
+$(document).ready(function () {
+    // Load device screens when screen management offcanvas is shown
+    $('#offcanvas_screen_management').on('show.bs.offcanvas', function () {
+        loadDeviceScreens();
+        if ($('#screen-form-alert').length) {
+            $('#screen-form-alert').hide().empty();
+        }
+    });
+
+    // Handle screen form submission
+    $('#screen-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const screenId = $('#screen-id').val();
+        const isEdit = screenId !== '';
+        const url = isEdit ? `/device-screen/${screenId}` : '/device-screen';
+
+        if (isEdit) {
+            formData.append('_method', 'PUT');
+        }
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                const $alertWrap = $('#screen-form-alert');
+                $alertWrap.show().html(`
+                    <div class="alert alert-${response.success ? 'success' : 'danger'} alert-dismissible fade show" role="alert">
+                        ${response.message || (response.success ? 'Success' : 'Failed')}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+
+                if (response.success) {
+                    $('#screen-form')[0].reset();
+                    $('#screen-id').val('');
+                    $('#screen-submit-btn').text('Add Screen');
+                    $('#screen-cancel-btn').hide();
+                    loadDeviceScreens();
+
+                    setTimeout(function () {
+                        $('#offcanvas_screen_management').offcanvas('hide');
+                        $alertWrap.hide().empty();
+                    }, 1200);
+                }
+            },
+            error: function (xhr) {
+                const response = xhr.responseJSON;
+                $('#screen-form-alert').show().html(`
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ${(response && (response.message || (response.errors && Object.values(response.errors)[0][0]))) || 'An error occurred'}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
+        });
+    });
+
+    // Edit screen
+    $(document).on('click', '.edit-screen-btn', function () {
+        const screenId = $(this).data('screen-id');
+        const screenNo = $(this).data('screen-no');
+        const screenHeight = $(this).data('screen-height');
+        const screenWidth = $(this).data('screen-width');
+        const layoutId = $(this).data('layout-id');
+
+        $('#screen-id').val(screenId);
+        $('#screen-no').val(screenNo);
+        $('#screen-height').val(screenHeight);
+        $('#screen-width').val(screenWidth);
+        $('#screen-layout-id').val(layoutId);
+        $('#screen-submit-btn').text('Update Screen');
+        $('#screen-cancel-btn').show();
+        $('#screen-form-title').text('Edit Screen');
+
+        $('#offcanvas_screen_management').offcanvas('show');
+    });
+
+    // Delete screen
+    $(document).on('click', '.delete-screen-btn', function () {
+        const screenId = $(this).data('screen-id');
+        if (confirm('Are you sure you want to delete this screen?')) {
+            $.ajax({
+                url: `/device-screen/${screenId}`,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.success) {
+                        loadDeviceScreens();
+                    } else {
+                        alert(response.message || 'Failed to delete screen');
+                    }
+                },
+                error: function () {
+                    alert('Failed to delete screen');
+                }
+            });
+        }
+    });
+
+    // Cancel edit
+    $('#screen-cancel-btn').on('click', function () {
+        $('#screen-form')[0].reset();
+        $('#screen-id').val('');
+        $('#screen-submit-btn').text('Add Screen');
+        $('#screen-cancel-btn').hide();
+        $('#screen-form-title').text('Add New Screen');
+    });
+
+    function loadDeviceScreens() {
+        try {
+            const deviceId = $('#screen-device-id').val();
+            if (!deviceId) return;
+
+            $.ajax({
+                url: `/device/${deviceId}/screens`,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (!response || !response.success) return;
+
+                    const screens = response.screens || [];
+
+                    // Update counts in the Device Screens card header
+                    const header = $(".card-header:contains('Device Screens')");
+                    header.find('.badge:contains("Total:")').text(`Total: ${response.counts?.total ?? screens.length}`);
+
+                    // Target the card body of the Device Screens section
+                    const cardBody = header.next('.card-body');
+
+                    if (screens.length === 0) {
+                        cardBody.html(`
+                            <div class="text-center py-4">
+                                <i class="ti ti-layout-grid text-muted" style="font-size: 3rem;"></i>
+                                <h6 class="text-muted mt-2">No screens found</h6>
+                                <p class="text-muted">This device doesn't have any screens configured yet.</p>
+                                <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_screen_management">
+                                    <i class="ti ti-plus me-1"></i>Add First Screen
+                                </button>
+                            </div>
+                        `);
+                        return;
+                    }
+
+                    let rowsHtml = '';
+                    screens.forEach(function (s) {
+                        const createdAt = s.created_at ? new Date(s.created_at).toLocaleString() : '';
+                        rowsHtml += `
+                            <tr>
+                                <td>${s.screen_no ?? ''}</td>
+                                <td>${s.screen_height ?? ''}</td>
+                                <td>${s.screen_width ?? ''}</td>
+                                <td>${(s.layout && s.layout.layout_name) ? s.layout.layout_name : ''}</td>
+                                <td>${createdAt}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary edit-screen-btn" data-screen-id="${s.id}" data-screen-no="${s.screen_no}" data-screen-height="${s.screen_height}" data-screen-width="${s.screen_width}" data-layout-id="${s.layout_id}">
+                                            <i class="ti ti-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-screen-btn" data-screen-id="${s.id}">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                    });
+
+                    const tableHtml = `
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Screen No</th>
+                                        <th>Height</th>
+                                        <th>Width</th>
+                                        <th>Layout</th>
+                                        <th>Created At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rowsHtml}</tbody>
+                            </table>
+                        </div>`;
+
+                    cardBody.html(tableHtml);
+                },
+                error: function () {
+                    console.error('Error fetching device screens');
+                }
+            });
+        } catch (e) {
+            console.error('Failed to load device screens:', e);
+        }
+    }
+});

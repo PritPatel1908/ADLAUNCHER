@@ -247,9 +247,12 @@
                                 <h5 class="card-title mb-0">Device Layouts</h5>
                                 <div class="d-flex gap-2 mt-1">
                                     <span class="badge badge-soft-primary">Total: {{ $device->layouts_count }}</span>
-                                    <span class="badge badge-soft-success">Active: {{ $device->active_layouts_count }}</span>
-                                    <span class="badge badge-soft-warning">Inactive: {{ $device->getLayoutsByStatus(2) }}</span>
-                                    <span class="badge badge-soft-danger">Blocked: {{ $device->getLayoutsByStatus(3) }}</span>
+                                    <span class="badge badge-soft-success">Active:
+                                        {{ $device->active_layouts_count }}</span>
+                                    <span class="badge badge-soft-warning">Inactive:
+                                        {{ $device->getLayoutsByStatus(2) }}</span>
+                                    <span class="badge badge-soft-danger">Blocked:
+                                        {{ $device->getLayoutsByStatus(3) }}</span>
                                 </div>
                             </div>
                             <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
@@ -343,6 +346,81 @@
                                     <button class="btn btn-primary" data-bs-toggle="offcanvas"
                                         data-bs-target="#offcanvas_layout_management">
                                         <i class="ti ti-plus me-1"></i>Add First Layout
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Screens Section -->
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5 class="card-title mb-0">Device Screens</h5>
+                                <div class="d-flex gap-2 mt-1">
+                                    <span class="badge badge-soft-primary">Total: {{ $device->screens_count }}</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvas_screen_management">
+                                <i class="ti ti-plus me-1"></i>Add Screen
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            @if ($device->deviceScreens->count() > 0)
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Screen No</th>
+                                                <th>Height</th>
+                                                <th>Width</th>
+                                                <th>Layout</th>
+                                                <th>Created At</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($device->deviceScreens as $screen)
+                                                <tr>
+                                                    <td>{{ $screen->screen_no }}</td>
+                                                    <td>{{ $screen->screen_height }}</td>
+                                                    <td>{{ $screen->screen_width }}</td>
+                                                    <td>{{ optional($screen->layout)->layout_name }}</td>
+                                                    <td>{{ $screen->created_at->format('d M Y, h:i A') }}</td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <button class="btn btn-sm btn-outline-primary edit-screen-btn"
+                                                                data-screen-id="{{ $screen->id }}"
+                                                                data-screen-no="{{ $screen->screen_no }}"
+                                                                data-screen-height="{{ $screen->screen_height }}"
+                                                                data-screen-width="{{ $screen->screen_width }}"
+                                                                data-layout-id="{{ $screen->layout_id }}">
+                                                                <i class="ti ti-edit"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger delete-screen-btn"
+                                                                data-screen-id="{{ $screen->id }}">
+                                                                <i class="ti ti-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center py-4">
+                                    <i class="ti ti-layout-grid text-muted" style="font-size: 3rem;"></i>
+                                    <h6 class="text-muted mt-2">No screens found</h6>
+                                    <p class="text-muted">This device doesn't have any screens configured yet.</p>
+                                    <button class="btn btn-primary" data-bs-toggle="offcanvas"
+                                        data-bs-target="#offcanvas_screen_management">
+                                        <i class="ti ti-plus me-1"></i>Add First Screen
                                     </button>
                                 </div>
                             @endif
@@ -634,6 +712,68 @@
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary" id="layout-submit-btn">Add Layout</button>
                         <button type="button" class="btn btn-secondary" id="layout-cancel-btn"
+                            style="display: none;">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Screen Management Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas_screen_management">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Device Screen Management</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Add/Edit Screen Form -->
+            <div class="mb-4">
+                <h6 id="screen-form-title">Add New Screen</h6>
+                <div id="screen-form-alert" class="mt-2" style="display: none;"></div>
+                <form id="screen-form">
+                    @csrf
+                    <input type="hidden" id="screen-id" name="screen_id">
+                    <input type="hidden" id="screen-device-id" name="device_id" value="{{ $device->id }}">
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="screen-no" class="form-label">Screen No</label>
+                                <input type="number" min="1" class="form-control" id="screen-no"
+                                    name="screen_no" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="screen-height" class="form-label">Height</label>
+                                <input type="number" min="1" class="form-control" id="screen-height"
+                                    name="screen_height" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="screen-width" class="form-label">Width</label>
+                                <input type="number" min="1" class="form-control" id="screen-width"
+                                    name="screen_width" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="screen-layout-id" class="form-label">Layout</label>
+                        <select class="form-select" id="screen-layout-id" name="layout_id" required>
+                            <option value="">Select Layout</option>
+                            @foreach ($device->deviceLayouts->where('status', 1) as $layout)
+                                <option value="{{ $layout->id }}">{{ $layout->layout_name }}
+                                    ({{ $layout->layout_type_name }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="screen-submit-btn">Add Screen</button>
+                        <button type="button" class="btn btn-secondary" id="screen-cancel-btn"
                             style="display: none;">Cancel</button>
                     </div>
                 </form>
