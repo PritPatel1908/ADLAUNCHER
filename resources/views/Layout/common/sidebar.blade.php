@@ -10,8 +10,7 @@
 
             <!-- Logo Small -->
             <a href="{{ route('dashboard') }}" class="logo-small">
-                {{-- <img src="{{ asset('assets/img/logo-small.svg') }}" alt="Logo"> --}}
-                A
+                <img src="{{ asset('assets/img/logo-small.svg') }}" alt="Logo">
             </a>
 
             <!-- Logo Dark -->
@@ -131,6 +130,15 @@
                 <li class="menu-title"><span>Users</span></li>
                 <li>
                     <ul>
+                        {{-- <li><a href="{{ route('user.index') }}"
+                                class="{{ request()->routeIs('user.*') ? 'active' : '' }}"><i
+                                    class="ti ti-users"></i><span>Manage Users</span></a>
+                        </li> --}}
+                        <li><a href="{{ route('role-permission.index') }}"
+                                class="{{ request()->routeIs('role-permission.*') || request()->routeIs('roles.*') ? 'active' : '' }}"><i
+                                    class="ti ti-user-shield"></i><span>Roles & Permissions</span></a></li>
+                        {{-- <li><a href="{{ route('dashboard') }}"><i class="ti ti-flag-question"></i><span>Delete
+                                    Request</span></a></li> --}}
                         <li>
                             <a href="{{ route('user.index') }}"
                                 class="{{ request()->routeIs('user.*') ? 'active' : '' }}"><i
@@ -190,10 +198,9 @@
                 <li class="menu-title"><span>User Management</span></li>
                 <li>
                     <ul>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-users"></i><span>Manage Users</span></a>
+                        <li><a href="{{ route('user.index') }}" class="{{ request()->routeIs('user.*') ? 'active' : '' }}"><i class="ti ti-users"></i><span>Manage Users</span></a>
                         </li>
-                        <li><a href="{{ route('dashboard') }}"><i class="ti ti-user-shield"></i><span>Roles &
-                                    Permissions</span></a></li>
+                        <li><a href="{{ route('role-permission.index') }}" class="{{ request()->routeIs('role-permission.*') || request()->routeIs('roles.*') ? 'active' : '' }}"><i class="ti ti-user-shield"></i><span>Roles & Permissions</span></a></li>
                         <li><a href="{{ route('dashboard') }}"><i class="ti ti-flag-question"></i><span>Delete
                                     Request</span></a></li>
                     </ul>

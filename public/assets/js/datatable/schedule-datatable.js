@@ -506,12 +506,77 @@ $(document).ready(function () {
         // Handle create schedule
         $('#create-schedule-form').on('submit', function (e) {
             e.preventDefault();
+            console.log('Form submission started');
+
+            // Ensure Schedule Info section is expanded
+            $('#basic').collapse('show');
+
+            // Client-side validation
+            var scheduleName = $('input[name="schedule_name"]').val();
+            var startDate = $('input[name="schedule_start_date_time"]').val();
+            var endDate = $('input[name="schedule_end_date_time"]').val();
+            var deviceId = $('select[name="device_id"]').val();
+
+            if (!scheduleName) {
+                alert('Please enter a schedule name');
+                return;
+            }
+            if (!startDate) {
+                alert('Please select a start date and time');
+                return;
+            }
+            if (!endDate) {
+                alert('Please select an end date and time');
+                return;
+            }
+            if (!deviceId) {
+                alert('Please select a device');
+                return;
+            }
+
+            console.log('All required fields validated successfully');
+
             var submitBtn = $(this).find('button[type="submit"]');
             var originalBtnText = submitBtn.html();
             submitBtn.html('Creating...').prop('disabled', true);
 
             // Use FormData for file uploads
             var formData = new FormData(this);
+
+            // Debug: Log form data
+            console.log('Form data being sent:');
+            for (var pair of formData.entries()) {
+                if (pair[1] instanceof File) {
+                    console.log(pair[0] + ': [File] ' + pair[1].name + ' (' + pair[1].size + ' bytes)');
+                } else {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+            }
+
+            // Debug: Check if required fields are present
+            console.log('Required field validation:');
+            console.log('Schedule Name:', scheduleName);
+            console.log('Start Date:', startDate);
+            console.log('End Date:', endDate);
+            console.log('Device ID:', deviceId);
+
+            // Debug: Check media data
+            console.log('Media titles:', $('input[name="media_title[]"]').map(function () { return this.value; }).get());
+            console.log('Media types:', $('select[name="media_type[]"]').map(function () { return this.value; }).get());
+            console.log('Media files:', $('input[name="media_file[]"]').map(function () { return this.files[0] ? this.files[0].name : 'No file'; }).get());
+
+            // Check file sizes
+            $('input[name="media_file[]"]').each(function (index) {
+                if (this.files[0]) {
+                    var file = this.files[0];
+                    console.log('File ' + index + ':', file.name, 'Size:', file.size, 'bytes', 'Type:', file.type);
+                    if (file.size > 200 * 1024 * 1024) { // 200MB limit
+                        alert('File ' + file.name + ' is too large. Maximum size is 200MB.');
+                        submitBtn.html(originalBtnText).prop('disabled', false);
+                        return false;
+                    }
+                }
+            });
 
             $.ajax({
                 url: '/schedule',
@@ -520,8 +585,23 @@ $(document).ready(function () {
                 dataType: 'json',
                 processData: false,
                 contentType: false,
+                timeout: 60000, // 60 second timeout for file uploads
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                beforeSend: function () {
+                    console.log('AJAX request being sent to /schedule');
+                },
+                xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function (evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = evt.loaded / evt.total * 100;
+                            console.log('Upload progress: ' + percentComplete + '%');
+                        }
+                    }, false);
+                    return xhr;
+                },
                 success: function (response) {
+                    console.log('Schedule creation response:', response);
                     if (response.success) {
                         var $wrap = $('#create-form-alert');
                         var $alert = $wrap.find('.alert');
@@ -533,16 +613,41 @@ $(document).ready(function () {
                         scheduleTable.ajax.reload();
                         setTimeout(function () { $('#offcanvas_add').offcanvas('hide'); }, 1200);
                     } else {
+                        console.log('Schedule creation failed:', response);
                         alert(response.message || 'Failed to create schedule');
                     }
                 },
                 error: function (xhr) {
+                    console.error('Schedule creation error:', xhr);
                     const res = xhr.responseJSON;
                     let msg = 'Error creating schedule.';
-                    if (res && res.errors) { msg = Object.values(res.errors)[0][0]; }
+                    if (res && res.errors) {
+                        // Show all validation errors
+                        const errorMessages = [];
+                        Object.keys(res.errors).forEach(field => {
+                            errorMessages.push(`${field}: ${res.errors[field][0]}`);
+                        });
+                        msg = errorMessages.join('\n');
+                    } else if (res && res.message) {
+                        msg = res.message;
+                    } else {
+                        // Check for common issues
+                        if (xhr.status === 422) {
+                            msg = 'Validation failed. Please check all required fields are filled.';
+                        } else if (xhr.status === 500) {
+                            msg = 'Server error. Please try again.';
+                        } else if (xhr.status === 0) {
+                            msg = 'Network error. Please check your connection.';
+                        } else if (xhr.statusText === 'timeout') {
+                            msg = 'Request timed out. Please try again.';
+                        }
+                    }
                     alert(msg);
                 },
-                complete: function () { submitBtn.html(originalBtnText).prop('disabled', false); }
+                complete: function (xhr, status) {
+                    console.log('AJAX request completed with status:', status);
+                    submitBtn.html(originalBtnText).prop('disabled', false);
+                }
             });
         });
 
@@ -567,10 +672,16 @@ $(document).ready(function () {
                         // Populate form fields
                         $('#edit-schedule_name').val(schedule.schedule_name || '');
 
-                        // Format datetime values for datetime-local input
+                        // Format datetime values for datetime-local input (preserve local timezone)
                         if (schedule.schedule_start_date_time) {
                             const startDate = new Date(schedule.schedule_start_date_time);
-                            const startFormatted = startDate.toISOString().slice(0, 16);
+                            // Use local timezone formatting instead of UTC
+                            const year = startDate.getFullYear();
+                            const month = String(startDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(startDate.getDate()).padStart(2, '0');
+                            const hours = String(startDate.getHours()).padStart(2, '0');
+                            const minutes = String(startDate.getMinutes()).padStart(2, '0');
+                            const startFormatted = `${year}-${month}-${day}T${hours}:${minutes}`;
                             $('#edit-schedule_start_date_time').val(startFormatted);
                         } else {
                             $('#edit-schedule_start_date_time').val('');
@@ -578,7 +689,13 @@ $(document).ready(function () {
 
                         if (schedule.schedule_end_date_time) {
                             const endDate = new Date(schedule.schedule_end_date_time);
-                            const endFormatted = endDate.toISOString().slice(0, 16);
+                            // Use local timezone formatting instead of UTC
+                            const year = endDate.getFullYear();
+                            const month = String(endDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(endDate.getDate()).padStart(2, '0');
+                            const hours = String(endDate.getHours()).padStart(2, '0');
+                            const minutes = String(endDate.getMinutes()).padStart(2, '0');
+                            const endFormatted = `${year}-${month}-${day}T${hours}:${minutes}`;
                             $('#edit-schedule_end_date_time').val(endFormatted);
                         } else {
                             $('#edit-schedule_end_date_time').val('');
@@ -831,12 +948,27 @@ $(document).ready(function () {
             var deviceId = $(this).val();
             var $layout = $('select[name="layout_id"]');
             var $screen = $('select[name="screen_id"]');
-            $layout.empty().append('<option value="">Loading...</option>').trigger('change.select2');
-            $screen.empty().append('<option value="">Select screen...</option>').trigger('change.select2');
+
+            // Clear and reset screen options
+            $screen.empty().append('<option value="">Select screen...</option>');
+            if ($screen.hasClass('select2-hidden-accessible')) {
+                $screen.select2('destroy');
+            }
+            $screen.select2();
+
+            // Clear and reset layout options
+            $layout.empty().append('<option value="">Loading...</option>');
+            if ($layout.hasClass('select2-hidden-accessible')) {
+                $layout.select2('destroy');
+            }
+            $layout.select2();
+
             if (!deviceId) {
-                $layout.empty().append('<option value="">Select layout...</option>').trigger('change');
+                $layout.empty().append('<option value="">Select layout...</option>');
+                $layout.trigger('change');
                 return;
             }
+
             $.ajax({
                 url: '/device/' + deviceId + '/layouts', type: 'GET', data: { status: 1 },
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
@@ -847,10 +979,12 @@ $(document).ready(function () {
                             $layout.append('<option value="' + l.id + '">' + l.layout_name + '</option>');
                         });
                     }
+                    // Refresh Select2 after populating options
                     $layout.trigger('change');
                 },
                 error: function () {
                     $layout.empty().append('<option value="">Failed to load layouts</option>');
+                    $layout.trigger('change');
                 }
             });
         });
@@ -859,13 +993,23 @@ $(document).ready(function () {
             var layoutId = $(this).val();
             var deviceId = $('select[name="device_id"]').val();
             var $screen = $('select[name="screen_id"]');
-            $screen.empty().append('<option value="">Loading...</option>').trigger('change.select2');
+
+            // Clear and reset screen options
+            $screen.empty().append('<option value="">Loading...</option>');
+            if ($screen.hasClass('select2-hidden-accessible')) {
+                $screen.select2('destroy');
+            }
+            $screen.select2();
+
             if (!deviceId) {
-                $screen.empty().append('<option value="">Select screen...</option>').trigger('change');
+                $screen.empty().append('<option value="">Select screen...</option>');
+                $screen.trigger('change');
                 return;
             }
+
             var data = {};
             if (layoutId) { data.layout_id = layoutId; }
+
             $.ajax({
                 url: '/device/' + deviceId + '/screens', type: 'GET', data: data,
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
@@ -878,10 +1022,101 @@ $(document).ready(function () {
                             $screen.append('<option value="' + s.id + '">' + label + '</option>');
                         });
                     }
+                    // Refresh Select2 after populating options
                     $screen.trigger('change');
                 },
                 error: function () {
                     $screen.empty().append('<option value="">Failed to load screens</option>');
+                    $screen.trigger('change');
+                }
+            });
+        });
+
+        // Edit form dependent selects: device -> layouts (active), layout -> screens
+        $(document).on('change', '#edit-device_id', function () {
+            var deviceId = $(this).val();
+            var $layout = $('#edit-layout_id');
+            var $screen = $('#edit-screen_id');
+
+            // Clear and reset screen options
+            $screen.empty().append('<option value="">Select screen...</option>');
+            if ($screen.hasClass('select2-hidden-accessible')) {
+                $screen.select2('destroy');
+            }
+            $screen.select2();
+
+            // Clear and reset layout options
+            $layout.empty().append('<option value="">Loading...</option>');
+            if ($layout.hasClass('select2-hidden-accessible')) {
+                $layout.select2('destroy');
+            }
+            $layout.select2();
+
+            if (!deviceId) {
+                $layout.empty().append('<option value="">Select layout...</option>');
+                $layout.trigger('change');
+                return;
+            }
+
+            $.ajax({
+                url: '/device/' + deviceId + '/layouts', type: 'GET', data: { status: 1 },
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function (res) {
+                    $layout.empty().append('<option value="">Select layout...</option>');
+                    if (res && res.success && Array.isArray(res.layouts)) {
+                        res.layouts.forEach(function (l) {
+                            $layout.append('<option value="' + l.id + '">' + l.layout_name + '</option>');
+                        });
+                    }
+                    // Refresh Select2 after populating options
+                    $layout.trigger('change');
+                },
+                error: function () {
+                    $layout.empty().append('<option value="">Failed to load layouts</option>');
+                    $layout.trigger('change');
+                }
+            });
+        });
+
+        $(document).on('change', '#edit-layout_id', function () {
+            var layoutId = $(this).val();
+            var deviceId = $('#edit-device_id').val();
+            var $screen = $('#edit-screen_id');
+
+            // Clear and reset screen options
+            $screen.empty().append('<option value="">Loading...</option>');
+            if ($screen.hasClass('select2-hidden-accessible')) {
+                $screen.select2('destroy');
+            }
+            $screen.select2();
+
+            if (!deviceId) {
+                $screen.empty().append('<option value="">Select screen...</option>');
+                $screen.trigger('change');
+                return;
+            }
+
+            var data = {};
+            if (layoutId) { data.layout_id = layoutId; }
+
+            $.ajax({
+                url: '/device/' + deviceId + '/screens', type: 'GET', data: data,
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function (res) {
+                    $screen.empty().append('<option value="">Select screen...</option>');
+                    if (res && res.success && Array.isArray(res.screens)) {
+                        res.screens.forEach(function (s) {
+                            var label = 'Screen ' + s.screen_no;
+                            if (s.layout && s.layout.layout_name) { label += ' - ' + s.layout.layout_name; }
+                            $screen.append('<option value="' + s.id + '">' + label + '</option>');
+                        });
+                    }
+                    // Refresh Select2 after populating options
+                    $screen.trigger('change');
+                },
+                error: function () {
+                    $screen.empty().append('<option value="">Failed to load screens</option>');
+                    $screen.trigger('change');
                 }
             });
         });

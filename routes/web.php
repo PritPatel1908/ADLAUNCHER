@@ -12,6 +12,7 @@ use App\Http\Controllers\DeviceScreenController;
 use App\Http\Controllers\ShowColumnController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleMediaController;
+use App\Http\Controllers\RolePermissionController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -64,3 +65,11 @@ Route::get('/schedule/{schedule}/medias', [ScheduleMediaController::class, 'getS
 // Column Visibility Routes
 Route::get('/columns', [ShowColumnController::class, 'getColumns'])->name('columns.get')->middleware('auth');
 Route::post('/columns', [ShowColumnController::class, 'updateColumn'])->name('columns.update')->middleware('auth');
+
+// Role & Permission Routes
+Route::get('/role-permission', [RolePermissionController::class, 'index'])->name('role-permission.index')->middleware('auth');
+Route::get('/roles/data', [RolePermissionController::class, 'getRolesData'])->name('roles.data')->middleware('auth');
+Route::resource('roles', RolePermissionController::class)->middleware('auth');
+Route::get('/roles/{role}/permissions', [RolePermissionController::class, 'getPermissions'])->name('roles.permissions')->middleware('auth');
+Route::post('/roles/{role}/permissions', [RolePermissionController::class, 'storePermissions'])->name('roles.permissions.store')->middleware('auth');
+Route::get('/role-permission/stats', [RolePermissionController::class, 'getStats'])->name('role-permission.stats')->middleware('auth');

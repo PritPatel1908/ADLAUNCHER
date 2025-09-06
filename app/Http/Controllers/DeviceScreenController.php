@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\DeviceScreen;
+use App\Models\DeviceLayout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -37,7 +38,18 @@ class DeviceScreenController extends Controller
         try {
             DB::beginTransaction();
 
-            // Ensure screen_no is unique per device if needed
+            // Get the layout to check its type and screen limits
+            $layout = DeviceLayout::findOrFail($request->layout_id);
+            
+            // Check if layout allows adding more screens
+            if (!$layout->canAddMoreScreens()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "This layout type ({$layout->layout_type_name}) allows maximum {$layout->max_screens} screen(s). You have already reached the limit."
+                ], 422);
+            }
+
+            // Ensure screen_no is unique per device
             $exists = DeviceScreen::where('device_id', $request->device_id)
                 ->where('screen_no', $request->screen_no)
                 ->exists();
@@ -45,6 +57,17 @@ class DeviceScreenController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Screen number already exists for this device.'
+                ], 422);
+            }
+
+            // Check for dimension conflicts (same height and width in same device)
+            $deviceScreen = new DeviceScreen();
+            if ($deviceScreen->hasDimensionConflict($request->screen_height, $request->screen_width, $request->device_id)) {
+                $conflictingScreens = $deviceScreen->getConflictingScreens($request->screen_height, $request->screen_width, $request->device_id);
+                $conflictInfo = $conflictingScreens->pluck('screen_no')->join(', ');
+                return response()->json([
+                    'success' => false,
+                    'message' => "Screen dimensions ({$request->screen_height}x{$request->screen_width}) already exist for screen(s): {$conflictInfo}. Please use different dimensions."
                 ], 422);
             }
 
@@ -61,7 +84,12 @@ class DeviceScreenController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Device screen created successfully',
-                'screen' => $screen->load(['device', 'layout'])
+                'screen' => $screen->load(['device', 'layout']),
+                'layout_info' => [
+                    'max_screens' => $layout->max_screens,
+                    'remaining_slots' => $layout->remaining_screen_slots,
+                    'layout_type' => $layout->layout_type_name
+                ]
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -99,6 +127,24 @@ class DeviceScreenController extends Controller
         try {
             DB::beginTransaction();
 
+            // Get the layout to check its type and screen limits
+            $layout = DeviceLayout::findOrFail($request->layout_id);
+            
+            // If changing layout, check if new layout allows this screen
+            if ($deviceScreen->layout_id != $request->layout_id) {
+                // Count screens in the new layout (excluding current screen)
+                $screensInNewLayout = DeviceScreen::where('layout_id', $request->layout_id)
+                    ->where('id', '!=', $deviceScreen->id)
+                    ->count();
+                
+                if ($screensInNewLayout >= $layout->max_screens) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Cannot move screen to this layout. Layout type ({$layout->layout_type_name}) allows maximum {$layout->max_screens} screen(s) and already has {$screensInNewLayout} screen(s)."
+                    ], 422);
+                }
+            }
+
             // Ensure screen_no uniqueness per device when updating
             $exists = DeviceScreen::where('device_id', $deviceScreen->device_id)
                 ->where('screen_no', $request->screen_no)
@@ -108,6 +154,16 @@ class DeviceScreenController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Screen number already exists for this device.'
+                ], 422);
+            }
+
+            // Check for dimension conflicts (same height and width in same device, excluding current screen)
+            if ($deviceScreen->hasDimensionConflict($request->screen_height, $request->screen_width, $deviceScreen->device_id, $deviceScreen->id)) {
+                $conflictingScreens = $deviceScreen->getConflictingScreens($request->screen_height, $request->screen_width, $deviceScreen->device_id, $deviceScreen->id);
+                $conflictInfo = $conflictingScreens->pluck('screen_no')->join(', ');
+                return response()->json([
+                    'success' => false,
+                    'message' => "Screen dimensions ({$request->screen_height}x{$request->screen_width}) already exist for screen(s): {$conflictInfo}. Please use different dimensions."
                 ], 422);
             }
 
@@ -123,7 +179,12 @@ class DeviceScreenController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Device screen updated successfully',
-                'screen' => $deviceScreen->load(['device', 'layout'])
+                'screen' => $deviceScreen->load(['device', 'layout']),
+                'layout_info' => [
+                    'max_screens' => $layout->max_screens,
+                    'remaining_slots' => $layout->remaining_screen_slots,
+                    'layout_type' => $layout->layout_type_name
+                ]
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -165,9 +226,29 @@ class DeviceScreenController extends Controller
             $query->where('layout_id', (int) $layoutId);
         }
         $screens = $query->get();
+        
+        // Get layout information if layout_id is provided
+        $layoutInfo = null;
+        if ($layoutId !== null && $layoutId !== '') {
+            $layout = DeviceLayout::find($layoutId);
+            if ($layout) {
+                $layoutInfo = [
+                    'id' => $layout->id,
+                    'name' => $layout->layout_name,
+                    'type' => $layout->layout_type,
+                    'type_name' => $layout->layout_type_name,
+                    'max_screens' => $layout->max_screens,
+                    'current_screens' => $screens->count(),
+                    'remaining_slots' => $layout->remaining_screen_slots,
+                    'can_add_more' => $layout->canAddMoreScreens()
+                ];
+            }
+        }
+        
         return response()->json([
             'success' => true,
             'screens' => $screens,
+            'layout_info' => $layoutInfo,
             'counts' => [
                 'total' => $device->screens_count,
             ]

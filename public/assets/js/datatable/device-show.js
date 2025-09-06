@@ -725,6 +725,16 @@ $(document).ready(function () {
     }
 });
 
+// Helper function for screen alerts
+function showScreenAlert(type, message) {
+    $('#screen-form-alert').show().html(`
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `);
+}
+
 // Device Screen Management Functions
 $(document).ready(function () {
     // Load device screens when screen management offcanvas is shown
@@ -733,15 +743,90 @@ $(document).ready(function () {
         if ($('#screen-form-alert').length) {
             $('#screen-form-alert').hide().empty();
         }
+        // Reset layout info
+        $('#layout-info').hide();
+    });
+
+    // Handle layout selection change
+    $('#screen-layout-id').on('change', function() {
+        const layoutId = $(this).val();
+        const selectedOption = $(this).find('option:selected');
+        const layoutType = selectedOption.data('layout-type');
+        const layoutTypeName = selectedOption.data('layout-type-name');
+        
+        if (layoutId && layoutType !== undefined) {
+            // Get layout information and current screen count
+            $.ajax({
+                url: `/device/{{ $device->id }}/screens`,
+                type: 'GET',
+                data: { layout_id: layoutId },
+                success: function(response) {
+                    if (response.success && response.layout_info) {
+                        const layoutInfo = response.layout_info;
+                        const remainingSlots = layoutInfo.remaining_slots;
+                        const maxScreens = layoutInfo.max_screens;
+                        const currentScreens = layoutInfo.current_screens;
+                        
+                        $('#layout-type-info').text(layoutTypeName);
+                        $('#layout-limit-info').text(`Max: ${maxScreens} screens, Current: ${currentScreens}, Remaining: ${remainingSlots}`);
+                        $('#layout-info').show();
+                        
+                        // Disable/enable submit button based on remaining slots
+                        const submitBtn = $('#screen-submit-btn');
+                        if (remainingSlots <= 0 && !$('#screen-id').val()) {
+                            submitBtn.prop('disabled', true).text('Layout Full');
+                        } else {
+                            submitBtn.prop('disabled', false).text($('#screen-id').val() ? 'Update Screen' : 'Add Screen');
+                        }
+                    }
+                },
+                error: function() {
+                    $('#layout-info').hide();
+                }
+            });
+        } else {
+            $('#layout-info').hide();
+            $('#screen-submit-btn').prop('disabled', false);
+        }
     });
 
     // Handle screen form submission
     $('#screen-form').on('submit', function (e) {
         e.preventDefault();
 
-        const formData = new FormData(this);
+        // Frontend validation
+        const screenHeight = $('#screen-height').val();
+        const screenWidth = $('#screen-width').val();
+        const layoutId = $('#screen-layout-id').val();
         const screenId = $('#screen-id').val();
         const isEdit = screenId !== '';
+
+        // Check if layout is selected
+        if (!layoutId) {
+            showScreenAlert('danger', 'Please select a layout first.');
+            return;
+        }
+
+        // Check for duplicate dimensions (basic frontend check)
+        if (!isEdit) {
+            const existingScreens = $('.screen-row');
+            let hasConflict = false;
+            existingScreens.each(function() {
+                const existingHeight = $(this).find('.screen-height').text();
+                const existingWidth = $(this).find('.screen-width').text();
+                if (existingHeight === screenHeight && existingWidth === screenWidth) {
+                    hasConflict = true;
+                    return false; // break loop
+                }
+            });
+            
+            if (hasConflict) {
+                showScreenAlert('danger', `Screen dimensions ${screenHeight}x${screenWidth} already exist. Please use different dimensions.`);
+                return;
+            }
+        }
+
+        const formData = new FormData(this);
         const url = isEdit ? `/device-screen/${screenId}` : '/device-screen';
 
         if (isEdit) {
@@ -771,7 +856,26 @@ $(document).ready(function () {
                     $('#screen-id').val('');
                     $('#screen-submit-btn').text('Add Screen');
                     $('#screen-cancel-btn').hide();
+                    $('#layout-info').hide();
                     loadDeviceScreens();
+
+                    // Update layout info if provided
+                    if (response.layout_info) {
+                        const layoutInfo = response.layout_info;
+                        const remainingSlots = layoutInfo.remaining_slots;
+                        const maxScreens = layoutInfo.max_screens;
+                        const currentScreens = layoutInfo.current_screens;
+                        
+                        $('#layout-limit-info').text(`Max: ${maxScreens} screens, Current: ${currentScreens}, Remaining: ${remainingSlots}`);
+                        
+                        // Update submit button state
+                        const submitBtn = $('#screen-submit-btn');
+                        if (remainingSlots <= 0) {
+                            submitBtn.prop('disabled', true).text('Layout Full');
+                        } else {
+                            submitBtn.prop('disabled', false).text('Add Screen');
+                        }
+                    }
 
                     setTimeout(function () {
                         $('#offcanvas_screen_management').offcanvas('hide');

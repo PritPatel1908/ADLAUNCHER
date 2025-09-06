@@ -365,10 +365,16 @@
                                     <span class="badge badge-soft-primary">Total: {{ $device->screens_count }}</span>
                                 </div>
                             </div>
-                            <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
-                                data-bs-target="#offcanvas_screen_management">
-                                <i class="ti ti-plus me-1"></i>Add Screen
-                            </button>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-info btn-sm" data-bs-toggle="offcanvas"
+                                    data-bs-target="#offcanvas_screen_preview" id="preview-screens-btn">
+                                    <i class="ti ti-eye me-1"></i>Preview Screens
+                                </button>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
+                                    data-bs-target="#offcanvas_screen_management">
+                                    <i class="ti ti-plus me-1"></i>Add Screen
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             @if ($device->deviceScreens->count() > 0)
@@ -764,11 +770,18 @@
                         <select class="form-select" id="screen-layout-id" name="layout_id" required>
                             <option value="">Select Layout</option>
                             @foreach ($device->deviceLayouts->where('status', 1) as $layout)
-                                <option value="{{ $layout->id }}">{{ $layout->layout_name }}
-                                    ({{ $layout->layout_type_name }})
+                                <option value="{{ $layout->id }}" data-layout-type="{{ $layout->layout_type }}"
+                                    data-layout-type-name="{{ $layout->layout_type_name }}">
+                                    {{ $layout->layout_name }} ({{ $layout->layout_type_name }})
                                 </option>
                             @endforeach
                         </select>
+                        <div id="layout-info" class="mt-2" style="display: none;">
+                            <small class="text-muted">
+                                <span id="layout-type-info"></span> -
+                                <span id="layout-limit-info"></span>
+                            </small>
+                        </div>
                     </div>
 
                     <div class="d-flex gap-2">
@@ -777,6 +790,57 @@
                             style="display: none;">Cancel</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Screen Preview Offcanvas -->
+    <div class="offcanvas offcanvas-end offcanvas-large" tabindex="-1" id="offcanvas_screen_preview">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Device Screen Preview</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Screen Layout Preview</h6>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary" id="refresh-preview-btn">
+                            <i class="ti ti-refresh me-1"></i>Refresh
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                                <i class="ti ti-settings me-1"></i>Options
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" id="show-dimensions-btn">
+                                        <i class="ti ti-ruler me-1"></i>Show Dimensions
+                                    </a></li>
+                                <li><a class="dropdown-item" href="#" id="show-screen-numbers-btn">
+                                        <i class="ti ti-hash me-1"></i>Show Screen Numbers
+                                    </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen-preview-container" class="screen-preview-container">
+                <div class="text-center py-5" id="preview-loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading screen preview...</p>
+                </div>
+                <div id="preview-content" style="display: none;">
+                    <!-- Screen previews will be rendered here -->
+                </div>
+                <div id="preview-empty" class="text-center py-5" style="display: none;">
+                    <i class="ti ti-layout-grid text-muted" style="font-size: 3rem;"></i>
+                    <h6 class="text-muted mt-2">No screens to preview</h6>
+                    <p class="text-muted">This device doesn't have any screens configured yet.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -845,6 +909,135 @@
             background-color: #e9ecef !important;
             color: #495057 !important;
         }
+
+        /* Screen Preview Styles */
+        .screen-preview-container {
+            min-height: 400px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .screen-preview-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .screen-preview-item {
+            background: #fff;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .screen-preview-item:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .screen-preview-item .screen-content {
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen-preview-item .screen-number {
+            font-weight: bold;
+            color: #0d6efd;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .screen-preview-item .screen-dimensions {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .screen-preview-item .screen-layout {
+            font-size: 11px;
+            color: #28a745;
+            background: #d4edda;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .screen-preview-item .screen-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .screen-preview-item:hover .screen-overlay {
+            display: flex;
+        }
+
+        .preview-options {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        .preview-legend {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        .preview-legend .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .preview-legend .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+
+        .layout-group {
+            margin-bottom: 20px;
+        }
+
+        .layout-group-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #dee2e6;
+        }
     </style>
 
     <script>
@@ -885,6 +1078,165 @@
                 console.log('Force re-initializing Select2...');
                 initializeSelect2();
             }, 1000);
+
+            // Screen Preview Functionality
+            let showDimensions = false;
+            let showScreenNumbers = true;
+
+            // Preview screens button click
+            $('#preview-screens-btn').on('click', function() {
+                loadScreenPreview();
+            });
+
+            // Refresh preview button
+            $('#refresh-preview-btn').on('click', function() {
+                loadScreenPreview();
+            });
+
+            // Show dimensions toggle
+            $('#show-dimensions-btn').on('click', function(e) {
+                e.preventDefault();
+                showDimensions = !showDimensions;
+                $(this).find('i').toggleClass('ti-ruler ti-ruler-off');
+                renderScreenPreview();
+            });
+
+            // Show screen numbers toggle
+            $('#show-screen-numbers-btn').on('click', function(e) {
+                e.preventDefault();
+                showScreenNumbers = !showScreenNumbers;
+                $(this).find('i').toggleClass('ti-hash ti-hash-off');
+                renderScreenPreview();
+            });
+
+            function loadScreenPreview() {
+                const deviceId = {{ $device->id }};
+
+                // Show loading
+                $('#preview-loading').show();
+                $('#preview-content').hide();
+                $('#preview-empty').hide();
+
+                $.ajax({
+                    url: `/device/${deviceId}/screens`,
+                    type: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        $('#preview-loading').hide();
+
+                        if (response.success && response.screens && response.screens.length > 0) {
+                            window.screenPreviewData = response.screens;
+                            renderScreenPreview();
+                            $('#preview-content').show();
+                        } else {
+                            $('#preview-empty').show();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#preview-loading').hide();
+                        $('#preview-empty').show();
+                        console.error('Error loading screen preview:', error);
+                    }
+                });
+            }
+
+            function renderScreenPreview() {
+                if (!window.screenPreviewData) return;
+
+                const screens = window.screenPreviewData;
+                const container = $('#preview-content');
+
+                // Group screens by layout
+                const layoutGroups = {};
+                screens.forEach(screen => {
+                    const layoutName = screen.layout ? screen.layout.layout_name : 'No Layout';
+                    if (!layoutGroups[layoutName]) {
+                        layoutGroups[layoutName] = [];
+                    }
+                    layoutGroups[layoutName].push(screen);
+                });
+
+                let html = '';
+
+                // Render each layout group
+                Object.keys(layoutGroups).forEach(layoutName => {
+                    const layoutScreens = layoutGroups[layoutName];
+                    html += `<div class="layout-group">`;
+                    html +=
+                        `<div class="layout-group-title">${layoutName} (${layoutScreens.length} screens)</div>`;
+                    html += `<div class="screen-preview-grid">`;
+
+                    layoutScreens.forEach(screen => {
+                        const aspectRatio = screen.screen_width / screen.screen_height;
+                        const baseSize = 120; // Base size in pixels
+                        const width = Math.max(80, Math.min(200, baseSize * aspectRatio));
+                        const height = Math.max(60, Math.min(150, baseSize / aspectRatio));
+
+                        html += `
+                            <div class="screen-preview-item" style="width: ${width}px; height: ${height}px;"
+                                 data-screen-id="${screen.id}"
+                                 data-screen-no="${screen.screen_no}"
+                                 data-width="${screen.screen_width}"
+                                 data-height="${screen.screen_height}">
+                                <div class="screen-content">
+                                    ${showScreenNumbers ? `<div class="screen-number">Screen ${screen.screen_no}</div>` : ''}
+                                    ${showDimensions ? `<div class="screen-dimensions">${screen.screen_width} × ${screen.screen_height}</div>` : ''}
+                                    <div class="screen-layout">${screen.layout ? screen.layout.layout_name : 'No Layout'}</div>
+                                </div>
+                                <div class="screen-overlay">
+                                    <div>
+                                        <div><strong>Screen ${screen.screen_no}</strong></div>
+                                        <div>${screen.screen_width} × ${screen.screen_height}</div>
+                                        <div>${screen.layout ? screen.layout.layout_name : 'No Layout'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div></div>`;
+                });
+
+                // Add legend
+                html += `
+                    <div class="preview-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #0d6efd;"></div>
+                            <span>Screen Number</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #6c757d;"></div>
+                            <span>Dimensions (Width × Height)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #d4edda;"></div>
+                            <span>Layout Name</span>
+                        </div>
+                    </div>
+                `;
+
+                container.html(html);
+
+                // Add click handlers for screen items
+                $('.screen-preview-item').on('click', function() {
+                    const screenId = $(this).data('screen-id');
+                    const screenNo = $(this).data('screen-no');
+                    const width = $(this).data('width');
+                    const height = $(this).data('height');
+
+                    // You can add more functionality here, like showing detailed info
+                    alert(`Screen ${screenNo}\nDimensions: ${width} × ${height}\nID: ${screenId}`);
+                });
+            }
+
+            // Load preview when offcanvas is shown
+            $('#offcanvas_screen_preview').on('shown.bs.offcanvas', function() {
+                if (!window.screenPreviewData) {
+                    loadScreenPreview();
+                }
+            });
         });
     </script>
 @endpush

@@ -100,7 +100,7 @@ $(document).ready(function () {
         $('.container-fluid').prepend(successHtml);
 
         // Auto-hide after 5 seconds
-        setTimeout(function() {
+        setTimeout(function () {
             $('.container-fluid .alert-success').fadeOut();
         }, 5000);
     }
@@ -152,14 +152,21 @@ $(document).ready(function () {
             mediaContainer.empty();
 
             // Add new media rows
-            medias.forEach(function(media) {
+            medias.forEach(function (media) {
                 const createdDate = media.formatted_created_date || 'N/A';
 
                 const mediaRow = `
                     <tr>
                         <td>${media.title || ''}</td>
                         <td>${media.media_type ? media.media_type.charAt(0).toUpperCase() + media.media_type.slice(1) : ''}</td>
-                        <td>${media.duration_seconds || 0}s</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary preview-media-btn"
+                                    data-media-file="${media.media_file || ''}"
+                                    data-media-type="${media.media_type || ''}"
+                                    data-media-title="${media.title || ''}">
+                                <i class="ti ti-eye"></i> Preview
+                            </button>
+                        </td>
                         <td>${createdDate}</td>
                     </tr>
                 `;
@@ -240,6 +247,75 @@ $(document).ready(function () {
             $('#edit-schedule-form').append(deleteInput);
         }
         $(this).closest('.media-item').remove();
+    });
+
+    // Media preview functionality
+    $(document).on('click', '.preview-media-btn', function () {
+        const mediaFile = $(this).data('media-file');
+        const mediaType = $(this).data('media-type');
+        const mediaTitle = $(this).data('media-title');
+
+        // Update modal title
+        $('#mediaPreviewModalLabel').text('Preview: ' + mediaTitle);
+
+        // Clear previous content
+        $('#mediaPreviewContent').empty();
+
+        // Generate media URL
+        const mediaUrl = window.location.origin + '/storage/' + mediaFile;
+
+        let mediaHtml = '';
+
+        // Create appropriate media element based on type
+        if (mediaType === 'image' || mediaType === 'png' || mediaType === 'jpg' || mediaType === 'jpeg') {
+            mediaHtml = `
+                <div class="media-preview-container">
+                    <img src="${mediaUrl}" alt="${mediaTitle}" class="img-fluid rounded">
+                </div>
+            `;
+        } else if (mediaType === 'video' || mediaType === 'mp4') {
+            mediaHtml = `
+                <div class="media-preview-container">
+                    <video controls class="w-100">
+                        <source src="${mediaUrl}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            `;
+        } else if (mediaType === 'audio') {
+            mediaHtml = `
+                <div class="media-preview-container">
+                    <audio controls class="w-100">
+                        <source src="${mediaUrl}" type="audio/mpeg">
+                        Your browser does not support the audio tag.
+                    </audio>
+                </div>
+            `;
+        } else if (mediaType === 'pdf') {
+            mediaHtml = `
+                <div class="media-preview-container">
+                    <iframe src="${mediaUrl}" type="application/pdf">
+                        <p>Your browser does not support PDFs. <a href="${mediaUrl}" target="_blank">Click here to download the PDF</a></p>
+                    </iframe>
+                </div>
+            `;
+        } else {
+            mediaHtml = `
+                <div class="media-preview-placeholder">
+                    <i class="ti ti-file" style="font-size: 3rem;"></i>
+                    <h6 class="mt-2">Preview not available</h6>
+                    <p>This file type cannot be previewed.</p>
+                    <a href="${mediaUrl}" target="_blank" class="btn btn-primary">
+                        <i class="ti ti-download"></i> Download File
+                    </a>
+                </div>
+            `;
+        }
+
+        $('#mediaPreviewContent').html(mediaHtml);
+
+        // Show modal
+        $('#mediaPreviewModal').modal('show');
     });
 });
 

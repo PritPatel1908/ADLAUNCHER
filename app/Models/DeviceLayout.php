@@ -76,4 +76,34 @@ class DeviceLayout extends Model
             default => 'Unknown'
         };
     }
+
+    /**
+     * Get maximum allowed screens for this layout type
+     */
+    public function getMaxScreensAttribute(): int
+    {
+        return match ($this->layout_type) {
+            self::LAYOUT_TYPE_FULL_SCREEN => 1,
+            self::LAYOUT_TYPE_SPLIT_SCREEN => 2,
+            self::LAYOUT_TYPE_THREE_GRID_SCREEN => 3,
+            self::LAYOUT_TYPE_FOUR_GRID_SCREEN => 4,
+            default => 1
+        };
+    }
+
+    /**
+     * Check if layout type allows adding more screens
+     */
+    public function canAddMoreScreens(): bool
+    {
+        return $this->screens()->count() < $this->max_screens;
+    }
+
+    /**
+     * Get remaining screen slots available
+     */
+    public function getRemainingScreenSlotsAttribute(): int
+    {
+        return max(0, $this->max_screens - $this->screens()->count());
+    }
 }

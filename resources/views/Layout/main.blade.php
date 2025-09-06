@@ -183,6 +183,71 @@
             color: #0c5460;
             border-left: 4px solid #17a2b8;
         }
+
+        /* Custom Design Improvements */
+        .navbar-header {
+            background: #fff !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background: #fff !important;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-wrapper {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .btn {
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+
+        .form-control:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .badge {
+            font-weight: 500;
+        }
+
+        .breadcrumb-item+.breadcrumb-item::before {
+            content: "›";
+            color: #6c757d;
+        }
+
+        .modal-content {
+            border: none;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
     </style>
 
     @stack('js')

@@ -1007,6 +1007,12 @@
                             <option value="">Select Layout</option>
                         </select>
                         <div class="form-text">Layouts for the selected device will appear here.</div>
+                        <div id="layout-info" class="mt-2" style="display: none;">
+                            <small class="text-muted">
+                                <span id="layout-type-info"></span> -
+                                <span id="layout-limit-info"></span>
+                            </small>
+                        </div>
                     </div>
 
                     <div class="d-flex gap-2">

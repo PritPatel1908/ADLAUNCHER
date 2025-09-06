@@ -61,10 +61,11 @@ class DatabaseSeeder extends Seeder
             'updated_by' => 1,
         ]);
 
-        // Seed companies and areas
+        // Seed companies, areas, and roles
         $this->call([
             CompanySeeder::class,
             AreaSeeder::class,
+            RolePermissionSeeder::class,
         ]);
     }
 }

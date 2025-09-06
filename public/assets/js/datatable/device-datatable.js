@@ -1039,9 +1039,40 @@ $(document).ready(function () {
         // Submit screen form (create/update)
         $(document).on('submit', '#screen-form', function (e) {
             e.preventDefault();
-            const formData = new FormData(this);
+            
+            // Frontend validation
+            const screenHeight = $('#screen-height').val();
+            const screenWidth = $('#screen-width').val();
+            const layoutId = $('#screen-layout-id').val();
             const screenId = $('#screen-id').val();
             const isEdit = screenId !== '';
+
+            // Check if layout is selected
+            if (!layoutId) {
+                showScreenAlert('danger', 'Please select a layout first.');
+                return;
+            }
+
+            // Check for duplicate dimensions (basic frontend check)
+            if (!isEdit) {
+                const existingScreens = $('.screen-row');
+                let hasConflict = false;
+                existingScreens.each(function() {
+                    const existingHeight = $(this).find('.screen-height').text();
+                    const existingWidth = $(this).find('.screen-width').text();
+                    if (existingHeight === screenHeight && existingWidth === screenWidth) {
+                        hasConflict = true;
+                        return false; // break loop
+                    }
+                });
+                
+                if (hasConflict) {
+                    showScreenAlert('danger', `Screen dimensions ${screenHeight}x${screenWidth} already exist. Please use different dimensions.`);
+                    return;
+                }
+            }
+
+            const formData = new FormData(this);
             const url = isEdit ? `/device-screen/${screenId}` : '/device-screen';
             if (isEdit) {
                 formData.append('_method', 'PUT');
@@ -1165,6 +1196,16 @@ $(document).ready(function () {
                     }
                 }
             });
+        }
+
+        // Helper function for screen alerts
+        function showScreenAlert(type, message) {
+            $('#screen-form-alert').show().html(`
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `);
         }
 
         function loadDeviceScreensForIndex() {

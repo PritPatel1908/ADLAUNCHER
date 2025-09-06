@@ -344,9 +344,10 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Device</label>
+                                                    <label class="form-label">Device <span
+                                                            class="text-danger">*</span></label>
                                                     <select class="form-control select2" name="device_id"
-                                                        data-toggle="select2">
+                                                        data-toggle="select2" required>
                                                         <option value="">Select device...</option>
                                                         @foreach (\App\Models\Device::where('status', 1)->get() as $device)
                                                             <option value="{{ $device->id }}">{{ $device->name }} -
@@ -376,7 +377,8 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="play_forever" value="1" id="play_forever">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            name="play_forever" value="1" id="play_forever">
                                                         <label class="form-check-label" for="play_forever">
                                                             Play Forever (Ignore end time)
                                                         </label>
@@ -560,7 +562,8 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="play_forever" value="1" id="edit-play_forever">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            name="play_forever" value="1" id="edit-play_forever">
                                                         <label class="form-check-label" for="edit-play_forever">
                                                             Play Forever (Ignore end time)
                                                         </label>

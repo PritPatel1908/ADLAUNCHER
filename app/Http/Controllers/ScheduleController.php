@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Schedule;
-use App\Models\ScheduleMedia;
 use App\Models\Device;
+use App\Models\Schedule;
 use App\Models\DeviceLayout;
 use App\Models\DeviceScreen;
 use Illuminate\Http\Request;
+use App\Models\ScheduleMedia;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ScheduleController extends Controller
 {
@@ -27,26 +27,55 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'schedule_name' => 'required|string|max:255',
-            'schedule_start_date_time' => 'required|date',
-            'schedule_end_date_time' => 'required|date|after_or_equal:schedule_start_date_time',
-            'device_id' => 'required|exists:devices,id',
-            'layout_id' => 'nullable|exists:device_layouts,id',
-            'screen_id' => 'nullable|exists:device_screens,id',
-            'play_forever' => 'nullable|boolean',
-            'media_title.*' => 'nullable|string|max:255',
-            'media_type.*' => 'nullable|string|in:image,video,audio,mp4,png,jpg,pdf',
-            'media_file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,avi,mov,mp3,wav,pdf|max:10240',
+        // Debug logging
+        Log::info('Schedule creation request received', [
+            'all_data' => $request->all(),
+            'files' => $request->allFiles(),
+            'has_schedule_name' => $request->has('schedule_name'),
+            'has_device_id' => $request->has('device_id'),
+            'has_start_date' => $request->has('schedule_start_date_time'),
+            'has_end_date' => $request->has('schedule_end_date_time'),
+            'content_type' => $request->header('Content-Type'),
+            'content_length' => $request->header('Content-Length'),
         ]);
+
+        try {
+            $request->validate([
+                'schedule_name' => 'required|string|max:255',
+                'schedule_start_date_time' => 'required|date',
+                'schedule_end_date_time' => 'required|date|after_or_equal:schedule_start_date_time',
+                'device_id' => 'required|exists:devices,id',
+                'layout_id' => 'nullable|exists:device_layouts,id',
+                'screen_id' => 'nullable|exists:device_screens,id',
+                'play_forever' => 'nullable|boolean',
+                'media_title.*' => 'nullable|string|max:255',
+                'media_type.*' => 'nullable|string|in:image,video,audio,mp4,png,jpg,pdf',
+                'media_file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,avi,mov,mp3,wav,pdf|max:204800', // 200MB limit
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Schedule validation failed', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all(),
+                'files' => $request->allFiles()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        }
 
         try {
             DB::beginTransaction();
 
+            // Convert datetime-local input to proper datetime format
+            $startDateTime = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $request->schedule_start_date_time);
+            $endDateTime = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $request->schedule_end_date_time);
+
             $schedule = Schedule::create([
                 'schedule_name' => $request->schedule_name,
-                'schedule_start_date_time' => $request->schedule_start_date_time,
-                'schedule_end_date_time' => $request->schedule_end_date_time,
+                'schedule_start_date_time' => $startDateTime,
+                'schedule_end_date_time' => $endDateTime,
                 'device_id' => $request->device_id,
                 'layout_id' => $request->layout_id,
                 'screen_id' => $request->screen_id,
@@ -74,6 +103,15 @@ class ScheduleController extends Controller
                             $filename = time() . '_' . $file->getClientOriginalName();
                             $path = $file->storeAs('schedule_media', $filename, 'public');
                             $mediaData['media_file'] = $path;
+                        } elseif (isset($mediaFiles[$i])) {
+                            // Log file upload errors for debugging
+                            Log::error('File upload failed', [
+                                'file_name' => $mediaFiles[$i]->getClientOriginalName(),
+                                'file_size' => $mediaFiles[$i]->getSize(),
+                                'file_mime' => $mediaFiles[$i]->getMimeType(),
+                                'errors' => $mediaFiles[$i]->getError(),
+                                'error_message' => $mediaFiles[$i]->getErrorMessage()
+                            ]);
                         }
 
                         ScheduleMedia::create($mediaData);
@@ -90,6 +128,12 @@ class ScheduleController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Schedule creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'files' => $request->allFiles()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create schedule: ' . $e->getMessage()
@@ -133,16 +177,20 @@ class ScheduleController extends Controller
             'play_forever' => 'nullable|boolean',
             'edit_media_title.*' => 'nullable|string|max:255',
             'edit_media_type.*' => 'nullable|string|in:image,video,audio,mp4,png,jpg,pdf',
-            'edit_media_file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,avi,mov,mp3,wav,pdf|max:10240',
+            'edit_media_file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,avi,mov,mp3,wav,pdf|max:204800', // 200MB limit
         ]);
 
         try {
             DB::beginTransaction();
 
+            // Convert datetime-local input to proper datetime format
+            $startDateTime = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $request->schedule_start_date_time);
+            $endDateTime = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $request->schedule_end_date_time);
+
             $schedule->update([
                 'schedule_name' => $request->schedule_name,
-                'schedule_start_date_time' => $request->schedule_start_date_time,
-                'schedule_end_date_time' => $request->schedule_end_date_time,
+                'schedule_start_date_time' => $startDateTime,
+                'schedule_end_date_time' => $endDateTime,
                 'device_id' => $request->device_id,
                 'layout_id' => $request->layout_id,
                 'screen_id' => $request->screen_id,
@@ -169,6 +217,15 @@ class ScheduleController extends Controller
                             $filename = time() . '_' . $file->getClientOriginalName();
                             $path = $file->storeAs('schedule_media', $filename, 'public');
                             $mediaData['media_file'] = $path;
+                        } elseif (isset($mediaFiles[$i])) {
+                            // Log file upload errors for debugging
+                            Log::error('File upload failed in update', [
+                                'file_name' => $mediaFiles[$i]->getClientOriginalName(),
+                                'file_size' => $mediaFiles[$i]->getSize(),
+                                'file_mime' => $mediaFiles[$i]->getMimeType(),
+                                'errors' => $mediaFiles[$i]->getError(),
+                                'error_message' => $mediaFiles[$i]->getErrorMessage()
+                            ]);
                         }
 
                         // Update existing media or create new one

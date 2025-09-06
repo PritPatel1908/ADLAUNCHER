@@ -178,7 +178,7 @@
                                             <tr>
                                                 <th>Title</th>
                                                 <th>Type</th>
-                                                <th>Duration</th>
+                                                <th>Preview</th>
                                                 <th>Created At</th>
                                             </tr>
                                         </thead>
@@ -187,7 +187,15 @@
                                                 <tr>
                                                     <td>{{ $m->title }}</td>
                                                     <td>{{ ucfirst($m->media_type) }}</td>
-                                                    <td>{{ $m->duration_seconds }}s</td>
+                                                    <td>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-primary preview-media-btn"
+                                                            data-media-file="{{ $m->media_file }}"
+                                                            data-media-type="{{ $m->media_type }}"
+                                                            data-media-title="{{ $m->title }}">
+                                                            <i class="ti ti-eye"></i> Preview
+                                                        </button>
+                                                    </td>
                                                     <td>{{ optional($m->created_at)->format('d M Y, h:i A') }}</td>
                                                 </tr>
                                             @endforeach
@@ -225,17 +233,17 @@
                     <form id="edit-schedule-form" method="POST" action="{{ route('schedule.update', $schedule->id) }}">
                         @csrf
                         @method('PUT')
-                        <div class="accordion accordion-bordered" id="main_accordion">
+                        <div class="accordion accordion-bordered" id="edit_main_accordion">
                             <div class="accordion-item rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded"
-                                        data-bs-toggle="collapse" data-bs-target="#basic">
+                                        data-bs-toggle="collapse" data-bs-target="#edit_basic">
                                         <span class="avatar avatar-md rounded me-1"><i class="ti ti-calendar"></i></span>
                                         Schedule Info
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse show" id="basic"
-                                    data-bs-parent="#main_accordion">
+                                <div class="accordion-collapse collapse show" id="edit_basic"
+                                    data-bs-parent="#edit_main_accordion">
                                     <div class="accordion-body border-top">
                                         <div class="row">
                                             <div class="col-md-6">
@@ -313,6 +321,18 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            name="play_forever" value="1" id="edit-play_forever"
+                                                            {{ $schedule->play_forever ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="edit-play_forever">
+                                                            Play Forever (Ignore end time)
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -320,13 +340,13 @@
                             <div class="accordion-item rounded mb-3">
                                 <div class="accordion-header">
                                     <a href="#" class="accordion-button accordion-custom-button rounded collapsed"
-                                        data-bs-toggle="collapse" data-bs-target="#edit-media">
+                                        data-bs-toggle="collapse" data-bs-target="#edit_media">
                                         <span class="avatar avatar-md rounded me-1"><i class="ti ti-photo"></i></span>
                                         Schedule Media
                                     </a>
                                 </div>
-                                <div class="accordion-collapse collapse" id="edit-media"
-                                    data-bs-parent="#main_accordion">
+                                <div class="accordion-collapse collapse" id="edit_media"
+                                    data-bs-parent="#edit_main_accordion">
                                     <div class="accordion-body border-top">
                                         <div id="edit-media-container">
                                             @if ($schedule->medias && $schedule->medias->count())
@@ -334,7 +354,7 @@
                                                     <div class="media-item border rounded p-3 mb-3"
                                                         data-media-id="{{ $media->id }}">
                                                         <div class="row">
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-5">
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Media Title</label>
                                                                     <input type="text" class="form-control"
@@ -343,7 +363,7 @@
                                                                         placeholder="Enter media title">
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-3">
+                                                            <div class="col-md-5">
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Media Type</label>
                                                                     <select class="form-control select2"
@@ -371,15 +391,6 @@
                                                                             {{ $media->media_type == 'pdf' ? 'selected' : '' }}>
                                                                             PDF</option>
                                                                     </select>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Duration (seconds)</label>
-                                                                    <input type="number" class="form-control"
-                                                                        name="edit_duration_seconds[]"
-                                                                        value="{{ $media->duration_seconds }}"
-                                                                        placeholder="Duration in seconds" min="1">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2">
@@ -414,7 +425,7 @@
                                             @else
                                                 <div class="media-item border rounded p-3 mb-3">
                                                     <div class="row">
-                                                        <div class="col-md-4">
+                                                        <div class="col-md-5">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Media Title</label>
                                                                 <input type="text" class="form-control"
@@ -422,7 +433,7 @@
                                                                     placeholder="Enter media title">
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-3">
+                                                        <div class="col-md-5">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Media Type</label>
                                                                 <select class="form-control select2"
@@ -436,14 +447,6 @@
                                                                     <option value="jpg">JPG</option>
                                                                     <option value="pdf">PDF</option>
                                                                 </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Duration (seconds)</label>
-                                                                <input type="number" class="form-control"
-                                                                    name="edit_duration_seconds[]"
-                                                                    placeholder="Duration in seconds" min="1">
                                                             </div>
                                                         </div>
                                                         <div class="col-md-2">
@@ -498,10 +501,170 @@
             </div>
         </div>
     </div>
+
+    <!-- Media Preview Modal -->
+    <div class="modal fade" id="mediaPreviewModal" tabindex="-1" aria-labelledby="mediaPreviewModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mediaPreviewModalLabel">Media Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="mediaPreviewContent">
+                        <!-- Media content will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
     <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/schedule-show.js') }}" type="text/javascript"></script>
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #d1d3e2 !important;
+            border-radius: 0.375rem !important;
+            padding: 0.375rem 0.75rem !important;
+            background-color: #fff !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 26px !important;
+            padding-left: 0 !important;
+            padding-right: 20px !important;
+            color: #495057 !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+            right: 8px !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #86b7fe !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25) !important;
+        }
+
+        .select2-dropdown {
+            border: 1px solid #d1d3e2 !important;
+            border-radius: 0.375rem !important;
+            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+        }
+
+        /* Media Preview Styles */
+        .media-preview-container {
+            max-width: 100%;
+            max-height: 500px;
+            overflow: hidden;
+        }
+
+        .media-preview-container img,
+        .media-preview-container video {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+        }
+
+        .media-preview-container audio {
+            width: 100%;
+        }
+
+        .media-preview-container iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+
+        .media-preview-placeholder {
+            padding: 2rem;
+            color: #6c757d;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            // Media preview functionality
+            $('.preview-media-btn').on('click', function() {
+                const mediaFile = $(this).data('media-file');
+                const mediaType = $(this).data('media-type');
+                const mediaTitle = $(this).data('media-title');
+
+                // Update modal title
+                $('#mediaPreviewModalLabel').text('Preview: ' + mediaTitle);
+
+                // Clear previous content
+                $('#mediaPreviewContent').empty();
+
+                // Generate media URL
+                const mediaUrl = '{{ asset('storage/') }}/' + mediaFile;
+
+                let mediaHtml = '';
+
+                // Create appropriate media element based on type
+                if (mediaType === 'image' || mediaType === 'png' || mediaType === 'jpg' || mediaType ===
+                    'jpeg') {
+                    mediaHtml = `
+                        <div class="media-preview-container">
+                            <img src="${mediaUrl}" alt="${mediaTitle}" class="img-fluid rounded">
+                        </div>
+                    `;
+                } else if (mediaType === 'video' || mediaType === 'mp4') {
+                    mediaHtml = `
+                        <div class="media-preview-container">
+                            <video controls class="w-100">
+                                <source src="${mediaUrl}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                } else if (mediaType === 'audio') {
+                    mediaHtml = `
+                        <div class="media-preview-container">
+                            <audio controls class="w-100">
+                                <source src="${mediaUrl}" type="audio/mpeg">
+                                Your browser does not support the audio tag.
+                            </audio>
+                        </div>
+                    `;
+                } else if (mediaType === 'pdf') {
+                    mediaHtml = `
+                        <div class="media-preview-container">
+                            <iframe src="${mediaUrl}" type="application/pdf">
+                                <p>Your browser does not support PDFs. <a href="${mediaUrl}" target="_blank">Click here to download the PDF</a></p>
+                            </iframe>
+                        </div>
+                    `;
+                } else {
+                    mediaHtml = `
+                        <div class="media-preview-placeholder">
+                            <i class="ti ti-file" style="font-size: 3rem;"></i>
+                            <h6 class="mt-2">Preview not available</h6>
+                            <p>This file type cannot be previewed.</p>
+                            <a href="${mediaUrl}" target="_blank" class="btn btn-primary">
+                                <i class="ti ti-download"></i> Download File
+                            </a>
+                        </div>
+                    `;
+                }
+
+                $('#mediaPreviewContent').html(mediaHtml);
+
+                // Show modal
+                $('#mediaPreviewModal').modal('show');
+            });
+        });
+    </script>
 @endpush

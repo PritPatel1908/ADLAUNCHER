@@ -30,9 +30,10 @@
             <div class="me-auto d-flex align-items-center header-search d-lg-flex d-none">
                 <!-- Search -->
                 <div class="input-icon position-relative me-2">
-                    <input type="text" class="form-control" placeholder="Search Keyword">
-                    <span class="input-icon-addon d-inline-flex p-0 header-search-icon"><i
-                            class="ti ti-command"></i></span>
+                    <input type="text" class="form-control border-0 shadow-sm" placeholder="Search Keyword"
+                        style="background-color: #f8f9fa; border-radius: 8px;">
+                    <span class="input-icon-addon d-inline-flex p-0 header-search-icon"
+                        style="right: 12px; color: #6c757d;"><i class="ti ti-search"></i></span>
                 </div>
                 <!-- /Search -->
             </div>
@@ -142,9 +143,10 @@
             <!-- message -->
             <div class="header-item">
                 <div class="dropdown me-2">
-                    <a href="{{ route('dashboard') }}" class="btn topbar-link">
+                    <a href="{{ route('dashboard') }}" class="btn topbar-link position-relative">
                         <i class="ti ti-message-circle-exclamation"></i>
-                        <span class="badge rounded-pill">14</span>
+                        <span class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
+                            style="font-size: 10px; min-width: 18px; height: 18px; line-height: 18px;">34</span>
                     </a>
                 </div>
             </div>
@@ -153,11 +155,12 @@
             <div class="header-item">
                 <div class="dropdown me-2">
 
-                    <button class="topbar-link btn topbar-link dropdown-toggle drop-arrow-none"
+                    <button class="topbar-link btn topbar-link dropdown-toggle drop-arrow-none position-relative"
                         data-bs-toggle="dropdown" data-bs-offset="0,24" type="button" aria-haspopup="false"
                         aria-expanded="false">
                         <i class="ti ti-bell-check fs-16 animate-ring"></i>
-                        <span class="badge rounded-pill">10</span>
+                        <span class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
+                            style="font-size: 10px; min-width: 18px; height: 18px; line-height: 18px;">40</span>
                     </button>
 
                     <div class="dropdown-menu p-0 dropdown-menu-end dropdown-menu-lg" style="min-height: 300px;">

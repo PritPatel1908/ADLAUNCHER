@@ -41,4 +41,36 @@ class DeviceScreen extends Model
     {
         return $this->belongsTo(DeviceLayout::class, 'layout_id');
     }
+
+    /**
+     * Check if screen dimensions conflict with existing screens in the same device
+     */
+    public function hasDimensionConflict(int $height, int $width, int $deviceId, ?int $excludeId = null): bool
+    {
+        $query = self::where('device_id', $deviceId)
+            ->where('screen_height', $height)
+            ->where('screen_width', $width);
+
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Get conflicting screens for given dimensions
+     */
+    public function getConflictingScreens(int $height, int $width, int $deviceId, ?int $excludeId = null)
+    {
+        $query = self::where('device_id', $deviceId)
+            ->where('screen_height', $height)
+            ->where('screen_width', $width);
+
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->get();
+    }
 }

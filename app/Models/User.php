@@ -84,6 +84,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the roles that belong to the user.
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+    }
+
+    /**
      * Get the companies associated with the user.
      */
     public function companies(): BelongsToMany
