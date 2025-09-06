@@ -3,140 +3,296 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="page-wrapper">
+    {{-- <div class="page-wrapper"> --}}
         <!-- Start Content -->
         <div class="content pb-0">
+
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                 <div>
-                    <h4 class="mb-1">Dashboard</h4>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                        </ol>
-                    </nav>
+                    <h4 class="mb-0">Deals Dashboard</h4>
+                </div>
+                <div class="gap-2 d-flex align-items-center flex-wrap">
+                    <div class="daterangepick form-control w-auto d-flex align-items-center">
+                        <i class="ti ti-calendar text-dark me-2"></i>
+                        <span class="reportrange-picker-field text-dark">23 May 2025 - 30 May 2025</span>
+                    </div>
+                    <a href="javascript:void(0);" class="btn btn-icon btn-outline-light shadow" data-bs-toggle="tooltip"
+                        data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
+                            class="ti ti-refresh"></i></a>
+                    <a href="javascript:void(0);" class="btn btn-icon btn-outline-light shadow" data-bs-toggle="tooltip"
+                        data-bs-placement="top" aria-label="Collapse" data-bs-original-title="Collapse" id="collapse-header"><i
+                            class="ti ti-transition-top"></i></a>
                 </div>
             </div>
             <!-- End Page Header -->
 
-            <!-- Dashboard Cards -->
+            <!-- start row -->
             <div class="row">
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 rounded-0">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="avatar-sm bg-primary-subtle rounded">
-                                        <span class="avatar-title bg-primary-subtle text-primary rounded fs-18">
-                                            <i class="ti ti-users"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Total Users</p>
-                                    <h4 class="mb-0">0</h4>
+
+                <div class="col-md-6 d-flex">
+                    <div class="card flex-fill">
+                        <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                            <h6 class="mb-0">Recently Created Deals</h6>
+                            <div class="dropdown">
+                                <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                    href="javascript:void(0);">
+                                    Last 30 days
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="javascript:void(0);" class="dropdown-item">
+                                        Last 15 days
+                                    </a>
+                                    <a href="javascript:void(0);" class="dropdown-item">
+                                        Last 30 days
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 rounded-0">
                         <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="avatar-sm bg-success-subtle rounded">
-                                        <span class="avatar-title bg-success-subtle text-success rounded fs-18">
-                                            <i class="ti ti-shield"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Total Roles</p>
-                                    <h4 class="mb-0">0</h4>
-                                </div>
+                            <div class="table-responsive custom-table">
+                                <table class="table dataTable table-nowrap" id="deals-project">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Deal Name</th>
+                                            <th>Stage</th>
+                                            <th>Deal Value</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </div> <!-- end card body -->
+                    </div> <!-- end card -->
+                </div> <!-- end col -->
 
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 rounded-0">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="avatar-sm bg-warning-subtle rounded">
-                                        <span class="avatar-title bg-warning-subtle text-warning rounded fs-18">
-                                            <i class="ti ti-building"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Total Companies</p>
-                                    <h4 class="mb-0">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6">
-                    <div class="card border-0 rounded-0">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="avatar-sm bg-info-subtle rounded">
-                                        <span class="avatar-title bg-info-subtle text-info rounded fs-18">
-                                            <i class="ti ti-map-pin"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-1">Total Locations</p>
-                                    <h4 class="mb-0">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card border-0 rounded-0">
+                <div class="col-md-6 d-flex">
+                    <div class="card flex-fill">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Quick Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3 mb-3">
-                                    <a href="{{ route('role-permission.index') }}" class="btn btn-primary w-100">
-                                        <i class="ti ti-shield me-2"></i>Manage Roles & Permissions
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="{{ route('user.index') }}" class="btn btn-success w-100">
-                                        <i class="ti ti-users me-2"></i>Manage Users
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="{{ route('company.index') }}" class="btn btn-warning w-100">
-                                        <i class="ti ti-building me-2"></i>Manage Companies
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="{{ route('location.index') }}" class="btn btn-info w-100">
-                                        <i class="ti ti-map-pin me-2"></i>Manage Locations
-                                    </a>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                                <h6 class="mb-0">Deals By Stage</h6>
+                                <div class="d-flex align-items-center flex-wrap row-gap-3">
+                                    <div class="dropdown me-2">
+                                        <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                            href="javascript:void(0);">
+                                            Sales Pipeline
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Marketing Pipeline
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Sales Pipeline
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Email
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Chats
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Operational
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                            href="javascript:void(0);">
+                                            Last 30 Days
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 30 Days
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 15 Days
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 7 Days
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                        <div class="card-body py-0">
+                            <div id="deals-chart"></div>
+                        </div> <!-- end card body -->
+                    </div> <!-- end card -->
+                </div> <!-- end col -->
+
             </div>
+            <!-- end row -->
+
+            <!-- start row -->
+            <div class="row">
+
+                <div class="col-md-6 d-flex">
+                    <div class="card flex-fill">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                                <h6 class="mb-0">Lost Deals Stage</h6>
+                                <div class="d-flex align-items-center flex-wrap row-gap-3">
+                                    <div class="dropdown me-2">
+                                        <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                            href="javascript:void(0);">
+                                            Marketing Pipeline
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Marketing Pipeline
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Sales Pipeline
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Email
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Chats
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Operational
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                            href="javascript:void(0);">
+                                            Last 30 Days
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 30 Days
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 6 months
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 12 months
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body py-0">
+                            <div id="last-chart"></div>
+                        </div> <!-- end card body -->
+                    </div> <!-- end card -->
+                </div> <!-- end col -->
+
+                <div class="col-md-6 d-flex">
+                    <div class="card flex-fill">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                                <h6 class="mb-0">Won Deals Stage</h6>
+                                <div class="d-flex align-items-center flex-wrap row-gap-3">
+                                    <div class="dropdown me-2">
+                                        <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                            href="javascript:void(0);">
+                                            Marketing Pipeline
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Marketing Pipeline
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Sales Pipeline
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Email
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Chats
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Operational
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                            href="javascript:void(0);">
+                                            Last 30 Days
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 30 Days
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 6 months
+                                            </a>
+                                            <a href="javascript:void(0);" class="dropdown-item">
+                                                Last 12 months
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body py-0">
+                            <div id="won-chart"></div>
+                        </div> <!-- end card body -->
+                    </div> <!-- end card -->
+                </div> <!-- end col -->
+
+            </div>
+            <!-- end row -->
+
+            <!-- start row -->
+            <div class="row">
+
+                <div class="col-md-12 d-flex">
+                    <div class="card w-100">
+                        <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                            <h6 class="mb-0">Deals by Year</h6>
+                            <div class="d-flex align-items-center flex-wrap row-gap-3">
+                                <div class="dropdown me-2">
+                                    <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                        href="javascript:void(0);">
+                                        Sales Pipeline
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="javascript:void(0);" class="dropdown-item">
+                                            Marketing Pipeline
+                                        </a>
+                                        <a href="javascript:void(0);" class="dropdown-item">
+                                            Sales Pipeline
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle btn btn-outline-light shadow" data-bs-toggle="dropdown"
+                                        href="javascript:void(0);">
+                                        Last 30 Days
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="javascript:void(0);" class="dropdown-item">
+                                            Last 3 months
+                                        </a>
+                                        <a href="javascript:void(0);" class="dropdown-item">
+                                            Last 6 months
+                                        </a>
+                                        <a href="javascript:void(0);" class="dropdown-item">
+                                            Last 12 months
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body py-0">
+                            <div id="deals-year"></div>
+                        </div> <!-- end card body -->
+                    </div> <!-- end card -->
+                </div> <!-- end col -->
+
+            </div>
+            <!-- end row -->
+
         </div>
         <!-- End Content -->
-    </div>
+    {{-- </div> --}}
 @endsection

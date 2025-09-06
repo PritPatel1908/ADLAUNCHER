@@ -21,9 +21,9 @@ Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Dashboard Route (placeholder)
+// Dashboard Route
 Route::get('/', function () {
-    return view('dashboard.index');
+    return view('Dashboard.index');
 })->name('dashboard')->middleware('auth');
 
 Route::resource('location', LocationController::class)->middleware('auth');
@@ -68,6 +68,7 @@ Route::post('/columns', [ShowColumnController::class, 'updateColumn'])->name('co
 
 // Role & Permission Routes
 Route::get('/role-permission', [RolePermissionController::class, 'index'])->name('role-permission.index')->middleware('auth');
+Route::get('/permissions', [RolePermissionController::class, 'permissionIndex'])->name('permissions.index')->middleware('auth');
 Route::get('/roles/data', [RolePermissionController::class, 'getRolesData'])->name('roles.data')->middleware('auth');
 Route::resource('roles', RolePermissionController::class)->middleware('auth');
 Route::get('/roles/{role}/permissions', [RolePermissionController::class, 'getPermissions'])->name('roles.permissions')->middleware('auth');

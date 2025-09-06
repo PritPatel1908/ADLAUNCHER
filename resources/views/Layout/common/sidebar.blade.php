@@ -134,9 +134,15 @@
                                 class="{{ request()->routeIs('user.*') ? 'active' : '' }}"><i
                                     class="ti ti-users"></i><span>Manage Users</span></a>
                         </li> --}}
-                        <li><a href="{{ route('role-permission.index') }}"
-                                class="{{ request()->routeIs('role-permission.*') || request()->routeIs('roles.*') ? 'active' : '' }}"><i
-                                    class="ti ti-user-shield"></i><span>Roles & Permissions</span></a></li>
+                        <li class="submenu">
+                            <a href="javascript:void(0);" class="{{ request()->routeIs('role-permission.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'active subdrop' : '' }}">
+                                <i class="ti ti-user-shield"></i><span>Roles & Permissions</span><span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                                <li><a href="{{ route('role-permission.index') }}" class="{{ request()->routeIs('role-permission.index') ? 'active' : '' }}">Manage Roles</a></li>
+                                <li><a href="{{ route('permissions.index') }}" class="{{ request()->routeIs('permissions.index') ? 'active' : '' }}">Manage Permissions</a></li>
+                            </ul>
+                        </li>
                         {{-- <li><a href="{{ route('dashboard') }}"><i class="ti ti-flag-question"></i><span>Delete
                                     Request</span></a></li> --}}
                         <li>

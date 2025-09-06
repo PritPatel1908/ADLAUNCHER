@@ -19,6 +19,14 @@ class RolePermissionController extends Controller
     }
 
     /**
+     * Display the permission management page.
+     */
+    public function permissionIndex()
+    {
+        return view('role-permission.permission-index');
+    }
+
+    /**
      * Get roles data for AJAX requests.
      */
     public function getRolesData(): JsonResponse
@@ -63,6 +71,9 @@ class RolePermissionController extends Controller
                 'role_name' => $validated['role_name'],
                 'description' => $validated['role_description'] ?? null,
             ]);
+
+            // Auto-create permissions for all modules based on view folders
+            $this->createDefaultPermissions($role);
 
             return response()->json([
                 'success' => true,
@@ -268,27 +279,48 @@ class RolePermissionController extends Controller
     }
 
     /**
-     * Get available modules and sub-modules.
+     * Get available modules and sub-modules based on view folders.
      */
     private function getAvailableModules(): array
     {
-        return [
-            'Dashboard' => ['Dashboard'],
-            'Contacts' => ['Contacts', 'Contact Groups', 'Contact Import'],
-            'Companies' => ['Companies', 'Company Import'],
-            'Leads' => ['Leads', 'Lead Sources', 'Lead Import'],
-            'Deals' => ['Deals', 'Deal Stages', 'Deal Import'],
-            'Pipelines' => ['Pipelines', 'Pipeline Stages'],
-            'Campaign' => ['Campaign', 'Email Campaign', 'SMS Campaign'],
-            'Projects' => ['Projects', 'Project Tasks', 'Project Import'],
-            'Tasks' => ['Tasks', 'Task Categories', 'Task Import'],
-            'Activity' => ['Activity', 'Activity Types'],
-            'Reports' => ['Lead Reports', 'Deal Reports', 'Contact Reports', 'Company Reports'],
-            'User Management' => ['Users', 'Roles', 'Permissions'],
-            'Settings' => ['General Settings', 'Email Settings', 'System Settings'],
-            'Content' => ['Pages', 'Blog', 'Testimonials', 'FAQ'],
-            'Support' => ['Tickets', 'Contact Messages'],
-        ];
+        $modules = [];
+        $viewsPath = resource_path('views');
+
+        // Get all directories in views folder except Layout, Dashboard, auth, and extra
+        $directories = array_diff(scandir($viewsPath), ['.', '..', 'Layout', 'Dashboard', 'auth', 'extra']);
+
+        foreach ($directories as $directory) {
+            if (is_dir($viewsPath . '/' . $directory)) {
+                $moduleName = ucfirst(str_replace('-', ' ', $directory));
+                $modules[$moduleName] = [$moduleName];
+            }
+        }
+
+        return $modules;
+    }
+
+    /**
+     * Create default permissions for a new role.
+     */
+    private function createDefaultPermissions(Role $role): void
+    {
+        $modules = $this->getAvailableModules();
+
+        foreach ($modules as $moduleName => $subModules) {
+            foreach ($subModules as $subModule) {
+                RolePermission::create([
+                    'role_id' => $role->id,
+                    'modules' => $subModule,
+                    'view' => false,
+                    'create' => false,
+                    'edit' => false,
+                    'delete' => false,
+                    'import' => false,
+                    'export' => false,
+                    'manage_columns' => false,
+                ]);
+            }
+        }
     }
 
     /**
