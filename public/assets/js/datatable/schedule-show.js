@@ -37,6 +37,7 @@ $(document).ready(function () {
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             success: function (response) {
                 if (response.success) {
+                    // Show success message
                     var $wrap = $('#edit-form-alert');
                     var $alert = $wrap.find('.alert');
                     if ($alert.length === 0) { $wrap.html('<div class="alert alert-success alert-dismissible fade show" role="alert"></div>'); $alert = $wrap.find('.alert'); }
@@ -44,15 +45,18 @@ $(document).ready(function () {
                     $alert.html('Schedule updated successfully! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
                     $wrap.show();
 
-                    // Optionally update key fields on page
+                    // Show success message at top of page
+                    showPageSuccessMessage('Schedule updated successfully!');
+
+                    // Update page content with new data
                     if (response.schedule) {
-                        const s = response.schedule;
-                        $('h5.mb-1').first().text(s.schedule_name || '');
-                        $('.badge-soft-info').first().html('<i class="ti ti-clock me-1"></i>Start: ' + (s.schedule_start_date_time ? new Date(s.schedule_start_date_time).toLocaleString() : ''));
-                        $('.badge-soft-warning').first().html('<i class="ti ti-clock me-1"></i>End: ' + (s.schedule_end_date_time ? new Date(s.schedule_end_date_time).toLocaleString() : ''));
+                        updateScheduleContent(response.schedule);
                     }
 
-                    setTimeout(function () { $('#offcanvas_edit').offcanvas('hide'); }, 1200);
+                    // Close the offcanvas
+                    setTimeout(function () {
+                        $('#offcanvas_edit').offcanvas('hide');
+                    }, 1200);
                 } else {
                     showError(response.message || 'Failed to update schedule');
                 }
@@ -76,6 +80,99 @@ $(document).ready(function () {
         $alert.removeClass('alert-success').addClass('alert-danger');
         $alert.html(message + ' <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>');
         $wrap.show();
+    }
+
+    function showPageSuccessMessage(message) {
+        // Check if there's already a success alert at the top
+        var existingAlert = $('.container-fluid .alert-success');
+        if (existingAlert.length > 0) {
+            existingAlert.remove();
+        }
+
+        // Add success message at the top of the page
+        var successHtml = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+
+        $('.container-fluid').prepend(successHtml);
+
+        // Auto-hide after 5 seconds
+        setTimeout(function() {
+            $('.container-fluid .alert-success').fadeOut();
+        }, 5000);
+    }
+
+
+    function updateScheduleContent(schedule) {
+        // Update main header section
+        $('h5.mb-1').first().text(schedule.schedule_name || '');
+        $('p.mb-2').first().text((schedule.device ? schedule.device.name : '') || (schedule.device ? schedule.device.unique_id : '') || 'N/A');
+
+        // Update date badges using pre-formatted dates from server
+        if (schedule.formatted_start_date) {
+            $('.badge-soft-info').first().html('<i class="ti ti-clock me-1"></i>Start: ' + schedule.formatted_start_date);
+        }
+
+        if (schedule.formatted_end_date) {
+            $('.badge-soft-warning').first().html('<i class="ti ti-clock me-1"></i>End: ' + schedule.formatted_end_date);
+        }
+
+        // Update Schedule Overview section
+        $('.card-body .row .col-md-6:first .mb-4:first p').text(schedule.schedule_name || '');
+
+        if (schedule.formatted_start_date) {
+            $('.card-body .row .col-md-6:first .mb-4:nth-child(2) p').text(schedule.formatted_start_date);
+        }
+
+        if (schedule.formatted_end_date) {
+            $('.card-body .row .col-md-6:first .mb-4:nth-child(3) p').text(schedule.formatted_end_date);
+        }
+
+        // Update Target section
+        $('.card-body .row .col-md-6:last .mb-4:first p').text((schedule.device ? schedule.device.name : '') || 'N/A');
+        $('.card-body .row .col-md-6:last .mb-4:nth-child(2) p').text((schedule.layout ? schedule.layout.layout_name : '') || 'N/A');
+        $('.card-body .row .col-md-6:last .mb-4:nth-child(3) p').text((schedule.screen ? 'Screen ' + schedule.screen.screen_no : '') || 'N/A');
+
+        // Update media section
+        updateMediaSection(schedule.medias);
+    }
+
+    function updateMediaSection(medias) {
+        const mediaContainer = $('.card-body .table-responsive tbody');
+        const noMediaContainer = $('.text-center.py-4');
+
+        if (medias && medias.length > 0) {
+            // Hide no media message
+            noMediaContainer.hide();
+
+            // Clear existing media rows
+            mediaContainer.empty();
+
+            // Add new media rows
+            medias.forEach(function(media) {
+                const createdDate = media.formatted_created_date || 'N/A';
+
+                const mediaRow = `
+                    <tr>
+                        <td>${media.title || ''}</td>
+                        <td>${media.media_type ? media.media_type.charAt(0).toUpperCase() + media.media_type.slice(1) : ''}</td>
+                        <td>${media.duration_seconds || 0}s</td>
+                        <td>${createdDate}</td>
+                    </tr>
+                `;
+                mediaContainer.append(mediaRow);
+            });
+
+            // Show table
+            $('.table-responsive').show();
+        } else {
+            // Show no media message
+            $('.table-responsive').hide();
+            noMediaContainer.show();
+        }
     }
 
     // Handle add edit media functionality

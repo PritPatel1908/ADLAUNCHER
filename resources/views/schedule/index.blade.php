@@ -373,6 +373,16 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="play_forever" value="1" id="play_forever">
+                                                        <label class="form-check-label" for="play_forever">
+                                                            Play Forever (Ignore end time)
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -390,14 +400,14 @@
                                         <div id="media-container">
                                             <div class="media-item border rounded p-3 mb-3">
                                                 <div class="row">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-5">
                                                         <div class="mb-3">
                                                             <label class="form-label">Media Title</label>
                                                             <input type="text" class="form-control"
                                                                 name="media_title[]" placeholder="Enter media title">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-5">
                                                         <div class="mb-3">
                                                             <label class="form-label">Media Type</label>
                                                             <select class="form-control select2" name="media_type[]"
@@ -411,14 +421,6 @@
                                                                 <option value="jpg">JPG</option>
                                                                 <option value="pdf">PDF</option>
                                                             </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Duration (seconds)</label>
-                                                            <input type="number" class="form-control"
-                                                                name="duration_seconds[]"
-                                                                placeholder="Duration in seconds" min="1">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-2">
@@ -555,6 +557,16 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="play_forever" value="1" id="edit-play_forever">
+                                                        <label class="form-check-label" for="edit-play_forever">
+                                                            Play Forever (Ignore end time)
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -573,14 +585,14 @@
                                         <div id="edit-media-container">
                                             <div class="media-item border rounded p-3 mb-3">
                                                 <div class="row">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-5">
                                                         <div class="mb-3">
                                                             <label class="form-label">Media Title</label>
                                                             <input type="text" class="form-control"
                                                                 name="edit_media_title[]" placeholder="Enter media title">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-5">
                                                         <div class="mb-3">
                                                             <label class="form-label">Media Type</label>
                                                             <select class="form-control select2" name="edit_media_type[]"
@@ -594,14 +606,6 @@
                                                                 <option value="jpg">JPG</option>
                                                                 <option value="pdf">PDF</option>
                                                             </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Duration (seconds)</label>
-                                                            <input type="number" class="form-control"
-                                                                name="edit_duration_seconds[]"
-                                                                placeholder="Duration in seconds" min="1">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-2">

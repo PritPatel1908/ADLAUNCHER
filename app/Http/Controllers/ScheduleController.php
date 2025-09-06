@@ -34,9 +34,9 @@ class ScheduleController extends Controller
             'device_id' => 'required|exists:devices,id',
             'layout_id' => 'nullable|exists:device_layouts,id',
             'screen_id' => 'nullable|exists:device_screens,id',
+            'play_forever' => 'nullable|boolean',
             'media_title.*' => 'nullable|string|max:255',
             'media_type.*' => 'nullable|string|in:image,video,audio,mp4,png,jpg,pdf',
-            'duration_seconds.*' => 'nullable|integer|min:1|sometimes',
             'media_file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,avi,mov,mp3,wav,pdf|max:10240',
         ]);
 
@@ -50,27 +50,22 @@ class ScheduleController extends Controller
                 'device_id' => $request->device_id,
                 'layout_id' => $request->layout_id,
                 'screen_id' => $request->screen_id,
+                'play_forever' => $request->has('play_forever') ? true : false,
             ]);
 
             // Handle ScheduleMedia creation
             if ($request->has('media_title')) {
                 $mediaTitles = $request->input('media_title', []);
                 $mediaTypes = $request->input('media_type', []);
-                $durationSeconds = $request->input('duration_seconds', []);
                 $mediaFiles = $request->file('media_file', []);
 
-                // Clean up empty duration values
-                $durationSeconds = array_map(function ($duration) {
-                    return empty($duration) ? null : (int)$duration;
-                }, $durationSeconds);
-
                 for ($i = 0; $i < count($mediaTitles); $i++) {
-                    if (!empty($mediaTitles[$i]) || !empty($mediaTypes[$i])) {
+                    // Create media if any of title, type, or file is provided
+                    if (!empty($mediaTitles[$i]) || !empty($mediaTypes[$i]) || (isset($mediaFiles[$i]) && $mediaFiles[$i]->isValid())) {
                         $mediaData = [
                             'schedule_id' => $schedule->id,
                             'title' => $mediaTitles[$i] ?? null,
                             'media_type' => $mediaTypes[$i] ?? null,
-                            'duration_seconds' => $durationSeconds[$i] ?? null,
                         ];
 
                         // Handle file upload
@@ -135,9 +130,9 @@ class ScheduleController extends Controller
             'device_id' => 'required|exists:devices,id',
             'layout_id' => 'nullable|exists:device_layouts,id',
             'screen_id' => 'nullable|exists:device_screens,id',
+            'play_forever' => 'nullable|boolean',
             'edit_media_title.*' => 'nullable|string|max:255',
             'edit_media_type.*' => 'nullable|string|in:image,video,audio,mp4,png,jpg,pdf',
-            'edit_duration_seconds.*' => 'nullable|integer|min:1|sometimes',
             'edit_media_file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,avi,mov,mp3,wav,pdf|max:10240',
         ]);
 
@@ -151,27 +146,21 @@ class ScheduleController extends Controller
                 'device_id' => $request->device_id,
                 'layout_id' => $request->layout_id,
                 'screen_id' => $request->screen_id,
+                'play_forever' => $request->has('play_forever') ? true : false,
             ]);
 
             // Handle ScheduleMedia updates
             if ($request->has('edit_media_title')) {
                 $mediaTitles = $request->input('edit_media_title', []);
                 $mediaTypes = $request->input('edit_media_type', []);
-                $durationSeconds = $request->input('edit_duration_seconds', []);
                 $mediaFiles = $request->file('edit_media_file', []);
                 $mediaIds = $request->input('edit_media_id', []);
-
-                // Clean up empty duration values
-                $durationSeconds = array_map(function ($duration) {
-                    return empty($duration) ? null : (int)$duration;
-                }, $durationSeconds);
 
                 for ($i = 0; $i < count($mediaTitles); $i++) {
                     if (!empty($mediaTitles[$i]) || !empty($mediaTypes[$i])) {
                         $mediaData = [
                             'title' => $mediaTitles[$i] ?? null,
                             'media_type' => $mediaTypes[$i] ?? null,
-                            'duration_seconds' => $durationSeconds[$i] ?? null,
                         ];
 
                         // Handle file upload
@@ -204,10 +193,25 @@ class ScheduleController extends Controller
 
             DB::commit();
 
+            // Load the schedule with relationships
+            $schedule->load(['device', 'layout', 'screen', 'medias']);
+
+            // Add formatted dates to match the blade template format
+            $schedule->formatted_start_date = \Carbon\Carbon::parse($schedule->schedule_start_date_time)->format('d M Y, h:i A');
+            $schedule->formatted_end_date = \Carbon\Carbon::parse($schedule->schedule_end_date_time)->format('d M Y, h:i A');
+            $schedule->formatted_created_date = $schedule->created_at->format('d M Y, h:i A');
+
+            // Format media created dates
+            if ($schedule->medias) {
+                foreach ($schedule->medias as $media) {
+                    $media->formatted_created_date = $media->created_at ? $media->created_at->format('d M Y, h:i A') : 'N/A';
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Schedule updated successfully',
-                'schedule' => $schedule->load(['device', 'layout', 'screen', 'medias'])
+                'schedule' => $schedule
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

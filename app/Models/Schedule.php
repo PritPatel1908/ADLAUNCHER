@@ -18,6 +18,7 @@ class Schedule extends Model
         'device_id',
         'layout_id',
         'screen_id',
+        'play_forever',
     ];
 
     protected $casts = [
@@ -26,6 +27,7 @@ class Schedule extends Model
         'device_id' => 'integer',
         'layout_id' => 'integer',
         'screen_id' => 'integer',
+        'play_forever' => 'boolean',
     ];
 
     public function device(): BelongsTo

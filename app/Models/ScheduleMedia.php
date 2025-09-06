@@ -10,12 +10,13 @@ class ScheduleMedia extends Model
 {
     use HasFactory;
 
+    protected $table = 'schedule_medias';
+
     protected $fillable = [
         'media_file',
         'schedule_id',
         'media_type',
         'title',
-        'duration_seconds',
     ];
 
     protected $casts = [
