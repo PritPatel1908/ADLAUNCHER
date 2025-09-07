@@ -158,6 +158,15 @@ $(document).ready(function () {
                 { "data": "sub_module" },
                 {
                     "render": function (data, type, row) {
+                        const isChecked = existingPermissions[row.sub_module]?.view || false;
+                        return `<div class="form-check form-check-md">
+                                    <input class="form-check-input permission-checkbox view-checkbox" type="checkbox"
+                                           data-module="${row.sub_module}" data-permission="view" ${isChecked ? 'checked' : ''}>
+                                </div>`;
+                    }
+                },
+                {
+                    "render": function (data, type, row) {
                         const isChecked = existingPermissions[row.sub_module]?.create || false;
                         return `<div class="form-check form-check-md">
                                     <input class="form-check-input permission-checkbox create-checkbox" type="checkbox"
@@ -176,15 +185,6 @@ $(document).ready(function () {
                 },
                 {
                     "render": function (data, type, row) {
-                        const isChecked = existingPermissions[row.sub_module]?.view || false;
-                        return `<div class="form-check form-check-md">
-                                    <input class="form-check-input permission-checkbox view-checkbox" type="checkbox"
-                                           data-module="${row.sub_module}" data-permission="view" ${isChecked ? 'checked' : ''}>
-                                </div>`;
-                    }
-                },
-                {
-                    "render": function (data, type, row) {
                         const isChecked = existingPermissions[row.sub_module]?.delete || false;
                         return `<div class="form-check form-check-md">
                                     <input class="form-check-input permission-checkbox delete-checkbox" type="checkbox"
@@ -194,11 +194,41 @@ $(document).ready(function () {
                 },
                 {
                     "render": function (data, type, row) {
+                        const isChecked = existingPermissions[row.sub_module]?.import || false;
+                        return `<div class="form-check form-check-md">
+                                    <input class="form-check-input permission-checkbox import-checkbox" type="checkbox"
+                                           data-module="${row.sub_module}" data-permission="import" ${isChecked ? 'checked' : ''}>
+                                </div>`;
+                    }
+                },
+                {
+                    "render": function (data, type, row) {
+                        const isChecked = existingPermissions[row.sub_module]?.export || false;
+                        return `<div class="form-check form-check-md">
+                                    <input class="form-check-input permission-checkbox export-checkbox" type="checkbox"
+                                           data-module="${row.sub_module}" data-permission="export" ${isChecked ? 'checked' : ''}>
+                                </div>`;
+                    }
+                },
+                {
+                    "render": function (data, type, row) {
+                        const isChecked = existingPermissions[row.sub_module]?.manage_columns || false;
+                        return `<div class="form-check form-check-md">
+                                    <input class="form-check-input permission-checkbox manage-columns-checkbox" type="checkbox"
+                                           data-module="${row.sub_module}" data-permission="manage_columns" ${isChecked ? 'checked' : ''}>
+                                </div>`;
+                    }
+                },
+                {
+                    "render": function (data, type, row) {
                         const hasAllPermissions = existingPermissions[row.sub_module] &&
+                            existingPermissions[row.sub_module].view &&
                             existingPermissions[row.sub_module].create &&
                             existingPermissions[row.sub_module].edit &&
-                            existingPermissions[row.sub_module].view &&
-                            existingPermissions[row.sub_module].delete;
+                            existingPermissions[row.sub_module].delete &&
+                            existingPermissions[row.sub_module].import &&
+                            existingPermissions[row.sub_module].export &&
+                            existingPermissions[row.sub_module].manage_columns;
                         return `<div class="form-check form-check-md">
                                     <input class="form-check-input module-checkbox" type="checkbox"
                                            data-module="${row.sub_module}" ${hasAllPermissions ? 'checked' : ''}>
@@ -266,27 +296,32 @@ $(document).ready(function () {
 
         const permissions = [];
 
+        // First, create permission objects for all modules
+        permissionsData.forEach(function(moduleData) {
+            const module = moduleData.sub_module;
+            permissions.push({
+                modules: module,
+                view: false,
+                create: false,
+                edit: false,
+                delete: false,
+                import: false,
+                export: false,
+                manage_columns: false
+            });
+        });
+
+        // Then, update with actual checkbox values
         $('.permission-checkbox').each(function() {
             const module = $(this).data('module');
             const permission = $(this).data('permission');
             const isChecked = $(this).is(':checked');
 
-            // Find or create permission object for this module
+            // Find permission object for this module
             let permissionObj = permissions.find(p => p.modules === module);
-            if (!permissionObj) {
-                permissionObj = {
-                    modules: module,
-                    view: false,
-                    create: false,
-                    edit: false,
-                    delete: false,
-                    import: false,
-                    export: false
-                };
-                permissions.push(permissionObj);
+            if (permissionObj) {
+                permissionObj[permission] = isChecked; // This is already a boolean
             }
-
-            permissionObj[permission] = isChecked;
         });
 
         // Show loading state
@@ -294,12 +329,16 @@ $(document).ready(function () {
         const originalText = saveBtn.html();
         saveBtn.html('<i class="ti ti-loader me-1"></i>Saving...').prop('disabled', true);
 
+        // Debug: Log the permissions data being sent
+        console.log('Sending permissions data:', permissions);
+
         $.ajax({
             url: `/roles/${currentRoleId}/permissions`,
             type: 'POST',
-            data: {
+            contentType: 'application/json',
+            data: JSON.stringify({
                 permissions: permissions
-            },
+            }),
             success: function(response) {
                 if (response.success) {
                     showAlert('Permissions saved successfully!', 'success');
@@ -311,9 +350,16 @@ $(document).ready(function () {
             },
             error: function(xhr) {
                 let errorMessage = 'Error saving permissions';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
+                if (xhr.responseJSON) {
+                    if (xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    if (xhr.responseJSON.errors) {
+                        console.error('Validation errors:', xhr.responseJSON.errors);
+                        errorMessage += '<br>Validation errors: ' + JSON.stringify(xhr.responseJSON.errors);
+                    }
                 }
+                console.error('AJAX error:', xhr);
                 showAlert(errorMessage, 'danger');
             },
             complete: function() {

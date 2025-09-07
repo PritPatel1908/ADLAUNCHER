@@ -7,6 +7,7 @@ use App\Models\RolePermission;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class RolePermissionController extends Controller
 {
@@ -36,10 +37,28 @@ class RolePermissionController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($role) {
+                    // Count total individual permissions (view, create, edit, delete, import, export, manage_columns)
+                    $total_individual_permissions = 0;
+                    $granted_individual_permissions = 0;
+
+                    $rolePermissions = $role->rolePermissions;
+                    foreach ($rolePermissions as $permission) {
+                        // Count all 7 individual permission types
+                        $permissionTypes = ['view', 'create', 'edit', 'delete', 'import', 'export', 'manage_columns'];
+                        foreach ($permissionTypes as $type) {
+                            $total_individual_permissions++;
+                            if ($permission->$type) {
+                                $granted_individual_permissions++;
+                            }
+                        }
+                    }
+
                     return [
                         'id' => $role->id,
                         'role_name' => $role->role_name,
                         'users_count' => $role->users()->count() ?? 0,
+                        'permissions_count' => $granted_individual_permissions,
+                        'total_permissions' => $total_individual_permissions,
                         'created_at' => $role->created_at->format('d M Y, h:i A'),
                     ];
                 });
@@ -226,37 +245,73 @@ class RolePermissionController extends Controller
     public function storePermissions(Request $request, Role $role): JsonResponse
     {
         try {
+            // Log the incoming request data for debugging
+            Log::info('Permission save request data:', $request->all());
+            Log::info('Role ID:', ['role_id' => $role->id]);
+
+            // Handle JSON requests
+            if ($request->isJson()) {
+                $data = $request->json()->all();
+                Log::info('JSON data parsed:', $data);
+                $request->merge($data);
+            }
+
             $validated = $request->validate([
                 'permissions' => 'required|array',
                 'permissions.*.modules' => 'required|string',
-                'permissions.*.view' => 'boolean',
-                'permissions.*.create' => 'boolean',
-                'permissions.*.edit' => 'boolean',
-                'permissions.*.delete' => 'boolean',
-                'permissions.*.import' => 'boolean',
-                'permissions.*.export' => 'boolean',
+                'permissions.*.view' => 'sometimes|boolean',
+                'permissions.*.create' => 'sometimes|boolean',
+                'permissions.*.edit' => 'sometimes|boolean',
+                'permissions.*.delete' => 'sometimes|boolean',
+                'permissions.*.import' => 'sometimes|boolean',
+                'permissions.*.export' => 'sometimes|boolean',
+                'permissions.*.manage_columns' => 'sometimes|boolean',
             ]);
 
-            // Delete existing permissions
-            $role->rolePermissions()->delete();
+            // Log the validated data
+            Log::info('Validated permission data:', $validated);
 
-            // Create new permissions
+            // Update existing permissions instead of delete+create
             foreach ($validated['permissions'] as $permissionData) {
-                if (
-                    $permissionData['view'] || $permissionData['create'] || $permissionData['edit'] ||
-                    $permissionData['delete'] || $permissionData['import'] || $permissionData['export']
-                ) {
+                $view = $permissionData['view'] ?? false;
+                $create = $permissionData['create'] ?? false;
+                $edit = $permissionData['edit'] ?? false;
+                $delete = $permissionData['delete'] ?? false;
+                $import = $permissionData['import'] ?? false;
+                $export = $permissionData['export'] ?? false;
+                $manageColumns = $permissionData['manage_columns'] ?? false;
 
-                    RolePermission::create([
+                // Check if permission exists for this module
+                $existingPermission = RolePermission::where('role_id', $role->id)
+                    ->where('modules', $permissionData['modules'])
+                    ->first();
+
+                if ($existingPermission) {
+                    // Always update existing permission (don't delete even if all false)
+                    $existingPermission->update([
+                        'view' => $view,
+                        'create' => $create,
+                        'edit' => $edit,
+                        'delete' => $delete,
+                        'import' => $import,
+                        'export' => $export,
+                        'manage_columns' => $manageColumns,
+                    ]);
+                    Log::info('Updated permission:', $existingPermission->toArray());
+                } else {
+                    // Create new permission (this should not happen as all permissions are created by default)
+                    $newPermission = RolePermission::create([
                         'role_id' => $role->id,
                         'modules' => $permissionData['modules'],
-                        'view' => $permissionData['view'] ?? false,
-                        'create' => $permissionData['create'] ?? false,
-                        'edit' => $permissionData['edit'] ?? false,
-                        'delete' => $permissionData['delete'] ?? false,
-                        'import' => $permissionData['import'] ?? false,
-                        'export' => $permissionData['export'] ?? false,
+                        'view' => $view,
+                        'create' => $create,
+                        'edit' => $edit,
+                        'delete' => $delete,
+                        'import' => $import,
+                        'export' => $export,
+                        'manage_columns' => $manageColumns,
                     ]);
+                    Log::info('Created new permission (unexpected):', $newPermission->toArray());
                 }
             }
 
@@ -265,6 +320,7 @@ class RolePermissionController extends Controller
                 'message' => 'Permissions saved successfully'
             ]);
         } catch (ValidationException $e) {
+            Log::error('Permission validation failed:', $e->errors());
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
@@ -301,6 +357,7 @@ class RolePermissionController extends Controller
 
     /**
      * Create default permissions for a new role.
+     * Creates permissions for all modules with all false values initially.
      */
     private function createDefaultPermissions(Role $role): void
     {
@@ -321,6 +378,8 @@ class RolePermissionController extends Controller
                 ]);
             }
         }
+
+        Log::info('Default permissions created for role:', ['role_id' => $role->id, 'role_name' => $role->role_name]);
     }
 
     /**

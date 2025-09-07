@@ -81,6 +81,7 @@
                                         </div>
                                     </th>
                                     <th>Role Name</th>
+                                    <th>Permissions</th>
                                     <th>Created</th>
                                     <th class="no-sort">Action</th>
                                 </tr>

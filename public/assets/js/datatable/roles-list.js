@@ -34,6 +34,12 @@ $(document).ready(function () {
 					return '<div class="form-check form-check-md"><input class="form-check-input" type="checkbox" data-id="' + row.id + '"></div>';
 				}},
 				{ "data": "role_name" },
+				{ "render": function ( data, type, row ){
+					const grantedCount = row.permissions_count || 0;
+					const totalCount = row.total_permissions || 0;
+					const badgeClass = grantedCount > 0 ? 'bg-success' : 'bg-secondary';
+					return '<span class="badge ' + badgeClass + '">' + grantedCount + '/' + totalCount + '</span>';
+				}},
 				{ "data": "created_at" },
 				{ "render": function ( data, type, row ){
 					return '<div class="dropdown table-action"><a href="#" class="action-icon btn btn-xs shadow btn-icon btn-outline-light" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></a><div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item edit-role" href="javascript:void(0);" data-id="' + row.id + '" data-name="' + row.role_name + '" data-bs-toggle="modal" data-bs-target="#edit_role"><i class="ti ti-edit text-blue"></i> Edit</a><a class="dropdown-item" href="/permissions?role_id=' + row.id + '"><i class="ti ti-shield"></i> Permission</a><a class="dropdown-item delete-role" href="javascript:void(0);" data-id="' + row.id + '" data-name="' + row.role_name + '"><i class="ti ti-trash text-red"></i> Delete</a></div></div>';

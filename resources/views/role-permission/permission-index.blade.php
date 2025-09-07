@@ -107,10 +107,13 @@
                                     </th>
                                     <th>Modules</th>
                                     <th>Sub Modules</th>
+                                    <th>View</th>
                                     <th>Create</th>
                                     <th>Edit</th>
-                                    <th>View</th>
                                     <th>Delete</th>
+                                    <th>Import</th>
+                                    <th>Export</th>
+                                    <th>Manage Columns</th>
                                     <th>Allow All</th>
                                 </tr>
                             </thead>
