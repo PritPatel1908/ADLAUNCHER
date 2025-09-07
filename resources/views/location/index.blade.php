@@ -419,7 +419,6 @@
                                                 </label>
                                             </div>
                                         </li>
-                                        @if(\App\Helpers\PermissionHelper::canViewAuditFields())
                                         <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
@@ -440,7 +439,6 @@
                                                 </label>
                                             </div>
                                         </li>
-                                        @endif
                                         <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
@@ -514,10 +512,8 @@
                                     <th>state</th>
                                     <th>country</th>
                                     <th>zip_code</th>
-                                    @if(\App\Helpers\PermissionHelper::canViewAuditFields())
                                     <th>created_by</th>
                                     <th>updated_by</th>
-                                    @endif
                                     <th>created_at</th>
                                     <th>updated_at</th>
                                     <th>status</th>

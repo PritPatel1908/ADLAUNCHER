@@ -315,8 +315,8 @@ class AreaController extends Controller
 
             // Format data for DataTables
             $data = [];
-            $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
-            
+            // $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
+
             foreach ($areas as $area) {
                 $areaData = [
                     'id' => $area->id,
@@ -332,10 +332,10 @@ class AreaController extends Controller
                 ];
 
                 // Only include audit fields if user has permission
-                if ($canViewAuditFields) {
-                    $areaData['created_by'] = $area->createdByUser ? $area->createdByUser->name : 'N/A';
-                    $areaData['updated_by'] = $area->updatedByUser ? $area->updatedByUser->name : 'N/A';
-                }
+                // if ($canViewAuditFields) {
+                $areaData['created_by'] = $area->createdByUser ? $area->createdByUser->name : 'N/A';
+                $areaData['updated_by'] = $area->updatedByUser ? $area->updatedByUser->name : 'N/A';
+                // }
 
                 $data[] = $areaData;
             }
@@ -376,10 +376,10 @@ class AreaController extends Controller
         ];
 
         // Only include audit columns if user has permission
-        if (\App\Helpers\PermissionHelper::canViewAuditFields()) {
-            $columnMap['created_by'] = 'created_by';
-            $columnMap['updated_by'] = 'updated_by';
-        }
+        // if (\App\Helpers\PermissionHelper::canViewAuditFields()) {
+        $columnMap['created_by'] = 'created_by';
+        $columnMap['updated_by'] = 'updated_by';
+        // }
 
         return $columnMap[$columnData] ?? null;
     }

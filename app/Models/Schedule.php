@@ -13,21 +13,13 @@ class Schedule extends Model
 
     protected $fillable = [
         'schedule_name',
-        'schedule_start_date_time',
-        'schedule_end_date_time',
         'device_id',
         'layout_id',
-        'screen_id',
-        'play_forever',
     ];
 
     protected $casts = [
-        'schedule_start_date_time' => 'datetime',
-        'schedule_end_date_time' => 'datetime',
         'device_id' => 'integer',
         'layout_id' => 'integer',
-        'screen_id' => 'integer',
-        'play_forever' => 'boolean',
     ];
 
     public function device(): BelongsTo
@@ -40,10 +32,6 @@ class Schedule extends Model
         return $this->belongsTo(DeviceLayout::class, 'layout_id');
     }
 
-    public function screen(): BelongsTo
-    {
-        return $this->belongsTo(DeviceScreen::class, 'screen_id');
-    }
 
     public function medias(): HasMany
     {

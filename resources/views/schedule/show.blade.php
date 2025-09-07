@@ -30,19 +30,19 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    @if(\App\Helpers\PermissionHelper::canExport('schedule'))
-                    <div class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
-                            data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <ul>
-                                <li><a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-pdf me-1"></i>Export as PDF</a></li>
-                                <li><a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-xls me-1"></i>Export as Excel</a></li>
-                            </ul>
+                    @if (\App\Helpers\PermissionHelper::canExport('schedule'))
+                        <div class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
+                                data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <ul>
+                                    <li><a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-pdf me-1"></i>Export as PDF</a></li>
+                                    <li><a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-xls me-1"></i>Export as Excel</a></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
                     @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
@@ -73,27 +73,28 @@
                                         </p>
                                         <div class="d-flex align-items-center flex-wrap gap-2">
                                             <span class="badge badge-soft-info me-2"><i class="ti ti-clock me-1"></i>Start:
-                                                {{ \Carbon\Carbon::parse($schedule->schedule_start_date_time)->format('d M Y, h:i A') }}</span>
+                                                {{ optional($schedule->medias->first() ? \Carbon\Carbon::parse($schedule->medias->first()->schedule_start_date_time) : null)->format('d M Y, h:i A') }}</span>
                                             <span class="badge badge-soft-warning"><i class="ti ti-clock me-1"></i>End:
-                                                {{ \Carbon\Carbon::parse($schedule->schedule_end_date_time)->format('d M Y, h:i A') }}</span>
+                                                {{ optional($schedule->medias->first() ? \Carbon\Carbon::parse($schedule->medias->first()->schedule_end_date_time) : null)->format('d M Y, h:i A') }}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center flex-wrap gap-2">
-                                    @if(\App\Helpers\PermissionHelper::canEdit('schedule'))
-                                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                                        data-bs-target="#offcanvas_edit"><i class="ti ti-edit me-1"></i>Edit Schedule</a>
+                                    @if (\App\Helpers\PermissionHelper::canEdit('schedule'))
+                                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvas_edit"><i class="ti ti-edit me-1"></i>Edit
+                                            Schedule</a>
                                     @endif
-                                    @if(\App\Helpers\PermissionHelper::canDelete('schedule'))
-                                    <form action="{{ route('schedule.destroy', $schedule->id) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger"
-                                            onclick="return confirm('Are you sure you want to delete this schedule?')">
-                                            <i class="ti ti-trash me-1"></i>Delete
-                                        </button>
-                                    </form>
+                                    @if (\App\Helpers\PermissionHelper::canDelete('schedule'))
+                                        <form action="{{ route('schedule.destroy', $schedule->id) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger"
+                                                onclick="return confirm('Are you sure you want to delete this schedule?')">
+                                                <i class="ti ti-trash me-1"></i>Delete
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </div>
@@ -117,14 +118,14 @@
                                     </div>
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">Start At</h6>
-                                        <p>{{ \Carbon\Carbon::parse($schedule->schedule_start_date_time)->format('d M Y, h:i A') }}
+                                        <p>{{ optional($schedule->medias->first() ? \Carbon\Carbon::parse($schedule->medias->first()->schedule_start_date_time) : null)->format('d M Y, h:i A') }}
                                         </p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-4">
                                         <h6 class="fw-semibold">End At</h6>
-                                        <p>{{ \Carbon\Carbon::parse($schedule->schedule_end_date_time)->format('d M Y, h:i A') }}
+                                        <p>{{ optional($schedule->medias->first() ? \Carbon\Carbon::parse($schedule->medias->first()->schedule_end_date_time) : null)->format('d M Y, h:i A') }}
                                         </p>
                                     </div>
                                     <div class="mb-4">
@@ -261,26 +262,7 @@
                                                         required>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Start At <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_start_date_time" id="edit-start_at"
-                                                        value="{{ \Carbon\Carbon::parse($schedule->schedule_start_date_time)->format('Y-m-d\TH:i') }}"
-                                                        required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="mb-3">
-                                                    <label class="form-label">End At <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_end_date_time" id="edit-end_at"
-                                                        value="{{ \Carbon\Carbon::parse($schedule->schedule_end_date_time)->format('Y-m-d\TH:i') }}"
-                                                        required>
-                                                </div>
-                                            </div>
+
                                             <div class="col-md-4">
                                                 <div class="mb-3">
                                                     <label class="form-label">Device</label>
@@ -311,28 +293,12 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Screen</label>
-                                                    <select class="form-control select2" name="screen_id"
-                                                        id="edit-screen_id" data-toggle="select2">
-                                                        <option value="">Select screen...</option>
-                                                        @if ($schedule->device_id)
-                                                            @foreach (\App\Models\DeviceScreen::where('device_id', $schedule->device_id)->get() as $screen)
-                                                                <option value="{{ $screen->id }}"
-                                                                    {{ $schedule->screen_id == $screen->id ? 'selected' : '' }}>
-                                                                    Screen {{ $screen->screen_no }}</option>
-                                                            @endforeach
-                                                        @endif
-                                                    </select>
-                                                </div>
-                                            </div>
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox"
                                                             name="play_forever" value="1" id="edit-play_forever"
-                                                            {{ $schedule->play_forever ? 'checked' : '' }}>
+                                                            {{ $schedule->medias->first() && $schedule->medias->first()->play_forever ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="edit-play_forever">
                                                             Play Forever (Ignore end time)
                                                         </label>
@@ -349,18 +315,32 @@
                                         data-bs-toggle="collapse" data-bs-target="#edit_media">
                                         <span class="avatar avatar-md rounded me-1"><i class="ti ti-photo"></i></span>
                                         Schedule Media
+                                        <span class="badge badge-soft-info ms-2">Multiple Media Support</span>
                                     </a>
                                 </div>
                                 <div class="accordion-collapse collapse" id="edit_media"
                                     data-bs-parent="#edit_main_accordion">
                                     <div class="accordion-body border-top">
+                                        <div class="alert alert-info mb-3">
+                                            <i class="ti ti-info-circle me-2"></i>
+                                            <strong>Multi-Media Support:</strong> You can add multiple media files and
+                                            assign them to different screens.
+                                            When you select a layout, all screens from that layout will be available for
+                                            media assignment.
+                                            <div class="mt-2">
+                                                <button type="button" class="btn btn-sm btn-outline-info"
+                                                    id="refresh-edit-screens">
+                                                    <i class="ti ti-refresh me-1"></i>Refresh Screens
+                                                </button>
+                                            </div>
+                                        </div>
                                         <div id="edit-media-container">
                                             @if ($schedule->medias && $schedule->medias->count())
                                                 @foreach ($schedule->medias as $index => $media)
                                                     <div class="media-item border rounded p-3 mb-3"
                                                         data-media-id="{{ $media->id }}">
                                                         <div class="row">
-                                                            <div class="col-md-5">
+                                                            <div class="col-md-4">
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Media Title</label>
                                                                     <input type="text" class="form-control"
@@ -369,7 +349,7 @@
                                                                         placeholder="Enter media title">
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-5">
+                                                            <div class="col-md-3">
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Media Type</label>
                                                                     <select class="form-control select2"
@@ -397,6 +377,48 @@
                                                                             {{ $media->media_type == 'pdf' ? 'selected' : '' }}>
                                                                             PDF</option>
                                                                     </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Screen</label>
+                                                                    <select class="form-control select2"
+                                                                        name="edit_media_screen_id[]"
+                                                                        data-toggle="select2">
+                                                                        <option value="">Select screen...</option>
+                                                                        @if ($schedule->device_id)
+                                                                            @foreach (\App\Models\DeviceScreen::where('device_id', $schedule->device_id)->get() as $screen)
+                                                                                <option value="{{ $screen->id }}"
+                                                                                    {{ $media->screen_id == $screen->id ? 'selected' : '' }}>
+                                                                                    Screen {{ $screen->screen_no }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        @endif
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Start At</label>
+                                                                    <input type="datetime-local" class="form-control"
+                                                                        name="edit_media_start_date_time[]"
+                                                                        value="{{ $media->schedule_start_date_time ? \Carbon\Carbon::parse($media->schedule_start_date_time)->format('Y-m-d\\TH:i') : '' }}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">End At</label>
+                                                                    <input type="datetime-local" class="form-control"
+                                                                        name="edit_media_end_date_time[]"
+                                                                        value="{{ $media->schedule_end_date_time ? \Carbon\Carbon::parse($media->schedule_end_date_time)->format('Y-m-d\\TH:i') : '' }}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-2 d-flex align-items-center">
+                                                                <div class="form-check mt-4">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="edit_media_play_forever[]" value="1"
+                                                                        {{ $media->play_forever ? 'checked' : '' }}>
+                                                                    <label class="form-check-label">Play Forever</label>
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2">
@@ -431,7 +453,7 @@
                                             @else
                                                 <div class="media-item border rounded p-3 mb-3">
                                                     <div class="row">
-                                                        <div class="col-md-5">
+                                                        <div class="col-md-4">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Media Title</label>
                                                                 <input type="text" class="form-control"
@@ -439,7 +461,7 @@
                                                                     placeholder="Enter media title">
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-5">
+                                                        <div class="col-md-3">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Media Type</label>
                                                                 <select class="form-control select2"
@@ -453,6 +475,42 @@
                                                                     <option value="jpg">JPG</option>
                                                                     <option value="pdf">PDF</option>
                                                                 </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Screen</label>
+                                                                <select class="form-control select2"
+                                                                    name="edit_media_screen_id[]" data-toggle="select2">
+                                                                    <option value="">Select screen...</option>
+                                                                    @if ($schedule->device_id)
+                                                                        @foreach (\App\Models\DeviceScreen::where('device_id', $schedule->device_id)->get() as $screen)
+                                                                            <option value="{{ $screen->id }}">
+                                                                                Screen {{ $screen->screen_no }}</option>
+                                                                        @endforeach
+                                                                    @endif
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Start At</label>
+                                                                <input type="datetime-local" class="form-control"
+                                                                    name="edit_media_start_date_time[]">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">End At</label>
+                                                                <input type="datetime-local" class="form-control"
+                                                                    name="edit_media_end_date_time[]">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 d-flex align-items-center">
+                                                            <div class="form-check mt-4">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    name="edit_media_play_forever[]" value="1">
+                                                                <label class="form-check-label">Play Forever</label>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-2">
@@ -481,10 +539,13 @@
                                             @endif
                                         </div>
                                         <div class="text-center">
-                                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                                id="add-edit-media">
+                                            <button type="button" class="btn btn-primary btn-sm" id="add-edit-media">
                                                 <i class="ti ti-plus me-1"></i>Add Another Media
                                             </button>
+                                            <p class="text-muted mt-2 mb-0">
+                                                <small><i class="ti ti-info-circle me-1"></i>You can add multiple media
+                                                    files and assign them to different screens</small>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

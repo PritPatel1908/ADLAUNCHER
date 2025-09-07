@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'permission' => \App\Http\Middleware\CheckPermission::class,
+            'device.api.rate.limit' => \App\Http\Middleware\DeviceApiRateLimit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

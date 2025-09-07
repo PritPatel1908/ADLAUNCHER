@@ -8,6 +8,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\DeviceApiController;
 use App\Http\Controllers\ShowColumnController;
 use App\Http\Controllers\DeviceLayoutController;
 use App\Http\Controllers\DeviceScreenController;
@@ -139,6 +140,7 @@ Route::get('/device-layout-stats', [DeviceLayoutController::class, 'getLayoutSta
 // Device Screen Routes
 Route::resource('device-screen', DeviceScreenController::class)->middleware('auth');
 Route::get('/device/{device}/screens', [DeviceScreenController::class, 'getDeviceScreens'])->name('device.screens')->middleware('auth');
+Route::get('/layout/{layout}/screens', [DeviceScreenController::class, 'getLayoutScreens'])->name('layout.screens')->middleware('auth');
 
 // Schedule Routes with individual permissions
 Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index')->middleware(['auth', 'permission:schedule,view']);
@@ -171,3 +173,22 @@ Route::delete('/roles/{role}', [RolePermissionController::class, 'destroy'])->na
 Route::get('/roles/{role}/permissions', [RolePermissionController::class, 'getPermissions'])->name('roles.permissions')->middleware(['auth', 'permission:role-permission,view']);
 Route::post('/roles/{role}/permissions', [RolePermissionController::class, 'storePermissions'])->name('roles.permissions.store')->middleware(['auth', 'permission:role-permission,edit']);
 Route::get('/role-permission/stats', [RolePermissionController::class, 'getStats'])->name('role-permission.stats')->middleware(['auth', 'permission:role-permission,view']);
+
+// Device API Routes with rate limiting
+Route::post('/api/device/get_auth', [DeviceApiController::class, 'getAuth'])
+    ->middleware('device.api.rate.limit')
+    ->name('api.device.get_auth');
+Route::get('/api/device/get_auth', [DeviceApiController::class, 'getAuth'])
+    ->middleware('device.api.rate.limit')
+    ->name('api.device.get_auth.get');
+Route::post('/api/device/get_new_data', [DeviceApiController::class, 'getNewData'])
+    ->middleware('device.api.rate.limit')
+    ->name('api.device.get_new_data');
+Route::get('/api/device/get_new_data', [DeviceApiController::class, 'getNewData'])
+    ->middleware('device.api.rate.limit')
+    ->name('api.device.get_new_data.get');
+Route::get('/api/device/status', [DeviceApiController::class, 'getApiStatus'])->name('api.device.status');
+// Download media with signed URL for devices
+Route::get('/api/device/download', [DeviceApiController::class, 'downloadMedia'])
+    ->middleware('device.api.rate.limit')
+    ->name('api.device.download');

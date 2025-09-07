@@ -442,8 +442,8 @@ class CompanyController extends Controller
 
             // Format data for DataTables
             $data = [];
-            $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
-            
+            // $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
+
             foreach ($companies as $company) {
                 $companyData = [
                     'id' => $company->id,
@@ -468,10 +468,10 @@ class CompanyController extends Controller
                 ];
 
                 // Only include audit fields if user has permission
-                if ($canViewAuditFields) {
-                    $companyData['created_by'] = $company->createdByUser ? $company->createdByUser->name : 'N/A';
-                    $companyData['updated_by'] = $company->updatedByUser ? $company->updatedByUser->name : 'N/A';
-                }
+                // if ($canViewAuditFields) {
+                $companyData['created_by'] = $company->createdByUser ? $company->createdByUser->name : 'N/A';
+                $companyData['updated_by'] = $company->updatedByUser ? $company->updatedByUser->name : 'N/A';
+                // }
 
                 $data[] = $companyData;
             }
@@ -514,10 +514,10 @@ class CompanyController extends Controller
         ];
 
         // Only include audit columns if user has permission
-        if (\App\Helpers\PermissionHelper::canViewAuditFields()) {
-            $columnMap['created_by'] = 'created_by';
-            $columnMap['updated_by'] = 'updated_by';
-        }
+        // if (\App\Helpers\PermissionHelper::canViewAuditFields()) {
+        $columnMap['created_by'] = 'created_by';
+        $columnMap['updated_by'] = 'updated_by';
+        // }
 
         return $columnMap[$columnData] ?? null;
     }

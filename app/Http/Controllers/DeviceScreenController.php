@@ -40,7 +40,7 @@ class DeviceScreenController extends Controller
 
             // Get the layout to check its type and screen limits
             $layout = DeviceLayout::findOrFail($request->layout_id);
-            
+
             // Check if layout allows adding more screens
             if (!$layout->canAddMoreScreens()) {
                 return response()->json([
@@ -129,14 +129,14 @@ class DeviceScreenController extends Controller
 
             // Get the layout to check its type and screen limits
             $layout = DeviceLayout::findOrFail($request->layout_id);
-            
+
             // If changing layout, check if new layout allows this screen
             if ($deviceScreen->layout_id != $request->layout_id) {
                 // Count screens in the new layout (excluding current screen)
                 $screensInNewLayout = DeviceScreen::where('layout_id', $request->layout_id)
                     ->where('id', '!=', $deviceScreen->id)
                     ->count();
-                
+
                 if ($screensInNewLayout >= $layout->max_screens) {
                     return response()->json([
                         'success' => false,
@@ -226,7 +226,7 @@ class DeviceScreenController extends Controller
             $query->where('layout_id', (int) $layoutId);
         }
         $screens = $query->get();
-        
+
         // Get layout information if layout_id is provided
         $layoutInfo = null;
         if ($layoutId !== null && $layoutId !== '') {
@@ -244,13 +244,41 @@ class DeviceScreenController extends Controller
                 ];
             }
         }
-        
+
         return response()->json([
             'success' => true,
             'screens' => $screens,
             'layout_info' => $layoutInfo,
             'counts' => [
                 'total' => $device->screens_count,
+            ]
+        ]);
+    }
+
+    /**
+     * Get screens for a specific layout
+     */
+    public function getLayoutScreens(DeviceLayout $layout)
+    {
+        $screens = $layout->screens()->with('device')->orderBy('screen_no')->get();
+
+        $layoutInfo = [
+            'id' => $layout->id,
+            'name' => $layout->layout_name,
+            'type' => $layout->layout_type,
+            'type_name' => $layout->layout_type_name,
+            'max_screens' => $layout->max_screens,
+            'current_screens' => $screens->count(),
+            'remaining_slots' => $layout->remaining_screen_slots,
+            'can_add_more' => $layout->canAddMoreScreens()
+        ];
+
+        return response()->json([
+            'success' => true,
+            'screens' => $screens,
+            'layout_info' => $layoutInfo,
+            'counts' => [
+                'total' => $screens->count(),
             ]
         ]);
     }

@@ -12,9 +12,6 @@ $(document).ready(function () {
             'schedule_name': true,
             'device': true,
             'layout': true,
-            'screen': true,
-            'start_at': true,
-            'end_at': true,
             'created_at': true,
             'action': true
         };
@@ -135,9 +132,6 @@ $(document).ready(function () {
                     'schedule_name': true,
                     'device': true,
                     'layout': true,
-                    'screen': true,
-                    'start_at': true,
-                    'end_at': true,
                     'created_at': true,
                     'action': true
                 };
@@ -320,9 +314,6 @@ $(document).ready(function () {
                 { data: 'schedule_name', name: 'schedule_name', orderable: true },
                 { data: 'device', name: 'device', orderable: true },
                 { data: 'layout', name: 'layout', orderable: true },
-                { data: 'screen', name: 'screen', orderable: true },
-                { data: 'start_at', name: 'start_at', orderable: true, render: function (data) { return data ? new Date(data).toLocaleString() : 'N/A'; } },
-                { data: 'end_at', name: 'end_at', orderable: true, render: function (data) { return data ? new Date(data).toLocaleString() : 'N/A'; } },
                 { data: 'created_at', name: 'created_at', orderable: true, render: function (data) { return data ? new Date(data).toLocaleString() : 'N/A'; } },
                 {
                     data: 'id', orderable: false, name: 'action', render: function (data) {
@@ -531,22 +522,15 @@ $(document).ready(function () {
 
             // Client-side validation
             var scheduleName = $('input[name="schedule_name"]').val();
-            var startDate = $('input[name="schedule_start_date_time"]').val();
-            var endDate = $('input[name="schedule_end_date_time"]').val();
+            var startDate = null; // removed schedule-level dates
+            var endDate = null;
             var deviceId = $('select[name="device_id"]').val();
 
             if (!scheduleName) {
                 alert('Please enter a schedule name');
                 return;
             }
-            if (!startDate) {
-                alert('Please select a start date and time');
-                return;
-            }
-            if (!endDate) {
-                alert('Please select an end date and time');
-                return;
-            }
+            // schedule-level dates removed; per-media dates optional
             if (!deviceId) {
                 alert('Please select a device');
                 return;
@@ -588,8 +572,8 @@ $(document).ready(function () {
                 if (this.files[0]) {
                     var file = this.files[0];
                     console.log('File ' + index + ':', file.name, 'Size:', file.size, 'bytes', 'Type:', file.type);
-                    if (file.size > 200 * 1024 * 1024) { // 200MB limit
-                        alert('File ' + file.name + ' is too large. Maximum size is 200MB.');
+                    if (file.size > 2 * 1024 * 1024 * 1024) { // 2GB limit
+                        alert('File ' + file.name + ' is too large. Maximum size is 2GB.');
                         submitBtn.html(originalBtnText).prop('disabled', false);
                         return false;
                     }
@@ -603,7 +587,7 @@ $(document).ready(function () {
                 dataType: 'json',
                 processData: false,
                 contentType: false,
-                timeout: 60000, // 60 second timeout for file uploads
+                timeout: 0, // no timeout for large uploads
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 beforeSend: function () {
                     console.log('AJAX request being sent to /schedule');
@@ -691,8 +675,9 @@ $(document).ready(function () {
                         $('#edit-schedule_name').val(schedule.schedule_name || '');
 
                         // Format datetime values for datetime-local input (preserve local timezone)
-                        if (schedule.schedule_start_date_time) {
-                            const startDate = new Date(schedule.schedule_start_date_time);
+                        const firstMedia = (schedule.medias && schedule.medias.length > 0) ? schedule.medias[0] : null;
+                        if (firstMedia && firstMedia.schedule_start_date_time) {
+                            const startDate = new Date(firstMedia.schedule_start_date_time);
                             // Use local timezone formatting instead of UTC
                             const year = startDate.getFullYear();
                             const month = String(startDate.getMonth() + 1).padStart(2, '0');
@@ -705,8 +690,8 @@ $(document).ready(function () {
                             $('#edit-schedule_start_date_time').val('');
                         }
 
-                        if (schedule.schedule_end_date_time) {
-                            const endDate = new Date(schedule.schedule_end_date_time);
+                        if (firstMedia && firstMedia.schedule_end_date_time) {
+                            const endDate = new Date(firstMedia.schedule_end_date_time);
                             // Use local timezone formatting instead of UTC
                             const year = endDate.getFullYear();
                             const month = String(endDate.getMonth() + 1).padStart(2, '0');
@@ -724,8 +709,8 @@ $(document).ready(function () {
                             $('#edit-device_id').val(schedule.device_id).trigger('change');
                         }
 
-                        // Set play_forever checkbox
-                        if (schedule.play_forever) {
+                        // Set play_forever checkbox from first media
+                        if (firstMedia && firstMedia.play_forever) {
                             $('#edit-play_forever').prop('checked', true);
                         } else {
                             $('#edit-play_forever').prop('checked', false);
@@ -734,13 +719,20 @@ $(document).ready(function () {
                         // Set form action
                         $('#edit-schedule-form').attr('action', `/schedule/${id}`);
 
-                        // Load layouts and screens after device is set
+                        // Load layouts after device is set
                         if (schedule.device_id) {
-                            loadLayoutsForEdit(schedule.device_id, schedule.layout_id, schedule.screen_id);
+                            loadLayoutsForEdit(schedule.device_id, schedule.layout_id);
                         }
 
                         // Load existing media data
                         loadExistingMedia(schedule.medias || []);
+
+                        // Load screens for existing media after a short delay to ensure DOM is ready
+                        setTimeout(function () {
+                            if (schedule.device_id) {
+                                loadScreensForEditMedia(schedule.device_id, schedule.layout_id);
+                            }
+                        }, 100);
                     } else {
                         alert('Failed to load schedule data');
                         $('#offcanvas_edit').offcanvas('hide');
@@ -780,42 +772,51 @@ $(document).ready(function () {
             $container.empty();
 
             if (medias && medias.length > 0) {
-                medias.forEach(function (media) {
+                medias.forEach(function (media, index) {
                     const mediaHtml = `
-                        <div class="media-item border rounded p-3 mb-3">
+                        <div class="media-item border rounded p-3 mb-3" data-media-index="${index}">
                             <input type="hidden" name="edit_media_id[]" value="${media.id}">
                             <div class="row">
-                                                            <div class="col-md-5">
-                                <div class="mb-3">
-                                    <label class="form-label">Media Title</label>
-                                    <input type="text" class="form-control" name="edit_media_title[]"
-                                        value="${media.title || ''}" placeholder="Enter media title">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Media Title</label>
+                                        <input type="text" class="form-control" name="edit_media_title[]"
+                                            value="${media.title || ''}" placeholder="Enter media title">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-5">
-                                <div class="mb-3">
-                                    <label class="form-label">Media Type</label>
-                                    <select class="form-control select2" name="edit_media_type[]"
-                                        data-toggle="select2">
-                                        <option value="">Select type...</option>
-                                        <option value="image" ${media.media_type === 'image' ? 'selected' : ''}>Image</option>
-                                        <option value="video" ${media.media_type === 'video' ? 'selected' : ''}>Video</option>
-                                        <option value="audio" ${media.media_type === 'audio' ? 'selected' : ''}>Audio</option>
-                                        <option value="mp4" ${media.media_type === 'mp4' ? 'selected' : ''}>MP4</option>
-                                        <option value="png" ${media.media_type === 'png' ? 'selected' : ''}>PNG</option>
-                                        <option value="jpg" ${media.media_type === 'jpg' ? 'selected' : ''}>JPG</option>
-                                        <option value="pdf" ${media.media_type === 'pdf' ? 'selected' : ''}>PDF</option>
-                                    </select>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Media Type</label>
+                                        <select class="form-control select2" name="edit_media_type[]"
+                                            data-toggle="select2">
+                                            <option value="">Select type...</option>
+                                            <option value="image" ${media.media_type === 'image' ? 'selected' : ''}>Image</option>
+                                            <option value="video" ${media.media_type === 'video' ? 'selected' : ''}>Video</option>
+                                            <option value="audio" ${media.media_type === 'audio' ? 'selected' : ''}>Audio</option>
+                                            <option value="mp4" ${media.media_type === 'mp4' ? 'selected' : ''}>MP4</option>
+                                            <option value="png" ${media.media_type === 'png' ? 'selected' : ''}>PNG</option>
+                                            <option value="jpg" ${media.media_type === 'jpg' ? 'selected' : ''}>JPG</option>
+                                            <option value="pdf" ${media.media_type === 'pdf' ? 'selected' : ''}>PDF</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="mb-3">
-                                    <label class="form-label">&nbsp;</label>
-                                    <button type="button" class="btn btn-danger btn-sm w-100 remove-media">
-                                        <i class="ti ti-trash"></i> Remove
-                                    </button>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Screen</label>
+                                        <select class="form-control select2" name="edit_media_screen_id[]"
+                                            data-toggle="select2" data-existing-screen-id="${media.screen_id || ''}">
+                                            <option value="">Select screen...</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="col-md-2">
+                                    <div class="mb-3">
+                                        <label class="form-label">&nbsp;</label>
+                                        <button type="button" class="btn btn-danger btn-sm w-100 remove-media">
+                                            <i class="ti ti-trash"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -887,12 +888,10 @@ $(document).ready(function () {
         }
 
         // Helper function to load layouts for edit form
-        function loadLayoutsForEdit(deviceId, selectedLayoutId, selectedScreenId) {
+        function loadLayoutsForEdit(deviceId, selectedLayoutId) {
             var $layout = $('#edit-layout_id');
-            var $screen = $('#edit-screen_id');
 
             $layout.empty().append('<option value="">Loading...</option>').trigger('change.select2');
-            $screen.empty().append('<option value="">Select screen...</option>').trigger('change.select2');
 
             if (!deviceId) {
                 $layout.empty().append('<option value="">Select layout...</option>').trigger('change');
@@ -914,10 +913,6 @@ $(document).ready(function () {
                     }
                     $layout.trigger('change');
 
-                    // Load screens if layout is selected
-                    if (selectedLayoutId) {
-                        loadScreensForEdit(deviceId, selectedLayoutId, selectedScreenId);
-                    }
                 },
                 error: function () {
                     $layout.empty().append('<option value="">Failed to load layouts</option>');
@@ -925,54 +920,106 @@ $(document).ready(function () {
             });
         }
 
-        // Helper function to load screens for edit form
-        function loadScreensForEdit(deviceId, selectedLayoutId, selectedScreenId) {
-            var $screen = $('#edit-screen_id');
+        // Helper function to load screens for media items
+        function loadScreensForMedia(deviceId, layoutId = null) {
+            if (!deviceId) return;
 
-            $screen.empty().append('<option value="">Loading...</option>').trigger('change.select2');
+            console.log('Loading screens for device:', deviceId, 'layout:', layoutId);
 
-            var data = {};
-            if (selectedLayoutId) {
-                data.layout_id = selectedLayoutId;
-            }
+            $('select[name="media_screen_id[]"]').each(function () {
+                var $screen = $(this);
+                var previouslySelected = $screen.val();
+                $screen.empty().append('<option value="">Loading...</option>');
 
-            $.ajax({
-                url: '/device/' + deviceId + '/screens',
-                type: 'GET',
-                data: data,
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                success: function (res) {
-                    $screen.empty().append('<option value="">Select screen...</option>');
-                    if (res && res.success && Array.isArray(res.screens)) {
-                        res.screens.forEach(function (s) {
-                            var label = 'Screen ' + s.screen_no;
-                            if (s.layout && s.layout.layout_name) {
-                                label += ' - ' + s.layout.layout_name;
+                var url = layoutId ? '/layout/' + layoutId + '/screens' : '/device/' + deviceId + '/screens';
+                console.log('Loading screens from URL:', url);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    success: function (res) {
+                        console.log('Screens loaded successfully:', res);
+                        $screen.empty().append('<option value="">Select screen...</option>');
+                        if (res && res.success && Array.isArray(res.screens)) {
+                            var hasPrev = false;
+                            res.screens.forEach(function (s) {
+                                var label = 'Screen ' + s.screen_no;
+                                if (s.layout && s.layout.layout_name) {
+                                    label += ' - ' + s.layout.layout_name;
+                                }
+                                var selected = (previouslySelected && String(s.id) === String(previouslySelected)) ? ' selected' : '';
+                                if (selected) { hasPrev = true; }
+                                $screen.append('<option value="' + s.id + '"' + selected + '>' + label + '</option>');
+                            });
+                            if (!hasPrev && previouslySelected) {
+                                console.log('Previously selected screen not in current list, leaving as empty.');
                             }
-                            var selected = (s.id == selectedScreenId) ? ' selected' : '';
-                            $screen.append('<option value="' + s.id + '"' + selected + '>' + label + '</option>');
-                        });
+                            console.log('Added', res.screens.length, 'screens to dropdown');
+                        } else {
+                            console.log('No screens found or invalid response');
+                        }
+                        $screen.trigger('change');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error loading screens:', error, xhr.responseText);
+                        $screen.empty().append('<option value="">Failed to load screens</option>');
                     }
-                    $screen.trigger('change');
-                },
-                error: function () {
-                    $screen.empty().append('<option value="">Failed to load screens</option>');
-                }
+                });
             });
         }
 
-        // Dependent selects: device -> layouts (active), layout -> screens
+        // Helper function to load screens for edit media items
+        function loadScreensForEditMedia(deviceId, layoutId = null) {
+            if (!deviceId) return;
+
+            console.log('Loading screens for edit media - device:', deviceId, 'layout:', layoutId);
+
+            $('select[name="edit_media_screen_id[]"]').each(function () {
+                var $screen = $(this);
+                var existingScreenId = $screen.data('existing-screen-id') || $screen.val();
+                $screen.empty().append('<option value="">Loading...</option>');
+
+                var url = layoutId ? '/layout/' + layoutId + '/screens' : '/device/' + deviceId + '/screens';
+                console.log('Loading edit screens from URL:', url, 'existing screen ID:', existingScreenId);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    success: function (res) {
+                        console.log('Edit screens loaded successfully:', res);
+                        $screen.empty().append('<option value="">Select screen...</option>');
+                        if (res && res.success && Array.isArray(res.screens)) {
+                            res.screens.forEach(function (s) {
+                                var label = 'Screen ' + s.screen_no;
+                                if (s.layout && s.layout.layout_name) {
+                                    label += ' - ' + s.layout.layout_name;
+                                }
+                                var selected = (existingScreenId && String(s.id) === String(existingScreenId)) ? ' selected' : '';
+                                $screen.append('<option value="' + s.id + '"' + selected + '>' + label + '</option>');
+                            });
+                            console.log('Added', res.screens.length, 'screens to edit dropdown, selected screen:', existingScreenId);
+                        } else {
+                            console.log('No screens found or invalid response for edit');
+                        }
+                        $screen.trigger('change');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error loading edit screens:', error, xhr.responseText);
+                        $screen.empty().append('<option value="">Failed to load screens</option>');
+                    }
+                });
+            });
+        }
+
+        // Dependent selects: device -> layouts (active)
         $(document).on('change', 'select[name="device_id"]', function () {
             var deviceId = $(this).val();
             var $layout = $('select[name="layout_id"]');
-            var $screen = $('select[name="screen_id"]');
 
-            // Clear and reset screen options
-            $screen.empty().append('<option value="">Select screen...</option>');
-            if ($screen.hasClass('select2-hidden-accessible')) {
-                $screen.select2('destroy');
-            }
-            $screen.select2();
+            // Load screens for all media items (will be updated when layout is selected)
+            loadScreensForMedia(deviceId);
 
             // Clear and reset layout options
             $layout.empty().append('<option value="">Loading...</option>');
@@ -1007,61 +1054,13 @@ $(document).ready(function () {
             });
         });
 
-        $(document).on('change', 'select[name="layout_id"]', function () {
-            var layoutId = $(this).val();
-            var deviceId = $('select[name="device_id"]').val();
-            var $screen = $('select[name="screen_id"]');
-
-            // Clear and reset screen options
-            $screen.empty().append('<option value="">Loading...</option>');
-            if ($screen.hasClass('select2-hidden-accessible')) {
-                $screen.select2('destroy');
-            }
-            $screen.select2();
-
-            if (!deviceId) {
-                $screen.empty().append('<option value="">Select screen...</option>');
-                $screen.trigger('change');
-                return;
-            }
-
-            var data = {};
-            if (layoutId) { data.layout_id = layoutId; }
-
-            $.ajax({
-                url: '/device/' + deviceId + '/screens', type: 'GET', data: data,
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                success: function (res) {
-                    $screen.empty().append('<option value="">Select screen...</option>');
-                    if (res && res.success && Array.isArray(res.screens)) {
-                        res.screens.forEach(function (s) {
-                            var label = 'Screen ' + s.screen_no;
-                            if (s.layout && s.layout.layout_name) { label += ' - ' + s.layout.layout_name; }
-                            $screen.append('<option value="' + s.id + '">' + label + '</option>');
-                        });
-                    }
-                    // Refresh Select2 after populating options
-                    $screen.trigger('change');
-                },
-                error: function () {
-                    $screen.empty().append('<option value="">Failed to load screens</option>');
-                    $screen.trigger('change');
-                }
-            });
-        });
-
-        // Edit form dependent selects: device -> layouts (active), layout -> screens
+        // Edit form dependent selects: device -> layouts (active)
         $(document).on('change', '#edit-device_id', function () {
             var deviceId = $(this).val();
             var $layout = $('#edit-layout_id');
-            var $screen = $('#edit-screen_id');
 
-            // Clear and reset screen options
-            $screen.empty().append('<option value="">Select screen...</option>');
-            if ($screen.hasClass('select2-hidden-accessible')) {
-                $screen.select2('destroy');
-            }
-            $screen.select2();
+            // Load screens for all media items in edit form (will be updated when layout is selected)
+            loadScreensForEditMedia(deviceId);
 
             // Clear and reset layout options
             $layout.empty().append('<option value="">Loading...</option>');
@@ -1096,47 +1095,103 @@ $(document).ready(function () {
             });
         });
 
+        // Function to show notification about available screens for selected layout
+        function showLayoutScreensNotification(layoutName, layoutId) {
+            // Get layout info to show screen count
+            $.ajax({
+                url: '/layout/' + layoutId + '/screens',
+                type: 'GET',
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function (res) {
+                    if (res && res.success && res.layout_info) {
+                        var screenCount = res.screens ? res.screens.length : 0;
+                        var maxScreens = res.layout_info.max_screens;
+                        var layoutType = res.layout_info.type_name;
+
+                        var message = 'Layout "' + layoutName + '" selected! ';
+                        message += 'Available screens: ' + screenCount + '/' + maxScreens + ' (' + layoutType + '). ';
+                        message += 'You can now assign media to any of these screens.';
+
+                        // Show toast notification
+                        showToast('Layout Selected', message, 'info');
+                    }
+                },
+                error: function () {
+                    // Fallback notification
+                    showToast('Layout Selected', 'Layout "' + layoutName + '" selected. Screens are now available for media assignment.', 'info');
+                }
+            });
+        }
+
+        // Function to show toast notifications
+        function showToast(title, message, type = 'info') {
+            // Create toast element
+            var toastHtml = `
+                <div class="toast align-items-center text-white bg-${type === 'info' ? 'primary' : type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <strong>${title}</strong><br>
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+            // Add to toast container or create one
+            var $toastContainer = $('#toast-container');
+            if ($toastContainer.length === 0) {
+                $toastContainer = $('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>');
+                $('body').append($toastContainer);
+            }
+
+            var $toast = $(toastHtml);
+            $toastContainer.append($toast);
+
+            // Initialize and show toast
+            var toast = new bootstrap.Toast($toast[0], { delay: 5000 });
+            toast.show();
+
+            // Remove toast element after it's hidden
+            $toast.on('hidden.bs.toast', function () {
+                $(this).remove();
+            });
+        }
+
+        // Layout change handler for create form
+        $(document).on('change', 'select[name="layout_id"]', function () {
+            var layoutId = $(this).val();
+            var deviceId = $('select[name="device_id"]').val();
+            var layoutName = $(this).find('option:selected').text();
+
+            if (layoutId && deviceId) {
+                // Load screens for the selected layout
+                loadScreensForMedia(deviceId, layoutId);
+
+                // Show notification about available screens
+                showLayoutScreensNotification(layoutName, layoutId);
+            } else if (deviceId) {
+                // If no layout selected, load all screens for the device
+                loadScreensForMedia(deviceId);
+            }
+        });
+
+        // Layout change handler for edit form
         $(document).on('change', '#edit-layout_id', function () {
             var layoutId = $(this).val();
             var deviceId = $('#edit-device_id').val();
-            var $screen = $('#edit-screen_id');
+            var layoutName = $(this).find('option:selected').text();
 
-            // Clear and reset screen options
-            $screen.empty().append('<option value="">Loading...</option>');
-            if ($screen.hasClass('select2-hidden-accessible')) {
-                $screen.select2('destroy');
+            if (layoutId && deviceId) {
+                // Load screens for the selected layout
+                loadScreensForEditMedia(deviceId, layoutId);
+
+                // Show notification about available screens
+                showLayoutScreensNotification(layoutName, layoutId);
+            } else if (deviceId) {
+                // If no layout selected, load all screens for the device
+                loadScreensForEditMedia(deviceId);
             }
-            $screen.select2();
-
-            if (!deviceId) {
-                $screen.empty().append('<option value="">Select screen...</option>');
-                $screen.trigger('change');
-                return;
-            }
-
-            var data = {};
-            if (layoutId) { data.layout_id = layoutId; }
-
-            $.ajax({
-                url: '/device/' + deviceId + '/screens', type: 'GET', data: data,
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                success: function (res) {
-                    $screen.empty().append('<option value="">Select screen...</option>');
-                    if (res && res.success && Array.isArray(res.screens)) {
-                        res.screens.forEach(function (s) {
-                            var label = 'Screen ' + s.screen_no;
-                            if (s.layout && s.layout.layout_name) { label += ' - ' + s.layout.layout_name; }
-                            $screen.append('<option value="' + s.id + '">' + label + '</option>');
-                        });
-                    }
-                    // Refresh Select2 after populating options
-                    $screen.trigger('change');
-                },
-                error: function () {
-                    $screen.empty().append('<option value="">Failed to load screens</option>');
-                    $screen.trigger('change');
-                }
-            });
         });
 
         // Handle edit schedule form submission
@@ -1200,14 +1255,14 @@ $(document).ready(function () {
             const mediaHtml = `
                 <div class="media-item border rounded p-3 mb-3">
                     <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Media Title</label>
                                 <input type="text" class="form-control" name="media_title[]"
                                     placeholder="Enter media title">
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Media Type</label>
                                 <select class="form-control select2" name="media_type[]"
@@ -1223,12 +1278,35 @@ $(document).ready(function () {
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Screen</label>
+                                <select class="form-control select2" name="media_screen_id[]"
+                                    data-toggle="select2">
+                                    <option value="">Select screen...</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-md-2">
                             <div class="mb-3">
                                 <label class="form-label">&nbsp;</label>
                                 <button type="button" class="btn btn-danger btn-sm w-100 remove-media">
                                     <i class="ti ti-trash"></i> Remove
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Start At</label>
+                                <input type="datetime-local" class="form-control" name="media_start_date_time[]">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">End At</label>
+                                <input type="datetime-local" class="form-control" name="media_end_date_time[]">
                             </div>
                         </div>
                     </div>
@@ -1245,6 +1323,13 @@ $(document).ready(function () {
             `;
             $('#media-container').append(mediaHtml);
             initializeSelect2();
+
+            // Load screens for the newly added media item
+            var deviceId = $('select[name="device_id"]').val();
+            var layoutId = $('select[name="layout_id"]').val();
+            if (deviceId) {
+                loadScreensForMedia(deviceId, layoutId);
+            }
         });
 
         // Handle add media functionality for edit form
@@ -1253,14 +1338,14 @@ $(document).ready(function () {
                 <div class="media-item border rounded p-3 mb-3">
                     <input type="hidden" name="edit_media_id[]" value="">
                     <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Media Title</label>
                                 <input type="text" class="form-control" name="edit_media_title[]"
                                     placeholder="Enter media title">
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Media Type</label>
                                 <select class="form-control select2" name="edit_media_type[]"
@@ -1276,12 +1361,35 @@ $(document).ready(function () {
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Screen</label>
+                                <select class="form-control select2" name="edit_media_screen_id[]"
+                                    data-toggle="select2">
+                                    <option value="">Select screen...</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-md-2">
                             <div class="mb-3">
                                 <label class="form-label">&nbsp;</label>
                                 <button type="button" class="btn btn-danger btn-sm w-100 remove-media">
                                     <i class="ti ti-trash"></i> Remove
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Start At</label>
+                                <input type="datetime-local" class="form-control" name="edit_media_start_date_time[]">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">End At</label>
+                                <input type="datetime-local" class="form-control" name="edit_media_end_date_time[]">
                             </div>
                         </div>
                     </div>
@@ -1298,11 +1406,56 @@ $(document).ready(function () {
             `;
             $('#edit-media-container').append(mediaHtml);
             initializeSelect2();
+
+            // Load screens for the newly added media item
+            var deviceId = $('#edit-device_id').val();
+            var layoutId = $('#edit-layout_id').val();
+            if (deviceId) {
+                loadScreensForEditMedia(deviceId, layoutId);
+            }
         });
 
         // Handle remove media functionality
         $(document).on('click', '.remove-media', function () {
             $(this).closest('.media-item').remove();
+        });
+
+        // Handle refresh screens button
+        $(document).on('click', '#refresh-screens', function () {
+            var deviceId = $('select[name="device_id"]').val();
+            var layoutId = $('select[name="layout_id"]').val();
+
+            if (!deviceId) {
+                showToast('Error', 'Please select a device first', 'danger');
+                return;
+            }
+
+            if (layoutId) {
+                loadScreensForMedia(deviceId, layoutId);
+                showToast('Screens Refreshed', 'Screens for the selected layout have been refreshed', 'success');
+            } else {
+                loadScreensForMedia(deviceId);
+                showToast('Screens Refreshed', 'All device screens have been refreshed', 'success');
+            }
+        });
+
+        // Handle refresh edit screens button
+        $(document).on('click', '#refresh-edit-screens', function () {
+            var deviceId = $('#edit-device_id').val();
+            var layoutId = $('#edit-layout_id').val();
+
+            if (!deviceId) {
+                showToast('Error', 'Please select a device first', 'danger');
+                return;
+            }
+
+            if (layoutId) {
+                loadScreensForEditMedia(deviceId, layoutId);
+                showToast('Screens Refreshed', 'Screens for the selected layout have been refreshed', 'success');
+            } else {
+                loadScreensForEditMedia(deviceId);
+                showToast('Screens Refreshed', 'All device screens have been refreshed', 'success');
+            }
         });
 
         // Reset forms once the offcanvas fully closes

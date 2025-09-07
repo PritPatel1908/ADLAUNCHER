@@ -17,14 +17,27 @@ class ScheduleMedia extends Model
         'schedule_id',
         'media_type',
         'title',
+        'screen_id',
+        'schedule_start_date_time',
+        'schedule_end_date_time',
+        'play_forever',
     ];
 
     protected $casts = [
         'schedule_id' => 'integer',
+        'screen_id' => 'integer',
+        'schedule_start_date_time' => 'datetime',
+        'schedule_end_date_time' => 'datetime',
+        'play_forever' => 'boolean',
     ];
 
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(Schedule::class);
+    }
+
+    public function screen(): BelongsTo
+    {
+        return $this->belongsTo(DeviceScreen::class, 'screen_id');
     }
 }

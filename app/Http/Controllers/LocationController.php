@@ -292,8 +292,8 @@ class LocationController extends Controller
 
         // Format data for DataTables
         $data = [];
-        $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
-        
+        // $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
+
         foreach ($locations as $location) {
             $locationData = [
                 'id' => $location->id,
@@ -310,10 +310,10 @@ class LocationController extends Controller
             ];
 
             // Only include audit fields if user has permission
-            if ($canViewAuditFields) {
-                $locationData['created_by'] = $location->created_by ? User::find($location->created_by)->name : null;
-                $locationData['updated_by'] = $location->updated_by ? User::find($location->updated_by)->name : null;
-            }
+            // if ($canViewAuditFields) {
+            $locationData['created_by'] = $location->created_by ? User::find($location->created_by)->name : null;
+            $locationData['updated_by'] = $location->updated_by ? User::find($location->updated_by)->name : null;
+            // }
 
             $data[] = $locationData;
         }

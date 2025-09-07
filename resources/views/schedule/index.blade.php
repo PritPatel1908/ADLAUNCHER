@@ -29,19 +29,19 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    @if(\App\Helpers\PermissionHelper::canExport('schedule'))
-                    <div class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
-                            data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <ul>
-                                <li><a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-pdf me-1"></i>Export as PDF</a></li>
-                                <li><a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-xls me-1"></i>Export as Excel</a></li>
-                            </ul>
+                    @if (\App\Helpers\PermissionHelper::canExport('schedule'))
+                        <div class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
+                                data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <ul>
+                                    <li><a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-pdf me-1"></i>Export as PDF</a></li>
+                                    <li><a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-xls me-1"></i>Export as Excel</a></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
                     @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
@@ -58,11 +58,11 @@
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
-                    @if(\App\Helpers\PermissionHelper::canCreate('schedule'))
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvas_add">
-                        <i class="ti ti-square-rounded-plus-filled me-1"></i>Add Schedule
-                    </a>
+                    @if (\App\Helpers\PermissionHelper::canCreate('schedule'))
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvas_add">
+                            <i class="ti ti-square-rounded-plus-filled me-1"></i>Add Schedule
+                        </a>
                     @endif
                 </div>
                 <div class="card-body">
@@ -188,36 +188,7 @@
                                                 </label>
                                             </div>
                                         </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Screen</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="screen">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>Start At</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="start_at">
-                                                </label>
-                                            </div>
-                                        </li>
-                                        <li class="gap-1 d-flex align-items-center mb-2">
-                                            <i class="ti ti-columns me-1"></i>
-                                            <div class="form-check form-switch w-100 ps-0">
-                                                <label class="form-check-label d-flex align-items-center gap-2 w-100">
-                                                    <span>End At</span>
-                                                    <input class="form-check-input column-visibility-toggle ms-auto"
-                                                        type="checkbox" role="switch" checked data-column="end_at">
-                                                </label>
-                                            </div>
-                                        </li>
+
                                         <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
@@ -263,9 +234,7 @@
                                     <th>schedule_name</th>
                                     <th>device</th>
                                     <th>layout</th>
-                                    <th>screen</th>
-                                    <th>start_at</th>
-                                    <th>end_at</th>
+
                                     <th>created_at</th>
                                     <th class="text-end no-sort">Action</th>
                                 </tr>
@@ -330,22 +299,7 @@
                                                         required>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Start At <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_start_date_time" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="mb-3">
-                                                    <label class="form-label">End At <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_end_date_time" required>
-                                                </div>
-                                            </div>
+
                                             <div class="col-md-4">
                                                 <div class="mb-3">
                                                     <label class="form-label">Device <span
@@ -369,26 +323,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Screen</label>
-                                                    <select class="form-control select2" name="screen_id"
-                                                        data-toggle="select2">
-                                                        <option value="">Select screen...</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            name="play_forever" value="1" id="play_forever">
-                                                        <label class="form-check-label" for="play_forever">
-                                                            Play Forever (Ignore end time)
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -399,21 +334,35 @@
                                         data-bs-toggle="collapse" data-bs-target="#media">
                                         <span class="avatar avatar-md rounded me-1"><i class="ti ti-photo"></i></span>
                                         Schedule Media
+                                        <span class="badge badge-soft-info ms-2">Multiple Media Support</span>
                                     </a>
                                 </div>
                                 <div class="accordion-collapse collapse" id="media" data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
+                                        <div class="alert alert-info mb-3">
+                                            <i class="ti ti-info-circle me-2"></i>
+                                            <strong>Multi-Media Support:</strong> You can add multiple media files and
+                                            assign them to different screens.
+                                            When you select a layout, all screens from that layout will be available for
+                                            media assignment.
+                                            <div class="mt-2">
+                                                <button type="button" class="btn btn-sm btn-outline-info"
+                                                    id="refresh-screens">
+                                                    <i class="ti ti-refresh me-1"></i>Refresh Screens
+                                                </button>
+                                            </div>
+                                        </div>
                                         <div id="media-container">
                                             <div class="media-item border rounded p-3 mb-3">
                                                 <div class="row">
-                                                    <div class="col-md-5">
+                                                    <div class="col-md-4">
                                                         <div class="mb-3">
                                                             <label class="form-label">Media Title</label>
                                                             <input type="text" class="form-control"
                                                                 name="media_title[]" placeholder="Enter media title">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-5">
+                                                    <div class="col-md-3">
                                                         <div class="mb-3">
                                                             <label class="form-label">Media Type</label>
                                                             <select class="form-control select2" name="media_type[]"
@@ -427,6 +376,36 @@
                                                                 <option value="jpg">JPG</option>
                                                                 <option value="pdf">PDF</option>
                                                             </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Screen</label>
+                                                            <select class="form-control select2" name="media_screen_id[]"
+                                                                data-toggle="select2">
+                                                                <option value="">Select screen...</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Start At</label>
+                                                            <input type="datetime-local" class="form-control"
+                                                                name="media_start_date_time[]">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">End At</label>
+                                                            <input type="datetime-local" class="form-control"
+                                                                name="media_end_date_time[]">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 d-flex align-items-center">
+                                                        <div class="form-check mt-4">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="media_play_forever[]" value="1">
+                                                            <label class="form-check-label">Play Forever</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-2">
@@ -452,9 +431,13 @@
                                             </div>
                                         </div>
                                         <div class="text-center">
-                                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-media">
+                                            <button type="button" class="btn btn-primary btn-sm" id="add-media">
                                                 <i class="ti ti-plus me-1"></i>Add Another Media
                                             </button>
+                                            <p class="text-muted mt-2 mb-0">
+                                                <small><i class="ti ti-info-circle me-1"></i>You can add multiple media
+                                                    files and assign them to different screens</small>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -514,24 +497,7 @@
                                                         id="edit-schedule_name" required>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Start At <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_start_date_time" id="edit-schedule_start_date_time"
-                                                        required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="mb-3">
-                                                    <label class="form-label">End At <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_end_date_time" id="edit-schedule_end_date_time"
-                                                        required>
-                                                </div>
-                                            </div>
+
                                             <div class="col-md-4">
                                                 <div class="mb-3">
                                                     <label class="form-label">Device</label>
@@ -554,26 +520,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Screen</label>
-                                                    <select class="form-control select2" name="screen_id"
-                                                        id="edit-screen_id" data-toggle="select2">
-                                                        <option value="">Select screen...</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            name="play_forever" value="1" id="edit-play_forever">
-                                                        <label class="form-check-label" for="edit-play_forever">
-                                                            Play Forever (Ignore end time)
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -584,22 +531,36 @@
                                         data-bs-toggle="collapse" data-bs-target="#edit_media">
                                         <span class="avatar avatar-md rounded me-1"><i class="ti ti-photo"></i></span>
                                         Schedule Media
+                                        <span class="badge badge-soft-info ms-2">Multiple Media Support</span>
                                     </a>
                                 </div>
                                 <div class="accordion-collapse collapse" id="edit_media"
                                     data-bs-parent="#edit_main_accordion">
                                     <div class="accordion-body border-top">
+                                        <div class="alert alert-info mb-3">
+                                            <i class="ti ti-info-circle me-2"></i>
+                                            <strong>Multi-Media Support:</strong> You can add multiple media files and
+                                            assign them to different screens.
+                                            When you select a layout, all screens from that layout will be available for
+                                            media assignment.
+                                            <div class="mt-2">
+                                                <button type="button" class="btn btn-sm btn-outline-info"
+                                                    id="refresh-screens">
+                                                    <i class="ti ti-refresh me-1"></i>Refresh Screens
+                                                </button>
+                                            </div>
+                                        </div>
                                         <div id="edit-media-container">
                                             <div class="media-item border rounded p-3 mb-3">
                                                 <div class="row">
-                                                    <div class="col-md-5">
+                                                    <div class="col-md-4">
                                                         <div class="mb-3">
                                                             <label class="form-label">Media Title</label>
                                                             <input type="text" class="form-control"
                                                                 name="edit_media_title[]" placeholder="Enter media title">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-5">
+                                                    <div class="col-md-3">
                                                         <div class="mb-3">
                                                             <label class="form-label">Media Type</label>
                                                             <select class="form-control select2" name="edit_media_type[]"
@@ -612,6 +573,15 @@
                                                                 <option value="png">PNG</option>
                                                                 <option value="jpg">JPG</option>
                                                                 <option value="pdf">PDF</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Screen</label>
+                                                            <select class="form-control select2"
+                                                                name="edit_media_screen_id[]" data-toggle="select2">
+                                                                <option value="">Select screen...</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -638,10 +608,13 @@
                                             </div>
                                         </div>
                                         <div class="text-center">
-                                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                                id="edit-add-media">
+                                            <button type="button" class="btn btn-primary btn-sm" id="edit-add-media">
                                                 <i class="ti ti-plus me-1"></i>Add Another Media
                                             </button>
+                                            <p class="text-muted mt-2 mb-0">
+                                                <small><i class="ti ti-info-circle me-1"></i>You can add multiple media
+                                                    files and assign them to different screens</small>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

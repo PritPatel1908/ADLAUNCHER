@@ -63,10 +63,14 @@ class UserController extends Controller
             // Generate username from first_name and last_name
             $username = User::generateUsername($request->first_name, $request->last_name);
 
+            // Create full name from first_name and last_name
+            $fullName = trim($request->first_name . ' ' . $request->last_name);
+
             $user = User::create([
                 'first_name' => $request->first_name,
                 'middle_name' => $request->middle_name,
                 'last_name' => $request->last_name,
+                'name' => $fullName,
                 'username' => $username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
@@ -170,10 +174,14 @@ class UserController extends Controller
         try {
             DB::beginTransaction();
 
+            // Create full name from first_name and last_name
+            $fullName = trim($request->first_name . ' ' . $request->last_name);
+
             $updateData = [
                 'first_name' => $request->first_name,
                 'middle_name' => $request->middle_name,
                 'last_name' => $request->last_name,
+                'name' => $fullName,
                 'email' => $request->email,
                 'mobile' => $request->mobile,
                 'phone' => $request->phone,

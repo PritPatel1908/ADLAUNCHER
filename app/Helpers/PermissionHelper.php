@@ -126,14 +126,14 @@ class PermissionHelper
      * Check if current user can view audit fields (created_by, updated_by)
      * Only admin users can view these fields
      */
-    public static function canViewAuditFields(): bool
-    {
-        $user = Auth::user();
-        if (!$user) {
-            return false;
-        }
+    // public static function canViewAuditFields(): bool
+    // {
+    //     $user = Auth::user();
+    //     if (!$user) {
+    //         return false;
+    //     }
 
-        // Only admin users can view audit fields
-        return $user->is_admin;
-    }
+    //     // Only admin users can view audit fields
+    //     return $user->is_admin;
+    // }
 }

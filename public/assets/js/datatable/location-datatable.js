@@ -283,25 +283,25 @@ $(document).ready(function () {
                         "name": "action",
                         "render": function (data, type, row) {
                             let actions = [];
-                            
+
                             // Check permissions and add actions accordingly
                             if (window.locationPermissions && window.locationPermissions.view) {
                                 actions.push(`<a class="dropdown-item" href="/location/${data}"><i class="ti ti-eye me-2"></i>View</a>`);
                             }
-                            
+
                             if (window.locationPermissions && window.locationPermissions.edit) {
-                                actions.push(`<a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_edit"><i class="ti ti-edit text-blue"></i> Edit</a>`);
+                                actions.push(`<a class="dropdown-item edit-location" href="javascript:void(0);" data-id="${data}" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_edit"><i class="ti ti-edit text-blue"></i> Edit</a>`);
                             }
-                            
+
                             if (window.locationPermissions && window.locationPermissions.delete) {
                                 actions.push(`<a class="dropdown-item delete-location" href="javascript:void(0);" data-id="${data}"><i class="ti ti-trash me-2"></i>Delete</a>`);
                             }
-                            
+
                             // If no actions available, return empty
                             if (actions.length === 0) {
                                 return '<span class="text-muted">No actions</span>';
                             }
-                            
+
                             return `
                                 <div class="dropdown dropdown-action">
                                     <a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></a>
@@ -596,7 +596,12 @@ $(document).ready(function () {
 
     // Handle edit button click
     $(document).on('click', '[data-bs-target="#offcanvas_edit"]', function () {
-        var locationId = $(this).closest('.dropdown-action').find('.delete-location').data('id');
+        // Prefer the id on the clicked element; fallback to sibling actions; final fallback to row data
+        var locationId = $(this).data('id');
+        if (!locationId) {
+            locationId = $(this).closest('.dropdown-action').find('.edit-location').data('id')
+                || $(this).closest('.dropdown-action').find('.delete-location').data('id');
+        }
 
         // Set the location ID to the form
         $('#edit-location-form').data('location-id', locationId);
@@ -607,7 +612,10 @@ $(document).ready(function () {
             url: '/location/' + locationId,
             type: 'GET',
             dataType: 'json',
-            success: function (data) {
+            success: function (response) {
+                // Handle both direct data and wrapped response
+                var data = response.location || response;
+
                 // Populate form fields
                 $('#edit-name').val(data.name);
                 $('#edit-email').val(data.email);
