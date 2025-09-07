@@ -116,6 +116,14 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load(['companies', 'locations', 'areas', 'roles']);
+
+        // Check if request is AJAX
+        if (request()->ajax()) {
+            return response()->json([
+                'user' => $user
+            ]);
+        }
+
         return view('user.show', compact('user'));
     }
 

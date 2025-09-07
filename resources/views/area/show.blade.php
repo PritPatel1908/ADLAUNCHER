@@ -33,6 +33,7 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
+                    @if(\App\Helpers\PermissionHelper::canExport('area'))
                     <div class="dropdown">
                         <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
                             data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
@@ -49,6 +50,7 @@
                             </ul>
                         </div>
                     </div>
+                    @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
                             class="ti ti-refresh"></i></a>
@@ -94,10 +96,13 @@
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center flex-wrap gap-2">
+                                    @if(\App\Helpers\PermissionHelper::canEdit('area'))
                                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                                         data-bs-target="#offcanvas_edit">
                                         <i class="ti ti-edit me-1"></i>Edit Area
                                     </a>
+                                    @endif
+                                    @if(\App\Helpers\PermissionHelper::canDelete('area'))
                                     <form action="{{ route('area.destroy', $area->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -106,6 +111,7 @@
                                             <i class="ti ti-trash me-1"></i>Delete
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>

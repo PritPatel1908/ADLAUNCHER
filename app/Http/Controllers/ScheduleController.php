@@ -147,6 +147,14 @@ class ScheduleController extends Controller
     public function show(Schedule $schedule)
     {
         $schedule->load(['device', 'layout', 'screen', 'medias']);
+
+        // Check if request is AJAX
+        if (request()->ajax()) {
+            return response()->json([
+                'schedule' => $schedule
+            ]);
+        }
+
         return view('schedule.show', compact('schedule'));
     }
 

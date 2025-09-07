@@ -151,6 +151,14 @@ class CompanyController extends Controller
     public function show($id)
     {
         $company = Company::with(['locations', 'addresses', 'contacts', 'notes'])->findOrFail($id);
+
+        // Check if request is AJAX
+        if (request()->ajax()) {
+            return response()->json([
+                'company' => $company
+            ]);
+        }
+
         return view('company.show', compact('company'));
     }
 
@@ -434,16 +442,16 @@ class CompanyController extends Controller
 
             // Format data for DataTables
             $data = [];
+            $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
+            
             foreach ($companies as $company) {
-                $data[] = [
+                $companyData = [
                     'id' => $company->id,
                     'name' => $company->name,
                     'industry' => $company->industry,
                     'website' => $company->website,
                     'email' => $company->email,
                     'phone' => $company->phone,
-                    'created_by' => $company->createdByUser ? $company->createdByUser->name : 'N/A',
-                    'updated_by' => $company->updatedByUser ? $company->updatedByUser->name : 'N/A',
                     'created_at' => $company->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $company->updated_at->format('Y-m-d H:i:s'),
                     'status' => match ((int) $company->status) {
@@ -458,6 +466,14 @@ class CompanyController extends Controller
                     'contacts_count' => $company->contacts->count(),
                     'notes_count' => $company->notes->count(),
                 ];
+
+                // Only include audit fields if user has permission
+                if ($canViewAuditFields) {
+                    $companyData['created_by'] = $company->createdByUser ? $company->createdByUser->name : 'N/A';
+                    $companyData['updated_by'] = $company->updatedByUser ? $company->updatedByUser->name : 'N/A';
+                }
+
+                $data[] = $companyData;
             }
 
             return response()->json([
@@ -495,9 +511,13 @@ class CompanyController extends Controller
             'status' => 'status',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
-            'created_by' => 'created_by',
-            'updated_by' => 'updated_by'
         ];
+
+        // Only include audit columns if user has permission
+        if (\App\Helpers\PermissionHelper::canViewAuditFields()) {
+            $columnMap['created_by'] = 'created_by';
+            $columnMap['updated_by'] = 'updated_by';
+        }
 
         return $columnMap[$columnData] ?? null;
     }

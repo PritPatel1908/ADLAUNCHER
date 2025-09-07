@@ -30,6 +30,7 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
+                    @if(\App\Helpers\PermissionHelper::canExport('company'))
                     <div class="dropdown">
                         <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
                             data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
@@ -48,6 +49,7 @@
                             </ul>
                         </div>
                     </div>
+                    @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
                             class="ti ti-refresh"></i></a>
@@ -65,9 +67,11 @@
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
+                    @if(\App\Helpers\PermissionHelper::canCreate('company'))
                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
                         Company</a>
+                    @endif
                 </div>
                 <div class="card-body">
                     <!-- table header -->
@@ -437,6 +441,7 @@
                                                 </label>
                                             </div>
                                         </li>
+                                        @if(\App\Helpers\PermissionHelper::canViewAuditFields())
                                         <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
@@ -457,6 +462,7 @@
                                                 </label>
                                             </div>
                                         </li>
+                                        @endif
                                         <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
@@ -532,8 +538,10 @@
                                     <th>addresses_count</th>
                                     <th>contacts_count</th>
                                     <th>notes_count</th>
+                                    @if(\App\Helpers\PermissionHelper::canViewAuditFields())
                                     <th>created_by</th>
                                     <th>updated_by</th>
+                                    @endif
                                     <th>created_at</th>
                                     <th>updated_at</th>
                                     <th>status</th>
@@ -1200,6 +1208,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
 
     <!-- Company DataTable JS -->
+    <script>
+        // Pass company permissions to JavaScript
+        window.companyPermissions = @json(\App\Helpers\PermissionHelper::getModulePermissions('company'));
+    </script>
     <script src="{{ asset('assets/js/datatable/company-datatable.js') }}" type="text/javascript"></script>
 
     <style>

@@ -91,6 +91,14 @@ class AreaController extends Controller
     public function show($id)
     {
         $area = Area::with(['locations', 'companies'])->findOrFail($id);
+
+        // Check if request is AJAX
+        if (request()->ajax()) {
+            return response()->json([
+                'area' => $area
+            ]);
+        }
+
         return view('area.show', compact('area'));
     }
 
@@ -307,14 +315,14 @@ class AreaController extends Controller
 
             // Format data for DataTables
             $data = [];
+            $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
+            
             foreach ($areas as $area) {
-                $data[] = [
+                $areaData = [
                     'id' => $area->id,
                     'name' => $area->name,
                     'description' => $area->description,
                     'code' => $area->code,
-                    'created_by' => $area->createdByUser ? $area->createdByUser->name : 'N/A',
-                    'updated_by' => $area->updatedByUser ? $area->updatedByUser->name : 'N/A',
                     'created_at' => $area->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $area->updated_at->format('Y-m-d H:i:s'),
                     'status' => $area->status_text,
@@ -322,6 +330,14 @@ class AreaController extends Controller
                     'locations_count' => $area->locations->count(),
                     'companies_count' => $area->companies->count(),
                 ];
+
+                // Only include audit fields if user has permission
+                if ($canViewAuditFields) {
+                    $areaData['created_by'] = $area->createdByUser ? $area->createdByUser->name : 'N/A';
+                    $areaData['updated_by'] = $area->updatedByUser ? $area->updatedByUser->name : 'N/A';
+                }
+
+                $data[] = $areaData;
             }
 
             return response()->json([
@@ -357,9 +373,13 @@ class AreaController extends Controller
             'status' => 'status',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
-            'created_by' => 'created_by',
-            'updated_by' => 'updated_by'
         ];
+
+        // Only include audit columns if user has permission
+        if (\App\Helpers\PermissionHelper::canViewAuditFields()) {
+            $columnMap['created_by'] = 'created_by';
+            $columnMap['updated_by'] = 'updated_by';
+        }
 
         return $columnMap[$columnData] ?? null;
     }

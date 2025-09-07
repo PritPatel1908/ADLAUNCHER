@@ -1,8 +1,8 @@
 @extends('Layout.main')
 
 @section('meta')
-<!-- CSRF Token -->
-<meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @push('css')
@@ -13,10 +13,10 @@
         <div class="container-fluid">
             <!-- Success Message -->
             @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
@@ -30,24 +30,26 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <div class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
-                            data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <ul>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-pdf me-1"></i>Export
-                                        as PDF</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-xls me-1"></i>Export
-                                        as Excel</a>
-                                </li>
-                            </ul>
+                    @if (\App\Helpers\PermissionHelper::canExport('role_permission'))
+                        <div class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
+                                data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <ul>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-pdf me-1"></i>Export
+                                            as PDF</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-xls me-1"></i>Export
+                                            as Excel</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
                             class="ti ti-refresh"></i></a>
@@ -65,8 +67,10 @@
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_role"><i
-                            class="ti ti-square-rounded-plus-filled me-1"></i>Add New Role</a>
+                    @if (\App\Helpers\PermissionHelper::canCreate('role_permission'))
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#add_role"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add New Role</a>
+                    @endif
                 </div>
                 <div class="card-body">
 
@@ -189,9 +193,8 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('js')
-<script src="{{ asset('assets/js/datatable/roles-list.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/datatable/roles-list.js') }}" type="text/javascript"></script>
 @endpush

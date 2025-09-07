@@ -421,13 +421,31 @@ $(document).ready(function () {
                     "orderable": false,
                     "name": "action",
                     "render": function (data, type, row) {
+                        let actions = [];
+
+                        // Check permissions and add actions accordingly
+                        if (window.userPermissions && window.userPermissions.view) {
+                            actions.push(`<a class="dropdown-item" href="/user/${data}"><i class="ti ti-eye me-2"></i>View</a>`);
+                        }
+
+                        if (window.userPermissions && window.userPermissions.edit) {
+                            actions.push(`<a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_edit" data-id="${data}"><i class="ti ti-edit text-blue"></i> Edit</a>`);
+                        }
+
+                        if (window.userPermissions && window.userPermissions.delete) {
+                            actions.push(`<a class="dropdown-item delete-user" href="javascript:void(0);" data-id="${data}"><i class="ti ti-trash me-2"></i>Delete</a>`);
+                        }
+
+                        // If no actions available, return empty
+                        if (actions.length === 0) {
+                            return '<span class="text-muted">No actions</span>';
+                        }
+
                         return `
                                 <div class="dropdown dropdown-action">
                                     <a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></a>
                                     <div class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item" href="/user/${data}"><i class="ti ti-eye me-2"></i>View</a>
-                                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_edit" data-id="${data}"><i class="ti ti-edit text-blue"></i> Edit</a>
-                                        <a class="dropdown-item delete-user" href="javascript:void(0);" data-id="${data}"><i class="ti ti-trash me-2"></i>Delete</a>
+                                        ${actions.join('')}
                                     </div>
                                 </div>
                             `;

@@ -24,6 +24,7 @@
                 </nav>
             </div>
             <div class="gap-2 d-flex align-items-center flex-wrap">
+                @if(\App\Helpers\PermissionHelper::canExport('location'))
                 <div class="dropdown">
                     <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
                         data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
@@ -40,6 +41,7 @@
                         </ul>
                     </div>
                 </div>
+                @endif
                 <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                     data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
                         class="ti ti-refresh"></i></a>
@@ -112,10 +114,13 @@
                                 </div>
                             </div>
                             <div class="d-flex align-items-center flex-wrap gap-2">
+                                @if(\App\Helpers\PermissionHelper::canEdit('location'))
                                 <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                                     data-bs-target="#offcanvas_edit">
                                     <i class="ti ti-edit me-1"></i>Edit Location
                                 </a>
+                                @endif
+                                @if(\App\Helpers\PermissionHelper::canDelete('location'))
                                 <form action="{{ route('location.destroy', $location->id) }}" method="POST"
                                     class="d-inline">
                                     @csrf
@@ -125,6 +130,7 @@
                                         <i class="ti ti-trash me-1"></i>Delete
                                     </button>
                                 </form>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -197,6 +203,7 @@
                                         class="col-6 text-dark">{{ $location->updated_at->format('d M Y, h:i A') }}</span>
                                 </li>
                             @endif
+                            @if(\App\Helpers\PermissionHelper::canViewAuditFields())
                             @if ($location->created_by)
                                 <li class="row mb-2">
                                     <span class="col-6">Created By</span>
@@ -208,6 +215,7 @@
                                     <span class="col-6">Last Updated By</span>
                                     <span class="col-6 text-dark">{{ $location->updatedByUser->name ?? 'N/A' }}</span>
                                 </li>
+                            @endif
                             @endif
                             <li class="row mb-2">
                                 <span class="col-6">Last Update</span>
@@ -565,7 +573,8 @@
                         }));
                 }
 
-                // Update created_by information if available
+                // Update created_by information if available and user has permission
+                @if(\App\Helpers\PermissionHelper::canViewAuditFields())
                 if (location.created_by && location.created_by.name) {
                     $('h6.mb-3.fw-semibold:contains("Status Information")').next().find(
                         'li.row:contains("Created By") .col-6.text-dark').text(location.created_by.name);
@@ -576,6 +585,7 @@
                     $('h6.mb-3.fw-semibold:contains("Status Information")').next().find(
                         'li.row:contains("Updated By") .col-6.text-dark').text(location.updated_by.name);
                 }
+                @endif
             }
 
             // Handle edit form submission

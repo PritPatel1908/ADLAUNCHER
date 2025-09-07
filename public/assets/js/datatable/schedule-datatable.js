@@ -326,13 +326,31 @@ $(document).ready(function () {
                 { data: 'created_at', name: 'created_at', orderable: true, render: function (data) { return data ? new Date(data).toLocaleString() : 'N/A'; } },
                 {
                     data: 'id', orderable: false, name: 'action', render: function (data) {
+                        let actions = [];
+
+                        // Check permissions and add actions accordingly
+                        if (window.schedulePermissions && window.schedulePermissions.view) {
+                            actions.push(`<a class="dropdown-item" href="/schedule/${data}"><i class="ti ti-eye me-2"></i>View</a>`);
+                        }
+
+                        if (window.schedulePermissions && window.schedulePermissions.edit) {
+                            actions.push(`<a class="dropdown-item edit-schedule" href="javascript:void(0);" data-id="${data}"><i class="ti ti-edit text-blue"></i> Edit</a>`);
+                        }
+
+                        if (window.schedulePermissions && window.schedulePermissions.delete) {
+                            actions.push(`<a class="dropdown-item delete-schedule" href="javascript:void(0);" data-id="${data}"><i class="ti ti-trash me-2"></i>Delete</a>`);
+                        }
+
+                        // If no actions available, return empty
+                        if (actions.length === 0) {
+                            return '<span class="text-muted">No actions</span>';
+                        }
+
                         return `
                         <div class="dropdown dropdown-action">
                             <a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></a>
                             <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="/schedule/${data}"><i class="ti ti-eye me-2"></i>View</a>
-                                <a class="dropdown-item edit-schedule" href="javascript:void(0);" data-id="${data}"><i class="ti ti-edit text-blue"></i> Edit</a>
-                                <a class="dropdown-item delete-schedule" href="javascript:void(0);" data-id="${data}"><i class="ti ti-trash me-2"></i>Delete</a>
+                                ${actions.join('')}
                             </div>
                         </div>`;
                     }

@@ -72,6 +72,14 @@ class DeviceController extends Controller
     public function show(Device $device)
     {
         $device->load(['company', 'location', 'area', 'deviceLayouts', 'deviceScreens']);
+
+        // Check if request is AJAX
+        if (request()->ajax()) {
+            return response()->json([
+                'device' => $device
+            ]);
+        }
+
         return view('device.show', compact('device'));
     }
 

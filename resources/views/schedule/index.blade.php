@@ -29,6 +29,7 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
+                    @if(\App\Helpers\PermissionHelper::canExport('schedule'))
                     <div class="dropdown">
                         <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
                             data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
@@ -41,6 +42,7 @@
                             </ul>
                         </div>
                     </div>
+                    @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
                             class="ti ti-refresh"></i></a>
@@ -56,10 +58,12 @@
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
+                    @if(\App\Helpers\PermissionHelper::canCreate('schedule'))
                     <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvas_add">
                         <i class="ti ti-square-rounded-plus-filled me-1"></i>Add Schedule
                     </a>
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -665,6 +669,10 @@
 @push('js')
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
     <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}"></script>
+    <script>
+        // Pass schedule permissions to JavaScript
+        window.schedulePermissions = @json(\App\Helpers\PermissionHelper::getModulePermissions('schedule'));
+    </script>
     <script src="{{ asset('assets/js/datatable/schedule-datatable.js') }}" type="text/javascript"></script>
     <style>
         .select2-container {

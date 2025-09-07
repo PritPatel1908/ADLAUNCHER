@@ -30,24 +30,26 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    <div class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
-                            data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <ul>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-pdf me-1"></i>Export
-                                        as PDF</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-xls me-1"></i>Export
-                                        as Excel</a>
-                                </li>
-                            </ul>
+                    @if (\App\Helpers\PermissionHelper::canExport('location'))
+                        <div class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
+                                data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <ul>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-pdf me-1"></i>Export
+                                            as PDF</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-xls me-1"></i>Export
+                                            as Excel</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
                             class="ti ti-refresh"></i></a>
@@ -65,9 +67,11 @@
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
-                        Location</a>
+                    @if (\App\Helpers\PermissionHelper::canCreate('location'))
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
+                            Location</a>
+                    @endif
                 </div>
                 <div class="card-body">
                     <!-- table header -->
@@ -415,6 +419,7 @@
                                                 </label>
                                             </div>
                                         </li>
+                                        @if(\App\Helpers\PermissionHelper::canViewAuditFields())
                                         <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
@@ -435,6 +440,7 @@
                                                 </label>
                                             </div>
                                         </li>
+                                        @endif
                                         <li class="gap-1 d-flex align-items-center mb-2">
                                             <i class="ti ti-columns me-1"></i>
                                             <div class="form-check form-switch w-100 ps-0">
@@ -508,8 +514,10 @@
                                     <th>state</th>
                                     <th>country</th>
                                     <th>zip_code</th>
+                                    @if(\App\Helpers\PermissionHelper::canViewAuditFields())
                                     <th>created_by</th>
                                     <th>updated_by</th>
+                                    @endif
                                     <th>created_at</th>
                                     <th>updated_at</th>
                                     <th>status</th>
@@ -839,6 +847,10 @@
 
 @push('js')
     <!-- Removed duplicate DataTable initialization - now using only location-datatable.js -->
+    <script>
+        // Pass location permissions to JavaScript
+        window.locationPermissions = @json(\App\Helpers\PermissionHelper::getModulePermissions('location'));
+    </script>
     <script src="{{ asset('assets/js/datatable/location-datatable.js') }}" type="text/javascript"></script>
 
     <style>
@@ -1131,7 +1143,8 @@
                     url: '/location/' + locationId,
                     type: 'GET',
                     dataType: 'json',
-                    success: function(data) {
+                    success: function(response) {
+                        var data = response.location || response;
                         $('#detail-name').text(data.name);
                         $('#detail-email').text(data.email || 'N/A');
                         $('#detail-address').text(data.address || 'N/A');
@@ -1537,7 +1550,8 @@
                     url: '/location/' + locationId,
                     type: 'GET',
                     dataType: 'json',
-                    success: function(data) {
+                    success: function(response) {
+                        var data = response.location || response;
                         $('#detail-name').text(data.name);
                         $('#detail-email').text(data.email || 'N/A');
                         $('#detail-address').text(data.address || 'N/A');

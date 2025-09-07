@@ -80,7 +80,9 @@ class LocationController extends Controller
         // Check if request is AJAX
         if (request()->ajax()) {
             $location->created_at = $location->created_at->format('d M Y, h:i A');
-            return response()->json($location);
+            return response()->json([
+                'location' => $location
+            ]);
         }
 
         return view('location.show', compact('location'));
@@ -97,7 +99,9 @@ class LocationController extends Controller
 
         // Check if request is AJAX
         if (request()->ajax()) {
-            return response()->json($location);
+            return response()->json([
+                'location' => $location
+            ]);
         }
 
         return redirect()->route('location.index');
@@ -288,8 +292,10 @@ class LocationController extends Controller
 
         // Format data for DataTables
         $data = [];
+        $canViewAuditFields = \App\Helpers\PermissionHelper::canViewAuditFields();
+        
         foreach ($locations as $location) {
-            $data[] = [
+            $locationData = [
                 'id' => $location->id,
                 'name' => $location->name,
                 'email' => $location->email,
@@ -298,12 +304,18 @@ class LocationController extends Controller
                 'state' => $location->state,
                 'country' => $location->country,
                 'zip_code' => $location->zip_code,
-                'created_by' => $location->created_by ? User::find($location->created_by)->name : null,
-                'updated_by' => $location->updated_by ? User::find($location->updated_by)->name : null,
                 'status' => $location->status_text,
                 'created_at' => $location->created_at->format('d M Y, h:i A'),
                 'updated_at' => $location->updated_at ? $location->updated_at->format('d M Y, h:i A') : null
             ];
+
+            // Only include audit fields if user has permission
+            if ($canViewAuditFields) {
+                $locationData['created_by'] = $location->created_by ? User::find($location->created_by)->name : null;
+                $locationData['updated_by'] = $location->updated_by ? User::find($location->updated_by)->name : null;
+            }
+
+            $data[] = $locationData;
         }
 
         return response()->json([
