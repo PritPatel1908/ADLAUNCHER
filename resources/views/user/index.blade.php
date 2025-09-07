@@ -548,6 +548,7 @@
                                     <th>companies_count</th>
                                     <th>locations_count</th>
                                     <th>areas_count</th>
+                                    <th>roles_count</th>
                                     <th>is_admin</th>
                                     <th>is_client</th>
                                     <th>is_user</th>
@@ -792,8 +793,41 @@
                                                         data-placeholder="Choose areas...">
                                                         <option value="">Select areas...</option>
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
-                                                            <option value="{{ $area->id }}">{{ $area->name }} -
-                                                                {{ $area->city }}, {{ $area->state }}</option>
+                                                            <option value="{{ $area->id }}">
+                                                                {{ $area->name }}{{ $area->code ? ' - ' . $area->code : '' }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Roles -->
+                            <div class="accordion-item rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded"
+                                        data-bs-toggle="collapse" data-bs-target="#roles">
+                                        <span class="avatar avatar-md rounded me-1"><i
+                                                class="ti ti-shield-check"></i></span>
+                                        Roles
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="roles" data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Roles</label>
+                                                    <select class="select2 form-control select2-multiple"
+                                                        name="role_ids[]" data-toggle="select2" multiple="multiple"
+                                                        data-placeholder="Choose roles...">
+                                                        <option value="">Select roles...</option>
+                                                        @foreach (\App\Models\Role::all() as $role)
+                                                            <option value="{{ $role->id }}">{{ $role->role_name }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -1031,8 +1065,41 @@
                                                         name="area_ids[]" id="edit-area_ids" data-toggle="select2"
                                                         multiple="multiple" data-placeholder="Choose areas...">
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
-                                                            <option value="{{ $area->id }}">{{ $area->name }} -
-                                                                {{ $area->city }}, {{ $area->state }}</option>
+                                                            <option value="{{ $area->id }}">
+                                                                {{ $area->name }}{{ $area->code ? ' - ' . $area->code : '' }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Roles --}}
+                            <div class="accordion-item border-top rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded"
+                                        data-bs-toggle="collapse" data-bs-target="#edit-roles">
+                                        <span class="avatar avatar-md rounded me-1"><i
+                                                class="ti ti-shield-check"></i></span>
+                                        Roles
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="edit-roles"
+                                    data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Roles</label>
+                                                    <select class="select2 form-control select2-multiple"
+                                                        name="role_ids[]" id="edit-role_ids" data-toggle="select2"
+                                                        multiple="multiple" data-placeholder="Choose roles...">
+                                                        @foreach (\App\Models\Role::all() as $role)
+                                                            <option value="{{ $role->id }}">{{ $role->role_name }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </div>

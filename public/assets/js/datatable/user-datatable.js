@@ -64,6 +64,7 @@ $(document).ready(function () {
                     'companies_count': true,
                     'locations_count': true,
                     'areas_count': true,
+                    'roles_count': true,
                     'is_admin': true,
                     'is_client': true,
                     'is_user': true,
@@ -325,6 +326,14 @@ $(document).ready(function () {
                     "orderable": true,
                     "render": function (data, type, row) {
                         return data ? `<span class="badge badge-pill badge-status bg-warning text-white">${data}</span>` : '<span class="badge badge-pill badge-status bg-secondary text-white">0</span>';
+                    }
+                },
+                {
+                    "data": "roles_count",
+                    "name": "roles_count",
+                    "orderable": true,
+                    "render": function (data, type, row) {
+                        return data ? `<span class="badge badge-pill badge-status bg-info text-white">${data}</span>` : '<span class="badge badge-pill badge-status bg-secondary text-white">0</span>';
                     }
                 },
                 {
@@ -650,6 +659,9 @@ $(document).ready(function () {
                 success: function (response) {
                     if (response.success && response.user) {
                         const user = response.user;
+                        console.log('User data received:', user);
+                        console.log('Date of birth:', user.date_of_birth);
+                        console.log('Date of joining:', user.date_of_joining);
 
                         // Populate form fields
                         $('#edit-first_name').val(user.first_name);
@@ -660,8 +672,48 @@ $(document).ready(function () {
                         $('#edit-phone').val(user.phone);
                         $('#edit-employee_id').val(user.employee_id);
                         $('#edit-gender').val(user.gender);
-                        $('#edit-date_of_birth').val(user.date_of_birth);
-                        $('#edit-date_of_joining').val(user.date_of_joining);
+
+                        // Format dates for HTML date input (YYYY-MM-DD)
+                        function formatDateForInput(dateValue) {
+                            if (!dateValue) return '';
+
+                            try {
+                                // Handle different date formats
+                                let date;
+                                if (typeof dateValue === 'string') {
+                                    // If it's already in YYYY-MM-DD format, use it directly
+                                    if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+                                        return dateValue;
+                                    }
+                                    // Try to parse the date
+                                    date = new Date(dateValue);
+                                } else if (dateValue instanceof Date) {
+                                    date = dateValue;
+                                } else {
+                                    return '';
+                                }
+
+                                if (!isNaN(date.getTime())) {
+                                    // Use local date formatting to avoid timezone issues
+                                    const year = date.getFullYear();
+                                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                                    const day = String(date.getDate()).padStart(2, '0');
+                                    return `${year}-${month}-${day}`;
+                                }
+                                return '';
+                            } catch (e) {
+                                console.error('Error formatting date:', e);
+                                return '';
+                            }
+                        }
+
+                        const formattedBirthDate = formatDateForInput(user.date_of_birth);
+                        $('#edit-date_of_birth').val(formattedBirthDate);
+                        console.log('Original birth date:', user.date_of_birth, 'Formatted:', formattedBirthDate);
+
+                        const formattedJoiningDate = formatDateForInput(user.date_of_joining);
+                        $('#edit-date_of_joining').val(formattedJoiningDate);
+                        console.log('Original joining date:', user.date_of_joining, 'Formatted:', formattedJoiningDate);
                         // Convert status integer to string
                         let statusValue = 'active';
                         if (user.status == 0) statusValue = 'delete';
@@ -694,8 +746,16 @@ $(document).ready(function () {
                             $('#edit-area_ids').val([]).trigger('change');
                         }
 
+                        // Populate roles
+                        if (user.roles && user.roles.length > 0) {
+                            const roleIds = user.roles.map(role => role.id);
+                            $('#edit-role_ids').val(roleIds).trigger('change');
+                        } else {
+                            $('#edit-role_ids').val([]).trigger('change');
+                        }
+
                         // Re-initialize Select2 for edit form
-                        $('#edit-company_ids, #edit-location_ids, #edit-area_ids').select2({
+                        $('#edit-company_ids, #edit-location_ids, #edit-area_ids, #edit-role_ids').select2({
                             theme: 'default',
                             width: '100%',
                             placeholder: 'Choose...',
@@ -928,6 +988,7 @@ $(document).ready(function () {
                     $('#edit-company_ids').val([]).trigger('change');
                     $('#edit-location_ids').val([]).trigger('change');
                     $('#edit-area_ids').val([]).trigger('change');
+                    $('#edit-role_ids').val([]).trigger('change');
                     $('#edit-form-alert').hide();
                 } catch (err) {
                     console.error('Error resetting edit form after close:', err);

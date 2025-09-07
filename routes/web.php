@@ -40,6 +40,10 @@ Route::get('/areas/data', [AreaController::class, 'getData'])->name('areas.data'
 // User Routes
 Route::resource('user', UserController::class)->middleware('auth');
 Route::get('/users/data', [UserController::class, 'getData'])->name('users.data')->middleware('auth');
+Route::get('/users/roles', [UserController::class, 'getRoles'])->name('users.roles')->middleware('auth');
+Route::get('/users/{user}/roles', [UserController::class, 'getUserRoles'])->name('users.user-roles')->middleware('auth');
+Route::post('/users/{user}/assign-roles', [UserController::class, 'assignRoles'])->name('users.assign-roles')->middleware('auth');
+Route::post('/users/{user}/remove-roles', [UserController::class, 'removeRoles'])->name('users.remove-roles')->middleware('auth');
 
 // Device Routes
 Route::resource('device', DeviceController::class)->middleware('auth');

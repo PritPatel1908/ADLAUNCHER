@@ -28,6 +28,9 @@ $(document).ready(function () {
 
         // Hide any previous alerts
         $('#edit-form-alert').hide();
+
+        // Load current user data into form fields
+        loadUserDataIntoForm();
     });
 
     // Re-initialize Select2 after dynamic content is added
@@ -37,7 +40,7 @@ $(document).ready(function () {
                 $(this).select2({
                     theme: 'default',
                     width: '100%',
-                    placeholder: 'Choose locations...',
+                    placeholder: 'Choose...',
                     allowClear: true,
                     closeOnSelect: false,
                     tags: false,
@@ -139,13 +142,131 @@ $(document).ready(function () {
         });
     });
 
+    // Function to load current user data into form fields
+    function loadUserDataIntoForm() {
+        // Get user data from the page (from the initial load)
+        const userData = window.currentUserData;
+        if (userData) {
+            console.log('Loading user data into form:', userData);
+            console.log('User status value:', userData.status, 'Type:', typeof userData.status);
+
+            // Update all form fields
+            $('#edit-first_name').val(userData.first_name || '');
+            $('#edit-middle_name').val(userData.middle_name || '');
+            $('#edit-last_name').val(userData.last_name || '');
+            $('#edit-email').val(userData.email || '');
+            $('#edit-mobile').val(userData.mobile || '');
+            $('#edit-phone').val(userData.phone || '');
+            $('#edit-employee_id').val(userData.employee_id || '');
+            $('#edit-gender').val(userData.gender || '');
+
+            // Format and set dates
+            const formattedBirthDate = formatDateForInput(userData.date_of_birth);
+            $('#edit-date_of_birth').val(formattedBirthDate);
+            console.log('Loaded birth date:', formattedBirthDate);
+
+            const formattedJoiningDate = formatDateForInput(userData.date_of_joining);
+            $('#edit-date_of_joining').val(formattedJoiningDate);
+            console.log('Loaded joining date:', formattedJoiningDate);
+
+            // Set status
+            let statusValue = 1; // Default to active
+            if (userData.status == 0) statusValue = 0; // delete
+            else if (userData.status == 1) statusValue = 1; // active
+            else if (userData.status == 2) statusValue = 2; // deactivate
+            else if (userData.status == 3) statusValue = 3; // block
+
+            console.log('Setting status dropdown to value:', statusValue, 'for user status:', userData.status);
+            $('#edit-status').val(statusValue);
+
+            // Verify the value was set
+            setTimeout(function () {
+                const currentValue = $('#edit-status').val();
+                console.log('Status dropdown current value after setting:', currentValue);
+            }, 100);
+
+            // Update relationships
+            if (userData.companies && userData.companies.length > 0) {
+                const companyIds = userData.companies.map(company => company.id);
+                $('#edit-company_ids').val(companyIds).trigger('change');
+            } else {
+                $('#edit-company_ids').val([]).trigger('change');
+            }
+
+            if (userData.locations && userData.locations.length > 0) {
+                const locationIds = userData.locations.map(location => location.id);
+                $('#edit-location_ids').val(locationIds).trigger('change');
+            } else {
+                $('#edit-location_ids').val([]).trigger('change');
+            }
+
+            if (userData.areas && userData.areas.length > 0) {
+                const areaIds = userData.areas.map(area => area.id);
+                $('#edit-area_ids').val(areaIds).trigger('change');
+            } else {
+                $('#edit-area_ids').val([]).trigger('change');
+            }
+
+            if (userData.roles && userData.roles.length > 0) {
+                const roleIds = userData.roles.map(role => role.id);
+                $('#edit-role_ids').val(roleIds).trigger('change');
+            } else {
+                $('#edit-role_ids').val([]).trigger('change');
+            }
+        }
+    }
+
+    // Function to format dates for HTML date input (YYYY-MM-DD)
+    function formatDateForInput(dateValue) {
+        if (!dateValue) return '';
+
+        try {
+            // Handle different date formats
+            let date;
+            if (typeof dateValue === 'string') {
+                // If it's already in YYYY-MM-DD format, use it directly
+                if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+                    return dateValue;
+                }
+                // Try to parse the date
+                date = new Date(dateValue);
+            } else if (dateValue instanceof Date) {
+                date = dateValue;
+            } else {
+                return '';
+            }
+
+            if (!isNaN(date.getTime())) {
+                // Use local date formatting to avoid timezone issues
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            return '';
+        } catch (e) {
+            console.error('Error formatting date:', e);
+            return '';
+        }
+    }
+
     // Function to update user details on the page without reloading
     function updateUserDetails(user) {
-        // Update user name
-        $('h5.mb-1:contains("' + user.full_name + '")').text(user.full_name);
+        console.log('Updating user details with:', user);
 
-        // Update username
-        $('p.mb-2:contains("' + user.username + '")').text(user.username);
+        // Construct full name if not available
+        const fullName = user.full_name || (user.first_name + (user.middle_name ? ' ' + user.middle_name : '') + ' ' + user.last_name).trim();
+
+        // Update user name in header - more specific selector
+        $('.card-body h5.mb-1').text(fullName);
+        console.log('Updated header name to:', fullName);
+
+        // Update username - more specific selector
+        $('.card-body p.mb-2').text(user.username);
+        console.log('Updated username to:', user.username);
+
+        // Update avatar text with first letter of first name
+        $('.avatar-text').text(user.first_name ? user.first_name.charAt(0).toUpperCase() : 'U');
 
         // Update status badge
         var statusClass = 'badge-soft-secondary';
@@ -174,32 +295,300 @@ $(document).ready(function () {
             .addClass(statusClass)
             .html(`<i class="ti ${statusIcon} me-1"></i>${statusText}`);
 
-        // Update email, mobile, employee_id
-        if (user.email) {
-            $('.d-inline-flex:contains("' + user.email + '")').html(
-                `<i class="ti ti-mail text-info me-1"></i> ${user.email}`);
-        }
-        if (user.mobile) {
-            $('.d-inline-flex:contains("' + user.mobile + '")').html(
-                `<i class="ti ti-phone text-success me-1"></i> ${user.mobile}`);
-        }
-        if (user.employee_id) {
-            $('.d-inline-flex:contains("' + user.employee_id + '")').html(
-                `<i class="ti ti-id text-warning me-1"></i> ${user.employee_id}`);
-        }
+        // Update email, mobile, employee_id in header
+        $('.d-inline-flex').each(function () {
+            const $this = $(this);
+            if ($this.find('.ti-mail').length > 0) {
+                $this.html(`<i class="ti ti-mail text-info me-1"></i> ${user.email || 'N/A'}`);
+            } else if ($this.find('.ti-phone').length > 0) {
+                $this.html(`<i class="ti ti-phone text-success me-1"></i> ${user.mobile || 'N/A'}`);
+            } else if ($this.find('.ti-id').length > 0) {
+                $this.html(`<i class="ti ti-id text-warning me-1"></i> ${user.employee_id || 'N/A'}`);
+            }
+        });
 
-        // Update user overview section
-        $('.col-md-6 .mb-4:contains("Full Name") p').text(user.full_name);
-        $('.col-md-6 .mb-4:contains("Email Address") p a').text(user.email).attr('href', 'mailto:' + user.email);
-        $('.col-md-6 .mb-4:contains("Username") p').text(user.username);
-        $('.col-md-6 .mb-4:contains("Employee ID") p').text(user.employee_id || 'N/A');
-        $('.col-md-6 .mb-4:contains("Mobile") p').text(user.mobile || 'N/A');
+        // Update user overview section - more specific selectors
+        $('.card:has(.card-title:contains("User Overview")) .col-md-6 .mb-4').each(function () {
+            const $this = $(this);
+            const label = $this.find('h6').text();
+            console.log('Processing overview field:', label);
+
+            if (label.includes('Full Name')) {
+                $this.find('p').text(fullName);
+                console.log('Updated Full Name to:', fullName);
+            } else if (label.includes('Email Address')) {
+                $this.find('p a').text(user.email).attr('href', 'mailto:' + user.email);
+                console.log('Updated Email to:', user.email);
+            } else if (label.includes('Username')) {
+                $this.find('p').text(user.username);
+                console.log('Updated Username to:', user.username);
+            } else if (label.includes('Employee ID')) {
+                $this.find('p').text(user.employee_id || 'N/A');
+                console.log('Updated Employee ID to:', user.employee_id);
+            } else if (label.includes('Mobile')) {
+                $this.find('p').text(user.mobile || 'N/A');
+                console.log('Updated Mobile to:', user.mobile);
+            } else if (label.includes('Phone')) {
+                $this.find('p').text(user.phone || 'N/A');
+                console.log('Updated Phone to:', user.phone);
+            } else if (label.includes('Gender')) {
+                let genderText = 'N/A';
+                if (user.gender == 1) genderText = 'Male';
+                else if (user.gender == 2) genderText = 'Female';
+                else if (user.gender == 3) genderText = 'Other';
+                $this.find('p').text(genderText);
+                console.log('Updated Gender to:', genderText);
+            } else if (label.includes('Date of Birth')) {
+                const birthDate = user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString() : 'N/A';
+                $this.find('p').text(birthDate);
+                console.log('Updated Date of Birth to:', birthDate);
+            } else if (label.includes('Date of Joining')) {
+                const joiningDate = user.date_of_joining ? new Date(user.date_of_joining).toLocaleDateString() : 'N/A';
+                $this.find('p').text(joiningDate);
+                console.log('Updated Date of Joining to:', joiningDate);
+            }
+        });
 
         // Update status in overview
         $('#overview-status-badge')
             .removeClass('badge-soft-success badge-soft-danger badge-soft-warning badge-soft-secondary')
             .addClass(statusClass)
             .text(statusText);
+
+        // Update status in edit form
+        let editStatusValue = 1; // Default to active
+        if (user.status == 0) editStatusValue = 0; // delete
+        else if (user.status == 1) editStatusValue = 1; // active
+        else if (user.status == 2) editStatusValue = 2; // deactivate
+        else if (user.status == 3) editStatusValue = 3; // block
+        $('#edit-status').val(editStatusValue);
+        console.log('Updated edit form status:', editStatusValue, 'for status:', user.status);
+
+        // Update statistics section - more specific selectors
+        $('.card:has(.card-title:contains("User Statistics")) .col-md-6 .mb-4').each(function () {
+            const $this = $(this);
+            const label = $this.find('h6').text();
+            console.log('Processing statistics field:', label);
+
+            if (label.includes('Companies')) {
+                $this.find('p').text(user.companies ? user.companies.length : 0);
+                console.log('Updated Companies count to:', user.companies ? user.companies.length : 0);
+            } else if (label.includes('Locations')) {
+                $this.find('p').text(user.locations ? user.locations.length : 0);
+                console.log('Updated Locations count to:', user.locations ? user.locations.length : 0);
+            } else if (label.includes('Areas')) {
+                $this.find('p').text(user.areas ? user.areas.length : 0);
+                console.log('Updated Areas count to:', user.areas ? user.areas.length : 0);
+            } else if (label.includes('Roles')) {
+                $this.find('p').text(user.roles ? user.roles.length : 0);
+                console.log('Updated Roles count to:', user.roles ? user.roles.length : 0);
+            } else if (label.includes('Last Login')) {
+                const lastLogin = user.last_login_at ? new Date(user.last_login_at).toLocaleDateString() : 'Never';
+                $this.find('p').text(lastLogin);
+                console.log('Updated Last Login to:', lastLogin);
+            }
+        });
+
+        // Update created and updated dates
+        $('.mt-3').each(function () {
+            const $this = $(this);
+            const createdLabel = $this.find('h6:contains("Created")');
+            const updatedLabel = $this.find('h6:contains("Last Updated")');
+
+            if (createdLabel.length > 0) {
+                const createdDate = user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A';
+                createdLabel.next('p').text(createdDate);
+            }
+
+            if (updatedLabel.length > 0) {
+                const updatedDate = user.updated_at ? new Date(user.updated_at).toLocaleString() : 'N/A';
+                updatedLabel.next('p').text(updatedDate);
+            }
+        });
+
+        // Update relationship sections
+        updateRelationshipSection('Companies', user.companies, 'building', 'industry');
+        updateRelationshipSection('Locations', user.locations, 'map-pin', 'address');
+        updateRelationshipSection('Areas', user.areas, 'map-pin', 'description');
+        updateRelationshipSection('Roles', user.roles, 'shield-check', 'role_name');
+
+        // Show/hide relationship sections based on data
+        toggleRelationshipSection('Companies', user.companies);
+        toggleRelationshipSection('Locations', user.locations);
+        toggleRelationshipSection('Areas', user.areas);
+        toggleRelationshipSection('Roles', user.roles);
+
+        // Update all edit form fields
+        $('#edit-first_name').val(user.first_name || '');
+        $('#edit-middle_name').val(user.middle_name || '');
+        $('#edit-last_name').val(user.last_name || '');
+        $('#edit-email').val(user.email || '');
+        $('#edit-mobile').val(user.mobile || '');
+        $('#edit-phone').val(user.phone || '');
+        $('#edit-employee_id').val(user.employee_id || '');
+        $('#edit-gender').val(user.gender || '');
+
+        // Update date fields in edit form
+        const formattedBirthDate = formatDateForInput(user.date_of_birth);
+        $('#edit-date_of_birth').val(formattedBirthDate);
+        console.log('Updated birth date:', formattedBirthDate);
+
+        const formattedJoiningDate = formatDateForInput(user.date_of_joining);
+        $('#edit-date_of_joining').val(formattedJoiningDate);
+        console.log('Updated joining date:', formattedJoiningDate);
+
+        // Update relationship dropdowns in edit form
+        if (user.companies && user.companies.length > 0) {
+            const companyIds = user.companies.map(company => company.id);
+            $('#edit-company_ids').val(companyIds).trigger('change');
+        } else {
+            $('#edit-company_ids').val([]).trigger('change');
+        }
+
+        if (user.locations && user.locations.length > 0) {
+            const locationIds = user.locations.map(location => location.id);
+            $('#edit-location_ids').val(locationIds).trigger('change');
+        } else {
+            $('#edit-location_ids').val([]).trigger('change');
+        }
+
+        if (user.areas && user.areas.length > 0) {
+            const areaIds = user.areas.map(area => area.id);
+            $('#edit-area_ids').val(areaIds).trigger('change');
+        } else {
+            $('#edit-area_ids').val([]).trigger('change');
+        }
+
+        if (user.roles && user.roles.length > 0) {
+            const roleIds = user.roles.map(role => role.id);
+            $('#edit-role_ids').val(roleIds).trigger('change');
+        } else {
+            $('#edit-role_ids').val([]).trigger('change');
+        }
+
+        // Update global user data
+        window.currentUserData = user;
+
+        // Direct updates for specific highlighted fields
+        // Update header name directly
+        $('.card-body h5.mb-1').text(fullName);
+        console.log('Direct update - Header name:', fullName);
+
+        // Update overview full name directly
+        $('.card:has(.card-title:contains("User Overview")) h6:contains("Full Name")').next('p').text(fullName);
+        console.log('Direct update - Overview Full Name:', fullName);
+
+        // Update statistics counts directly
+        $('.card:has(.card-title:contains("User Statistics")) h6:contains("Companies")').next('p').text(user.companies ? user.companies.length : 0);
+        $('.card:has(.card-title:contains("User Statistics")) h6:contains("Locations")').next('p').text(user.locations ? user.locations.length : 0);
+        $('.card:has(.card-title:contains("User Statistics")) h6:contains("Areas")').next('p').text(user.areas ? user.areas.length : 0);
+        $('.card:has(.card-title:contains("User Statistics")) h6:contains("Roles")').next('p').text(user.roles ? user.roles.length : 0);
+
+        // Fallback method - try multiple selectors for each field
+        // Header name fallback
+        if ($('.card-body h5.mb-1').text() !== fullName) {
+            $('h5.mb-1').text(fullName);
+            $('.card h5').text(fullName);
+            console.log('Fallback - Updated header name');
+        }
+
+        // Overview full name fallback
+        $('h6:contains("Full Name")').next('p').text(fullName);
+        $('.card-body h6:contains("Full Name")').next('p').text(fullName);
+
+        // Statistics fallback
+        $('h6:contains("Companies")').next('p').text(user.companies ? user.companies.length : 0);
+        $('h6:contains("Locations")').next('p').text(user.locations ? user.locations.length : 0);
+        $('h6:contains("Areas")').next('p').text(user.areas ? user.areas.length : 0);
+        $('h6:contains("Roles")').next('p').text(user.roles ? user.roles.length : 0);
+
+        console.log('Fallback updates completed');
+        console.log('Direct updates completed for highlighted fields');
+        console.log('All fields updated successfully for user:', fullName);
+    }
+
+    // Function to update relationship sections (companies, locations, areas, roles)
+    function updateRelationshipSection(sectionName, items, iconClass, detailField) {
+        const sectionSelector = `.card-header:contains("${sectionName}")`;
+        const $section = $(sectionSelector).closest('.card');
+
+        if ($section.length > 0) {
+            const $cardBody = $section.find('.card-body');
+            const $row = $cardBody.find('.row');
+
+            if (items && items.length > 0) {
+                // Update count in header
+                $section.find('.card-title').text(`${sectionName} (${items.length})`);
+
+                // Clear existing content
+                $row.empty();
+
+                // Add new items
+                items.forEach(function (item) {
+                    let detailText = '';
+                    if (detailField === 'industry') {
+                        detailText = `<p class="mb-1"><i class="ti ti-${iconClass} text-info me-2"></i>${item[detailField]}</p>`;
+                        if (item.email) {
+                            detailText += `<p class="mb-1"><i class="ti ti-mail text-warning me-2"></i>${item.email}</p>`;
+                        }
+                        if (item.phone) {
+                            detailText += `<p class="mb-0"><i class="ti ti-phone text-success me-2"></i>${item.phone}</p>`;
+                        }
+                    } else if (detailField === 'address') {
+                        detailText = `<p class="mb-1"><i class="ti ti-mail text-info me-2"></i>${item.email}</p>`;
+                        detailText += `<p class="mb-1"><i class="ti ti-map-pin text-warning me-2"></i>${item[detailField]}</p>`;
+                        detailText += `<p class="mb-0"><i class="ti ti-building text-success me-2"></i>${item.city}, ${item.state}, ${item.country}</p>`;
+                    } else if (detailField === 'description') {
+                        if (item.code) {
+                            detailText = `<p class="mb-1"><i class="ti ti-code text-info me-2"></i>${item.code}</p>`;
+                        }
+                        if (item[detailField]) {
+                            detailText += `<p class="mb-0"><i class="ti ti-note text-warning me-2"></i>${item[detailField]}</p>`;
+                        }
+                    } else if (detailField === 'role_name') {
+                        detailText = `<p class="mb-1 text-muted"><i class="ti ti-calendar text-info me-2"></i>Created: ${new Date(item.created_at).toLocaleDateString()}</p>`;
+                        if (item.updated_at) {
+                            detailText += `<p class="mb-0 text-muted"><i class="ti ti-clock text-warning me-2"></i>Updated: ${new Date(item.updated_at).toLocaleDateString()}</p>`;
+                        }
+                    }
+
+                    const itemHtml = `
+                        <div class="col-md-6 mb-3">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-semibold">
+                                    <i class="ti ti-${iconClass} text-primary me-2"></i>${item[detailField] || item.name}
+                                </h6>
+                                ${detailText}
+                            </div>
+                        </div>
+                    `;
+                    $row.append(itemHtml);
+                });
+
+                // Show the section
+                $section.show();
+            } else {
+                // Hide the section if no items
+                $section.hide();
+            }
+        }
+    }
+
+    // Function to show/hide relationship sections based on data
+    function toggleRelationshipSection(sectionName, items) {
+        const sectionSelector = `.card-header:contains("${sectionName}")`;
+        const $section = $(sectionSelector).closest('.card').parent();
+
+        if ($section.length === 0) {
+            console.log(`Section not found for toggle: ${sectionName}`);
+            return;
+        }
+
+        if (!items || items.length === 0) {
+            $section.hide();
+        } else {
+            $section.show();
+        }
     }
 
     // Function to add new address in edit form

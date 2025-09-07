@@ -531,8 +531,9 @@
                                                         data-toggle="select2">
                                                         <option value="">Select area...</option>
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
-                                                            <option value="{{ $area->id }}">{{ $area->name }} -
-                                                                {{ $area->city }}, {{ $area->state }}</option>
+                                                            <option value="{{ $area->id }}">
+                                                                {{ $area->name }}{{ $area->code ? ' - ' . $area->code : '' }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -688,8 +689,9 @@
                                                         data-toggle="select2">
                                                         <option value="">Select area...</option>
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
-                                                            <option value="{{ $area->id }}">{{ $area->name }} -
-                                                                {{ $area->city }}, {{ $area->state }}</option>
+                                                            <option value="{{ $area->id }}">
+                                                                {{ $area->name }}{{ $area->code ? ' - ' . $area->code : '' }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </div>

@@ -258,8 +258,12 @@ $(document).ready(function () {
             // Update area name
             $('.card-header:contains("Area Details")').next('.card-body').find('h6.fw-semibold').text(device.area.name);
 
-            // Update area city, state
-            $('.card-header:contains("Area Details")').next('.card-body').find('.ti-map-pin').parent().text(device.area.city + ', ' + device.area.state);
+            // Update area code
+            if (device.area.code) {
+                $('.card-header:contains("Area Details")').next('.card-body').find('.ti-map-pin').parent().text(device.area.code);
+            } else {
+                $('.card-header:contains("Area Details")').next('.card-body').find('.ti-map-pin').parent().text('N/A');
+            }
 
             // Update area description
             if (device.area.description) {
@@ -748,29 +752,29 @@ $(document).ready(function () {
     });
 
     // Handle layout selection change
-    $('#screen-layout-id').on('change', function() {
+    $('#screen-layout-id').on('change', function () {
         const layoutId = $(this).val();
         const selectedOption = $(this).find('option:selected');
         const layoutType = selectedOption.data('layout-type');
         const layoutTypeName = selectedOption.data('layout-type-name');
-        
+
         if (layoutId && layoutType !== undefined) {
             // Get layout information and current screen count
             $.ajax({
                 url: `/device/{{ $device->id }}/screens`,
                 type: 'GET',
                 data: { layout_id: layoutId },
-                success: function(response) {
+                success: function (response) {
                     if (response.success && response.layout_info) {
                         const layoutInfo = response.layout_info;
                         const remainingSlots = layoutInfo.remaining_slots;
                         const maxScreens = layoutInfo.max_screens;
                         const currentScreens = layoutInfo.current_screens;
-                        
+
                         $('#layout-type-info').text(layoutTypeName);
                         $('#layout-limit-info').text(`Max: ${maxScreens} screens, Current: ${currentScreens}, Remaining: ${remainingSlots}`);
                         $('#layout-info').show();
-                        
+
                         // Disable/enable submit button based on remaining slots
                         const submitBtn = $('#screen-submit-btn');
                         if (remainingSlots <= 0 && !$('#screen-id').val()) {
@@ -780,7 +784,7 @@ $(document).ready(function () {
                         }
                     }
                 },
-                error: function() {
+                error: function () {
                     $('#layout-info').hide();
                 }
             });
@@ -811,7 +815,7 @@ $(document).ready(function () {
         if (!isEdit) {
             const existingScreens = $('.screen-row');
             let hasConflict = false;
-            existingScreens.each(function() {
+            existingScreens.each(function () {
                 const existingHeight = $(this).find('.screen-height').text();
                 const existingWidth = $(this).find('.screen-width').text();
                 if (existingHeight === screenHeight && existingWidth === screenWidth) {
@@ -819,7 +823,7 @@ $(document).ready(function () {
                     return false; // break loop
                 }
             });
-            
+
             if (hasConflict) {
                 showScreenAlert('danger', `Screen dimensions ${screenHeight}x${screenWidth} already exist. Please use different dimensions.`);
                 return;
@@ -865,9 +869,9 @@ $(document).ready(function () {
                         const remainingSlots = layoutInfo.remaining_slots;
                         const maxScreens = layoutInfo.max_screens;
                         const currentScreens = layoutInfo.current_screens;
-                        
+
                         $('#layout-limit-info').text(`Max: ${maxScreens} screens, Current: ${currentScreens}, Remaining: ${remainingSlots}`);
-                        
+
                         // Update submit button state
                         const submitBtn = $('#screen-submit-btn');
                         if (remainingSlots <= 0) {

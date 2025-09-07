@@ -250,6 +250,26 @@ $(document).ready(function () {
             }).closest('.card');
 
             if (statsCard.length > 0) {
+                // Update Locations count
+                const locationsElement = statsCard.find('.mb-4').filter(function () {
+                    return $(this).find('h6').text().trim() === 'Locations';
+                }).find('p');
+                if (locationsElement.length > 0) {
+                    const locationsCount = area.locations ? area.locations.length : 0;
+                    locationsElement.text(locationsCount);
+                    console.log('Updated locations count in statistics:', locationsCount);
+                }
+
+                // Update Companies count
+                const companiesElement = statsCard.find('.mb-4').filter(function () {
+                    return $(this).find('h6').text().trim() === 'Companies';
+                }).find('p');
+                if (companiesElement.length > 0) {
+                    const companiesCount = area.companies ? area.companies.length : 0;
+                    companiesElement.text(companiesCount);
+                    console.log('Updated companies count in statistics:', companiesCount);
+                }
+
                 // Update Created date
                 const createdElement = statsCard.find('.mb-4').filter(function () {
                     return $(this).find('h6').text().trim() === 'Created';
@@ -321,16 +341,111 @@ $(document).ready(function () {
                 console.log('Page title updated');
             }
 
+            // Update Locations section
+            updateLocationsSection(area.locations);
+
+            // Update Companies section
+            updateCompaniesSection(area.companies);
+
             console.log('Area details update completed successfully');
         } catch (error) {
             console.error('Error updating area details:', error);
         }
-
-        // Note: For locations and companies relationships, a page reload would be needed
-        // to properly update these complex sections. However, the main area details
-        // will be updated without reload.
     }
-});
+
+    // Function to update the Locations section
+    function updateLocationsSection(locations) {
+        console.log('Updating locations section:', locations);
+
+        const locationsCard = $('.card-title').filter(function () {
+            return $(this).text().trim().includes('Locations (');
+        }).closest('.card');
+
+        if (locationsCard.length > 0) {
+            const locationsBody = locationsCard.find('.card-body');
+
+            if (locations && locations.length > 0) {
+                // Update the header count
+                const headerTitle = locationsCard.find('.card-title');
+                headerTitle.text(`Locations (${locations.length})`);
+
+                // Clear existing location items
+                locationsBody.find('.row').empty();
+
+                // Add new location items
+                let locationsHtml = '<div class="row">';
+                locations.forEach(function (location) {
+                    locationsHtml += `
+                        <div class="col-md-6 mb-3">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-semibold">${location.name || 'N/A'}</h6>
+                                <p class="mb-1"><i class="ti ti-mail text-info me-2"></i>${location.email || 'N/A'}</p>
+                                <p class="mb-1"><i class="ti ti-map-pin text-warning me-2"></i>${location.address || 'N/A'}</p>
+                                <p class="mb-0"><i class="ti ti-building text-success me-2"></i>${location.city || 'N/A'}, ${location.state || 'N/A'}, ${location.country || 'N/A'}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                locationsHtml += '</div>';
+
+                locationsBody.html(locationsHtml);
+                console.log('Updated locations section with', locations.length, 'locations');
+            } else {
+                // Hide the locations section if no locations
+                locationsCard.hide();
+                console.log('Hidden locations section - no locations');
+            }
+        } else {
+            console.log('Could not find locations card');
+        }
+    }
+
+    // Function to update the Companies section
+    function updateCompaniesSection(companies) {
+        console.log('Updating companies section:', companies);
+
+        const companiesCard = $('.card-title').filter(function () {
+            return $(this).text().trim().includes('Companies (');
+        }).closest('.card');
+
+        if (companiesCard.length > 0) {
+            const companiesBody = companiesCard.find('.card-body');
+
+            if (companies && companies.length > 0) {
+                // Update the header count
+                const headerTitle = companiesCard.find('.card-title');
+                headerTitle.text(`Companies (${companies.length})`);
+
+                // Clear existing company items
+                companiesBody.find('.row').empty();
+
+                // Add new company items
+                let companiesHtml = '<div class="row">';
+                companies.forEach(function (company) {
+                    companiesHtml += `
+                        <div class="col-md-6 mb-3">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-semibold">${company.name || 'N/A'}</h6>
+                                <p class="mb-1"><i class="ti ti-building text-info me-2"></i>${company.industry || 'N/A'}</p>
+                                <p class="mb-1"><i class="ti ti-mail text-warning me-2"></i>${company.email || 'N/A'}</p>
+                                <p class="mb-0"><i class="ti ti-phone text-success me-2"></i>${company.phone || 'N/A'}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                companiesHtml += '</div>';
+
+                companiesBody.html(companiesHtml);
+                console.log('Updated companies section with', companies.length, 'companies');
+            } else {
+                // Hide the companies section if no companies
+                companiesCard.hide();
+                console.log('Hidden companies section - no companies');
+            }
+        } else {
+            console.log('Could not find companies card');
+        }
+    });
 
 // Function to add new location in edit form
 function addEditLocation() {

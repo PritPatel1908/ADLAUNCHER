@@ -664,8 +664,13 @@ $(document).ready(function () {
                 });
             });
 
-            // Handle form submission for editing area
+            // Handle form submission for editing area (only on index page)
             $('#edit-area-form').on('submit', function (e) {
+                // Only handle form submission on the index page (where DataTable exists)
+                if (typeof dataTable === 'undefined') {
+                    return; // Let the show page handler take over
+                }
+
                 e.preventDefault();
 
                 const areaId = $(this).data('area-id');

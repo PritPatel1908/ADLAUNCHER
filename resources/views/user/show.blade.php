@@ -224,6 +224,12 @@
                                         <p class="h4 text-warning">{{ $user->areas->count() }}</p>
                                     </div>
                                     <div class="mb-4">
+                                        <h6 class="fw-semibold">Roles</h6>
+                                        <p class="h4 text-info">{{ $user->roles->count() }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-4">
                                         <h6 class="fw-semibold">Last Login</h6>
                                         <p class="h4 text-info">
                                             {{ $user->last_login_at ? $user->last_login_at->format('d M Y') : 'Never' }}
@@ -324,12 +330,50 @@
                                         <div class="col-md-6 mb-3">
                                             <div class="border rounded p-3">
                                                 <h6 class="fw-semibold">{{ $area->name }}</h6>
-                                                <p class="mb-1"><i
-                                                        class="ti ti-map-pin text-info me-2"></i>{{ $area->city }},
-                                                    {{ $area->state }}</p>
+                                                @if ($area->code)
+                                                    <p class="mb-1"><i
+                                                            class="ti ti-code text-info me-2"></i>{{ $area->code }}</p>
+                                                @endif
                                                 @if ($area->description)
                                                     <p class="mb-0"><i
                                                             class="ti ti-note text-warning me-2"></i>{{ $area->description }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Roles -->
+                @if ($user->roles->count() > 0)
+                    <div class="col-md-12 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Roles ({{ $user->roles->count() }})</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    @foreach ($user->roles as $role)
+                                        <div class="col-md-6 mb-3">
+                                            <div class="border rounded p-3">
+                                                <h6 class="fw-semibold">
+                                                    <i
+                                                        class="ti ti-shield-check text-primary me-2"></i>{{ $role->role_name }}
+                                                </h6>
+                                                @if ($role->created_at)
+                                                    <p class="mb-1 text-muted">
+                                                        <i class="ti ti-calendar text-info me-2"></i>
+                                                        Created: {{ $role->created_at->format('d M Y') }}
+                                                    </p>
+                                                @endif
+                                                @if ($role->updated_at)
+                                                    <p class="mb-0 text-muted">
+                                                        <i class="ti ti-clock text-warning me-2"></i>
+                                                        Updated: {{ $role->updated_at->format('d M Y') }}
                                                     </p>
                                                 @endif
                                             </div>
@@ -569,8 +613,7 @@
                                                         @foreach (\App\Models\Area::where('status', 1)->get() as $area)
                                                             <option value="{{ $area->id }}"
                                                                 {{ $user->areas->contains($area->id) ? 'selected' : '' }}>
-                                                                {{ $area->name }} - {{ $area->city }},
-                                                                {{ $area->state }}
+                                                                {{ $area->name }}{{ $area->code ? ' - ' . $area->code : '' }}
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -581,7 +624,39 @@
                                 </div>
                             </div>
 
-
+                            {{-- Roles --}}
+                            <div class="accordion-item border-top rounded mb-3">
+                                <div class="accordion-header">
+                                    <a href="#" class="accordion-button accordion-custom-button rounded"
+                                        data-bs-toggle="collapse" data-bs-target="#edit-roles">
+                                        <span class="avatar avatar-md rounded me-1"><i
+                                                class="ti ti-shield-check"></i></span>
+                                        Roles
+                                    </a>
+                                </div>
+                                <div class="accordion-collapse collapse" id="edit-roles"
+                                    data-bs-parent="#main_accordion">
+                                    <div class="accordion-body border-top">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Roles</label>
+                                                    <select class="select2 form-control select2-multiple"
+                                                        name="role_ids[]" id="edit-role_ids" data-toggle="select2"
+                                                        multiple="multiple" data-placeholder="Choose roles...">
+                                                        @foreach (\App\Models\Role::all() as $role)
+                                                            <option value="{{ $role->id }}"
+                                                                {{ $user->roles->contains($role->id) ? 'selected' : '' }}>
+                                                                {{ $role->role_name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div id="edit-form-alert" class="col-12" style="display: none;">
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -773,5 +848,9 @@
         }
     </style>
 
-    <!-- The inline script has been moved to user-show.js -->
+    <!-- Store user data globally for JavaScript access -->
+    <script>
+        window.currentUserData = @json($user);
+        console.log('User data stored globally:', window.currentUserData);
+    </script>
 @endpush

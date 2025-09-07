@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Location;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -52,6 +53,8 @@ class UserController extends Controller
             'location_ids.*' => 'exists:locations,id',
             'area_ids' => 'nullable|array',
             'area_ids.*' => 'exists:areas,id',
+            'role_ids' => 'nullable|array',
+            'role_ids.*' => 'exists:roles,id',
         ]);
 
         try {
@@ -87,13 +90,16 @@ class UserController extends Controller
             if ($request->area_ids) {
                 $user->areas()->attach($request->area_ids);
             }
+            if ($request->role_ids) {
+                $user->roles()->attach($request->role_ids);
+            }
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'User created successfully',
-                'user' => $user->load(['companies', 'locations', 'areas'])
+                'user' => $user->load(['companies', 'locations', 'areas', 'roles'])->append('full_name')
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -109,7 +115,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->load(['companies', 'locations', 'areas']);
+        $user->load(['companies', 'locations', 'areas', 'roles']);
         return view('user.show', compact('user'));
     }
 
@@ -118,10 +124,10 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $user->load(['companies', 'locations', 'areas']);
+        $user->load(['companies', 'locations', 'areas', 'roles']);
         return response()->json([
             'success' => true,
-            'user' => $user
+            'user' => $user->append('full_name')
         ]);
     }
 
@@ -149,6 +155,8 @@ class UserController extends Controller
             'location_ids.*' => 'exists:locations,id',
             'area_ids' => 'nullable|array',
             'area_ids.*' => 'exists:areas,id',
+            'role_ids' => 'nullable|array',
+            'role_ids.*' => 'exists:roles,id',
         ]);
 
         try {
@@ -180,13 +188,14 @@ class UserController extends Controller
             $user->companies()->sync($request->company_ids ?? []);
             $user->locations()->sync($request->location_ids ?? []);
             $user->areas()->sync($request->area_ids ?? []);
+            $user->roles()->sync($request->role_ids ?? []);
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'User updated successfully',
-                'user' => $user->load(['companies', 'locations', 'areas'])
+                'user' => $user->load(['companies', 'locations', 'areas', 'roles'])->append('full_name')
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -221,7 +230,7 @@ class UserController extends Controller
      */
     public function getData(Request $request)
     {
-        $query = User::with(['companies', 'locations', 'areas']);
+        $query = User::with(['companies', 'locations', 'areas', 'roles']);
 
         // Apply filters
         if ($request->filled('first_name_filter')) {
@@ -320,6 +329,8 @@ class UserController extends Controller
                 'companies_count' => $user->companies->count(),
                 'locations_count' => $user->locations->count(),
                 'areas_count' => $user->areas->count(),
+                'roles_count' => $user->roles->count(),
+                'roles' => $user->roles->pluck('role_name')->toArray(),
                 'is_admin' => (bool) ($user->is_admin ?? false),
                 'is_client' => (bool) ($user->is_client ?? false),
                 'is_user' => (bool) ($user->is_user ?? true),
@@ -336,5 +347,99 @@ class UserController extends Controller
             'recordsFiltered' => $recordsFiltered,
             'data' => $data,
         ]);
+    }
+
+    /**
+     * Get all available roles for role assignment
+     */
+    public function getRoles()
+    {
+        try {
+            $roles = Role::select('id', 'role_name')
+                ->orderBy('role_name')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $roles
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading roles: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Assign roles to a user
+     */
+    public function assignRoles(Request $request, User $user)
+    {
+        try {
+            $request->validate([
+                'role_ids' => 'required|array',
+                'role_ids.*' => 'exists:roles,id',
+            ]);
+
+            $user->roles()->sync($request->role_ids);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Roles assigned successfully',
+                'user' => $user->load('roles')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error assigning roles: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove roles from a user
+     */
+    public function removeRoles(Request $request, User $user)
+    {
+        try {
+            $request->validate([
+                'role_ids' => 'required|array',
+                'role_ids.*' => 'exists:roles,id',
+            ]);
+
+            $user->roles()->detach($request->role_ids);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Roles removed successfully',
+                'user' => $user->load('roles')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error removing roles: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get user's current roles
+     */
+    public function getUserRoles(User $user)
+    {
+        try {
+            $roles = $user->roles()->select('id', 'role_name')->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $roles
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading user roles: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
