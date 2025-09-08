@@ -204,7 +204,7 @@ $(document).ready(function () {
                 "order": [[0, 'asc']], // Default order by first column ascending
                 "orderCellsTop": true, // Enable ordering on header cells
                 "ajax": {
-                    "url": "locations/data",
+                    "url": (typeof window.locationsDataUrl !== 'undefined' ? window.locationsDataUrl : 'locations/data'),
                     "type": "GET",
                     "headers": {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

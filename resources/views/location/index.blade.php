@@ -842,6 +842,8 @@
     <script>
         // Pass location permissions to JavaScript
         window.locationPermissions = @json(\App\Helpers\PermissionHelper::getModulePermissions('location'));
+        // Absolute URL for datatable endpoint to avoid 404s due to base path issues
+        window.locationsDataUrl = "{{ route('locations.data') }}";
     </script>
     <script src="{{ asset('assets/js/datatable/location-datatable.js') }}" type="text/javascript"></script>
 
