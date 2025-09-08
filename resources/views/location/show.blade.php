@@ -121,15 +121,10 @@
                                     </a>
                                 @endif
                                 @if (\App\Helpers\PermissionHelper::canDelete('location'))
-                                    <form action="{{ route('location.destroy', $location->id) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger"
-                                            onclick="return confirm('Are you sure you want to delete this location?')">
-                                            <i class="ti ti-trash me-1"></i>Delete
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-danger delete-location-btn"
+                                        data-location-id="{{ $location->id }}">
+                                        <i class="ti ti-trash me-1"></i>Delete
+                                    </button>
                                 @endif
                             </div>
                         </div>
@@ -229,18 +224,12 @@
                                     <i class="ti ti-edit"></i>
                                 </span>Edit Location
                             </a>
-                            <form action="{{ route('location.destroy', $location->id) }}" method="POST"
-                                class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <a href="javascript:void(0);" class="d-block mb-0"
-                                    onclick="if(confirm('Are you sure you want to delete this location?')) { this.closest('form').submit(); }">
-                                    <span
-                                        class="avatar avatar-xs bg-danger p-0 flex-shrink-0 rounded-circle text-white me-2">
-                                        <i class="ti ti-trash-x"></i>
-                                    </span>Delete Location
-                                </a>
-                            </form>
+                            <a href="javascript:void(0);" class="d-block mb-0 delete-location-btn"
+                                data-location-id="{{ $location->id }}">
+                                <span class="avatar avatar-xs bg-danger p-0 flex-shrink-0 rounded-circle text-white me-2">
+                                    <i class="ti ti-trash-x"></i>
+                                </span>Delete Location
+                            </a>
                             <a href="{{ route('location.index') }}" class="d-block mt-2">
                                 <span class="avatar avatar-xs bg-info p-0 flex-shrink-0 rounded-circle text-white me-2">
                                     <i class="ti ti-list"></i>
@@ -416,11 +405,117 @@
         </div>
     </div>
     <!-- End Edit Location Offcanvas -->
+
+    <!-- Delete Location Modal -->
+    <div class="modal fade" id="delete_location" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Location</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this location?</p>
+                    <p>This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
     <script>
         $(document).ready(function() {
+            // Custom notification function to replace browser alerts
+            function showCustomNotification(message, type) {
+                var alertClass = 'alert-success';
+                var iconClass = 'ti ti-check-circle';
+
+                if (type === 'error') {
+                    alertClass = 'alert-danger';
+                    iconClass = 'ti ti-alert-circle';
+                }
+
+                var notification = $('<div class="alert ' + alertClass +
+                    ' alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+                    '<i class="' + iconClass + ' me-2"></i>' +
+                    message +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                    '</div>');
+
+                // Remove any existing notifications
+                $('.alert.position-fixed').remove();
+
+                // Append to body
+                $('body').append(notification);
+
+                // Auto dismiss after 4 seconds
+                setTimeout(function() {
+                    notification.alert('close');
+                }, 4000);
+            }
+
+            // Handle delete button click - Show custom modal
+            $(document).on('click', '.delete-location-btn', function() {
+                var locationId = $(this).data('location-id');
+
+                // Store the location ID for the delete operation
+                $('#delete_location').data('location-id', locationId);
+
+                // Show the custom delete modal
+                $('#delete_location').modal('show');
+            });
+
+            // Handle delete confirmation button click
+            $(document).on('click', '#confirm-delete-btn', function() {
+                var locationId = $('#delete_location').data('location-id');
+
+                if (!locationId) {
+                    showCustomNotification('Error: Location ID not found', 'error');
+                    return;
+                }
+
+                // Disable the button to prevent double clicks
+                $(this).prop('disabled', true).text('Deleting...');
+
+                $.ajax({
+                    url: '/location/' + locationId,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Close the modal
+                            $('#delete_location').modal('hide');
+
+                            // Show custom success notification
+                            showCustomNotification('Location deleted successfully', 'success');
+
+                            // Redirect to locations index after a short delay
+                            setTimeout(function() {
+                                window.location.href = '/location';
+                            }, 1500);
+                        } else {
+                            showCustomNotification('Error deleting location', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error deleting location:', xhr);
+                        showCustomNotification('Error deleting location: ' + (xhr.responseJSON ?
+                            xhr.responseJSON.message : 'Unknown error'), 'error');
+                    },
+                    complete: function() {
+                        // Re-enable the button
+                        $('#confirm-delete-btn').prop('disabled', false).text('Delete');
+                    }
+                });
+            });
+
             // Handle edit button click
             $(document).on('click', '[data-bs-target="#offcanvas_edit"]', function() {
                 var locationId = {{ $location->id }};
@@ -450,7 +545,8 @@
                     },
                     error: function(xhr) {
                         console.error('Error fetching location data');
-                        alert('Error loading location data. Please try again.');
+                        showCustomNotification('Error loading location data. Please try again.',
+                            'error');
                     }
                 });
             });
@@ -614,7 +710,7 @@
                                 updateLocationDataOnPage(response.location);
                             }, 1500);
                         } else {
-                            alert('Error updating location');
+                            showCustomNotification('Error updating location', 'error');
                         }
                     },
                     error: function(xhr) {
@@ -629,10 +725,11 @@
                                 errorMessage += errors[field][0] + '\n';
                             }
 
-                            alert(errorMessage);
+                            showCustomNotification(errorMessage, 'error');
                         } else {
-                            alert('Error updating location: ' + (xhr.responseJSON ? xhr
-                                .responseJSON.message : 'Unknown error'));
+                            showCustomNotification('Error updating location: ' + (xhr
+                                .responseJSON ? xhr
+                                .responseJSON.message : 'Unknown error'), 'error');
                         }
                     }
                 });

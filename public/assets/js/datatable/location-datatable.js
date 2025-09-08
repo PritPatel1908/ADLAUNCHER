@@ -5,6 +5,34 @@ $(document).ready(function () {
     // Set default sort option
     window.currentSortBy = 'newest';
 
+    // Custom notification function to replace browser alerts
+    function showCustomNotification(message, type) {
+        var alertClass = 'alert-success';
+        var iconClass = 'ti ti-check-circle';
+
+        if (type === 'error') {
+            alertClass = 'alert-danger';
+            iconClass = 'ti ti-alert-circle';
+        }
+
+        var notification = $('<div class="alert ' + alertClass + ' alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+            '<i class="' + iconClass + ' me-2"></i>' +
+            message +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>');
+
+        // Remove any existing notifications
+        $('.alert.position-fixed').remove();
+
+        // Append to body
+        $('body').append(notification);
+
+        // Auto dismiss after 4 seconds
+        setTimeout(function () {
+            notification.alert('close');
+        }, 4000);
+    }
+
     // Apply initial CSS to hide columns that should be hidden
     function applyInitialColumnVisibility() {
         // Get saved column visibility from localStorage if available
@@ -157,7 +185,7 @@ $(document).ready(function () {
                 }
 
                 // Show error to user
-                alert(`Failed to save column preference for ${column}. Please try again.`);
+                showCustomNotification(`Failed to save column preference for ${column}. Please try again.`, 'error');
             }
         });
     }
@@ -567,31 +595,58 @@ $(document).ready(function () {
         }
     });
 
-    // Delete location
+    // Delete location - Show custom modal instead of browser confirm
     $(document).on('click', '.delete-location', function () {
         var locationId = $(this).data('id');
-        if (confirm('Are you sure you want to delete this location?')) {
-            $.ajax({
-                url: '/location/' + locationId,
-                type: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response.success) {
-                        // Reload the DataTable
-                        $('#contactslist').DataTable().ajax.reload();
-                        alert('Location deleted successfully');
-                    } else {
-                        alert('Error deleting location');
-                    }
-                },
-                error: function (xhr) {
-                    console.error('Error deleting location:', xhr);
-                    alert('Error deleting location: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'));
-                }
-            });
+
+        // Store the location ID for the delete operation
+        $('#delete_location').data('location-id', locationId);
+
+        // Show the custom delete modal
+        $('#delete_location').modal('show');
+    });
+
+    // Handle delete confirmation button click
+    $(document).on('click', '#confirm-delete-btn', function () {
+        var locationId = $('#delete_location').data('location-id');
+
+        if (!locationId) {
+            showCustomNotification('Error: Location ID not found', 'error');
+            return;
         }
+
+        // Disable the button to prevent double clicks
+        $(this).prop('disabled', true).text('Deleting...');
+
+        $.ajax({
+            url: '/location/' + locationId,
+            type: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.success) {
+                    // Close the modal
+                    $('#delete_location').modal('hide');
+
+                    // Reload the DataTable
+                    $('#contactslist').DataTable().ajax.reload();
+
+                    // Show custom success notification
+                    showCustomNotification('Location deleted successfully', 'success');
+                } else {
+                    showCustomNotification('Error deleting location', 'error');
+                }
+            },
+            error: function (xhr) {
+                console.error('Error deleting location:', xhr);
+                showCustomNotification('Error deleting location: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'), 'error');
+            },
+            complete: function () {
+                // Re-enable the button
+                $('#confirm-delete-btn').prop('disabled', false).text('Delete');
+            }
+        });
     });
 
     // Handle edit button click
@@ -628,7 +683,7 @@ $(document).ready(function () {
             },
             error: function (xhr) {
                 console.error('Error fetching location data');
-                alert('Error loading location data. Please try again.');
+                showCustomNotification('Error loading location data. Please try again.', 'error');
             }
         });
     });
@@ -660,7 +715,7 @@ $(document).ready(function () {
                     // Reload the DataTable
                     $('#contactslist').DataTable().ajax.reload();
                 } else {
-                    alert('Error updating location');
+                    showCustomNotification('Error updating location', 'error');
                 }
             },
             error: function (xhr) {
@@ -675,9 +730,9 @@ $(document).ready(function () {
                         errorMessage += errors[field][0] + '\n';
                     }
 
-                    alert(errorMessage);
+                    showCustomNotification(errorMessage, 'error');
                 } else {
-                    alert('Error updating location: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'));
+                    showCustomNotification('Error updating location: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'), 'error');
                 }
             }
         });
@@ -730,9 +785,9 @@ $(document).ready(function () {
                         errorMessage += errors[field][0] + '\n';
                     }
 
-                    alert(errorMessage);
+                    showCustomNotification(errorMessage, 'error');
                 } else {
-                    alert('Error creating location: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'));
+                    showCustomNotification('Error creating location: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'), 'error');
                 }
             },
             complete: function () {

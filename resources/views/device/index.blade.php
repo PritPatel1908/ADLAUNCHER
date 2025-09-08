@@ -30,25 +30,25 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    @if(\App\Helpers\PermissionHelper::canExport('device'))
-                    <div class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
-                            data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <ul>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-pdf me-1"></i>Export
-                                        as PDF</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-xls me-1"></i>Export
-                                        as Excel</a>
-                                </li>
-                            </ul>
+                    @if (\App\Helpers\PermissionHelper::canExport('device'))
+                        <div class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
+                                data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <ul>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-pdf me-1"></i>Export
+                                            as PDF</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-xls me-1"></i>Export
+                                            as Excel</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
                     @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
@@ -67,10 +67,10 @@
                         <span class="input-icon-addon text-dark"><i class="ti ti-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search">
                     </div>
-                    @if(\App\Helpers\PermissionHelper::canCreate('device'))
-                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
-                        Device</a>
+                    @if (\App\Helpers\PermissionHelper::canCreate('device'))
+                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvas_add"><i class="ti ti-square-rounded-plus-filled me-1"></i>Add
+                            Device</a>
                     @endif
                 </div>
                 <div class="card-body">

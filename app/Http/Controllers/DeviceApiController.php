@@ -103,10 +103,27 @@ class DeviceApiController extends Controller
                 ], $responseData['status_code']);
             }
 
+            // Reformat response to required schema
+            $deviceUniqueId = $responseData[0]['device_unique_id'] ?? $deviceId;
+            $layoutType = $responseData[0]['layout_type'] ?? 'unknown';
+
+            // Map to desired schema and drop entries with no medias
+            $screens = array_values(array_filter(array_map(function ($item) {
+                $mapped = [
+                    'screen_no' => isset($item['screen_no']) ? (string) $item['screen_no'] : null,
+                    'screen_height' => isset($item['screen_height']) ? (string) $item['screen_height'] : null,
+                    'screen_width' => isset($item['screen_width']) ? (string) $item['screen_width'] : null,
+                    'medias' => $item['medias'] ?? []
+                ];
+                return !empty($mapped['medias']) ? $mapped : null;
+            }, $responseData)));
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Data retrieved successfully',
-                'data' => $responseData
+                'device_unique_id' => $deviceUniqueId,
+                'layout_type' => $layoutType,
+                'data' => $screens
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -136,20 +153,23 @@ class DeviceApiController extends Controller
                     ->on('dl.id', '=', 's.layout_id');
             })
             ->leftJoin('schedule_medias as sm', function ($join) {
-                $join->on('s.id', '=', 'sm.schedule_id')
-                    ->on('ds.id', '=', 'sm.screen_id');
+                // Join only by schedule; handle screen matching (or null) in PHP to avoid dropping rows
+                $join->on('s.id', '=', 'sm.schedule_id');
             })
             ->select(
                 'd.id as device_id',
                 'd.unique_id as device_unique_id',
                 'd.status as device_status',
                 'dl.layout_type',
+                'ds.id as ds_id',
                 'ds.screen_no',
                 'ds.screen_height',
                 'ds.screen_width',
+                'sm.screen_id as media_screen_id',
                 'sm.schedule_start_date_time',
                 'sm.schedule_end_date_time',
                 'sm.play_forever',
+                'sm.duration_seconds',
                 'sm.media_type',
                 'sm.title',
                 'sm.media_file'
@@ -168,8 +188,8 @@ class DeviceApiController extends Controller
             return ['error' => 'Device is not active', 'status_code' => 403];
         }
 
-        // Check if device has active layout
-        if (!$firstRow->layout_type) {
+        // Check if device has active layout (layout_type can be 0 for full screen, so check null)
+        if (is_null($firstRow->layout_type)) {
             return ['error' => 'No active layout found for device', 'status_code' => 404];
         }
 
@@ -177,28 +197,32 @@ class DeviceApiController extends Controller
         $schedules = [];
 
         foreach ($deviceData as $row) {
-            if ($row->schedule_start_date_time) {
-                $scheduleKey = $row->schedule_start_date_time . '_' . $row->screen_no;
+            // Include entries that either have a start time, are marked to play forever, or at least have media
+            if ($row->schedule_start_date_time || $row->play_forever || $row->media_file) {
+                $bucket = $row->play_forever ? 'forever' : ($row->schedule_start_date_time ?? 'unscheduled');
+                $scheduleKey = $bucket . '_' . ($row->screen_no ?? 'noscreen');
 
                 if (!isset($schedules[$scheduleKey])) {
                     $schedules[$scheduleKey] = [
                         'device_unique_id' => $row->device_unique_id,
-                        'layout_type' => $this->getLayoutTypeName($row->layout_type),
+                        'layout_type' => $this->getLayoutTypeName((int) $row->layout_type),
                         'screen_no' => $row->screen_no,
                         'screen_height' => $row->screen_height,
                         'screen_width' => $row->screen_width,
-                        'schedule_start_date_time' => $row->schedule_start_date_time,
-                        'schedule_end_date_time' => $row->schedule_end_date_time,
-                        'play_forever' => (bool) $row->play_forever,
                         'medias' => []
                     ];
                 }
 
-                // Add media if exists
-                if ($row->media_file) {
+                // Add media if exists and screen matches (or media is for all screens)
+                $mediaAppliesToThisScreen = is_null($row->media_screen_id) || ($row->media_screen_id == $row->ds_id);
+                if ($row->media_file && $mediaAppliesToThisScreen) {
                     $schedules[$scheduleKey]['medias'][] = [
                         'media_type' => $row->media_type,
                         'title' => $row->title,
+                        'duration_seconds' => isset($row->duration_seconds) ? (int) $row->duration_seconds : null,
+                        'schedule_start_date_time' => $row->schedule_start_date_time,
+                        'schedule_end_date_time' => $row->schedule_end_date_time,
+                        'play_forever' => (bool) $row->play_forever,
                         'media_file' => $row->media_file,
                         'media_url' => $this->getMediaUrl($row->media_file)
                     ];

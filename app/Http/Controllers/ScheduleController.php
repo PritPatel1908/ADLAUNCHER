@@ -51,6 +51,7 @@ class ScheduleController extends Controller
                 'media_type.*' => 'nullable|string|in:image,video,audio,mp4,png,jpg,pdf',
                 'media_file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,avi,mov,mp3,wav,pdf|max:204800', // 200MB limit
                 'media_screen_id.*' => 'nullable|exists:device_screens,id',
+                'media_duration_seconds.*' => 'nullable|integer|min:1|max:86400',
                 'media_start_date_time.*' => 'nullable|date',
                 'media_end_date_time.*' => 'nullable|date',
                 'media_play_forever.*' => 'nullable|boolean',
@@ -110,6 +111,7 @@ class ScheduleController extends Controller
                 $mediaTypes = $request->input('media_type', []);
                 $mediaFiles = $request->file('media_file', []);
                 $mediaScreenIds = $request->input('media_screen_id', []);
+                $mediaDurations = $request->input('media_duration_seconds', []);
                 $mediaStarts = $request->input('media_start_date_time', []);
                 $mediaEnds = $request->input('media_end_date_time', []);
                 $mediaForever = $request->input('media_play_forever', []);
@@ -150,6 +152,7 @@ class ScheduleController extends Controller
                             'title' => $mediaTitles[$i] ?? null,
                             'media_type' => $mediaTypes[$i] ?? null,
                             'screen_id' => $mediaScreenIds[$i] ?? null,
+                            'duration_seconds' => $mediaDurations[$i] ?? null,
                             'schedule_start_date_time' => $startAt,
                             'schedule_end_date_time' => $endAt,
                             'play_forever' => $playForeverVal,
@@ -244,6 +247,7 @@ class ScheduleController extends Controller
             'edit_media_type.*' => 'nullable|string|in:image,video,audio,mp4,png,jpg,pdf',
             'edit_media_file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,avi,mov,mp3,wav,pdf|max:204800', // 200MB limit
             'edit_media_screen_id.*' => 'nullable|exists:device_screens,id',
+            'edit_media_duration_seconds.*' => 'nullable|integer|min:1|max:86400',
             'edit_media_start_date_time.*' => 'nullable|date',
             'edit_media_end_date_time.*' => 'nullable|date',
             'edit_media_play_forever.*' => 'nullable|boolean',
@@ -292,6 +296,7 @@ class ScheduleController extends Controller
                 $mediaFiles = $request->file('edit_media_file', []);
                 $mediaIds = $request->input('edit_media_id', []);
                 $mediaScreenIds = $request->input('edit_media_screen_id', []);
+                $mediaDurations = $request->input('edit_media_duration_seconds', []);
                 $mediaStarts = $request->input('edit_media_start_date_time', []);
                 $mediaEnds = $request->input('edit_media_end_date_time', []);
                 $mediaForever = $request->input('edit_media_play_forever', []);
@@ -330,6 +335,7 @@ class ScheduleController extends Controller
                             'title' => $mediaTitles[$i] ?? null,
                             'media_type' => $mediaTypes[$i] ?? null,
                             'screen_id' => $mediaScreenIds[$i] ?? null,
+                            'duration_seconds' => $mediaDurations[$i] ?? null,
                             'schedule_start_date_time' => $startAt,
                             'schedule_end_date_time' => $endAt,
                             'play_forever' => $playForeverVal,

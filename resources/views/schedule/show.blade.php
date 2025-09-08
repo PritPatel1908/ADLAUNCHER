@@ -321,19 +321,6 @@
                                 <div class="accordion-collapse collapse" id="edit_media"
                                     data-bs-parent="#edit_main_accordion">
                                     <div class="accordion-body border-top">
-                                        <div class="alert alert-info mb-3">
-                                            <i class="ti ti-info-circle me-2"></i>
-                                            <strong>Multi-Media Support:</strong> You can add multiple media files and
-                                            assign them to different screens.
-                                            When you select a layout, all screens from that layout will be available for
-                                            media assignment.
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-sm btn-outline-info"
-                                                    id="refresh-edit-screens">
-                                                    <i class="ti ti-refresh me-1"></i>Refresh Screens
-                                                </button>
-                                            </div>
-                                        </div>
                                         <div id="edit-media-container">
                                             @if ($schedule->medias && $schedule->medias->count())
                                                 @foreach ($schedule->medias as $index => $media)
@@ -355,7 +342,7 @@
                                                                     <select class="form-control select2"
                                                                         name="edit_media_type[]" data-toggle="select2">
                                                                         <option value="">Select type...</option>
-                                                                        <option value="image"
+                                                                        {{-- <option value="image"
                                                                             {{ $media->media_type == 'image' ? 'selected' : '' }}>
                                                                             Image</option>
                                                                         <option value="video"
@@ -363,7 +350,7 @@
                                                                             Video</option>
                                                                         <option value="audio"
                                                                             {{ $media->media_type == 'audio' ? 'selected' : '' }}>
-                                                                            Audio</option>
+                                                                            Audio</option> --}}
                                                                         <option value="mp4"
                                                                             {{ $media->media_type == 'mp4' ? 'selected' : '' }}>
                                                                             MP4</option>
@@ -399,18 +386,20 @@
                                                             </div>
                                                             <div class="col-md-3">
                                                                 <div class="mb-3">
-                                                                    <label class="form-label">Start At</label>
-                                                                    <input type="datetime-local" class="form-control"
-                                                                        name="edit_media_start_date_time[]"
-                                                                        value="{{ $media->schedule_start_date_time ? \Carbon\Carbon::parse($media->schedule_start_date_time)->format('Y-m-d\\TH:i') : '' }}">
+                                                                    <label class="form-label">Duration (seconds)</label>
+                                                                    <input type="number" class="form-control"
+                                                                        name="edit_media_duration_seconds[]"
+                                                                        min="1" max="86400"
+                                                                        value="{{ $media->duration_seconds }}"
+                                                                        placeholder="e.g. 15">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-3">
                                                                 <div class="mb-3">
-                                                                    <label class="form-label">End At</label>
+                                                                    <label class="form-label">Start At</label>
                                                                     <input type="datetime-local" class="form-control"
-                                                                        name="edit_media_end_date_time[]"
-                                                                        value="{{ $media->schedule_end_date_time ? \Carbon\Carbon::parse($media->schedule_end_date_time)->format('Y-m-d\\TH:i') : '' }}">
+                                                                        name="edit_media_start_date_time[]"
+                                                                        value="{{ $media->schedule_start_date_time ? \Carbon\Carbon::parse($media->schedule_start_date_time)->format('Y-m-d\\TH:i') : '' }}">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2 d-flex align-items-center">
@@ -494,16 +483,17 @@
                                                         </div>
                                                         <div class="col-md-3">
                                                             <div class="mb-3">
-                                                                <label class="form-label">Start At</label>
-                                                                <input type="datetime-local" class="form-control"
-                                                                    name="edit_media_start_date_time[]">
+                                                                <label class="form-label">Duration (seconds)</label>
+                                                                <input type="number" class="form-control"
+                                                                    name="edit_media_duration_seconds[]" min="1"
+                                                                    max="86400" placeholder="e.g. 15">
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3">
                                                             <div class="mb-3">
-                                                                <label class="form-label">End At</label>
+                                                                <label class="form-label">Start At</label>
                                                                 <input type="datetime-local" class="form-control"
-                                                                    name="edit_media_end_date_time[]">
+                                                                    name="edit_media_start_date_time[]">
                                                             </div>
                                                         </div>
                                                         <div class="col-md-2 d-flex align-items-center">

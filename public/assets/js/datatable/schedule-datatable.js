@@ -67,6 +67,9 @@ $(document).ready(function () {
         setTimeout(initializeSelect2, 100);
     });
 
+    // Track whether user has explicitly selected a date range; default = not picked
+    $('#reportrange').data('picked', false);
+
     // Function to save column visibility preference
     function saveColumnVisibility(column, isVisible) {
         console.log('Saving column visibility for:', column, 'to:', isVisible);
@@ -268,11 +271,13 @@ $(document).ready(function () {
                     d.name_filter = $('.schedule-filter[data-column="schedule_name"]').val();
                     d.device_filter = $('.schedule-filter[data-column="device"]').val();
 
-                    // Add date range filter parameters
-                    var dateRange = $('#reportrange span').text().split(' - ');
-                    if (dateRange.length === 2) {
-                        d.start_date = moment(dateRange[0], 'D MMM YY').format('YYYY-MM-DD');
-                        d.end_date = moment(dateRange[1], 'D MMM YY').format('YYYY-MM-DD');
+                    // Add date range filter parameters only when user has picked a range
+                    if ($('#reportrange').data('picked') === true) {
+                        var dateRange = $('#reportrange span').text().split(' - ');
+                        if (dateRange.length === 2) {
+                            d.start_date = moment(dateRange[0], 'D MMM YY').format('YYYY-MM-DD');
+                            d.end_date = moment(dateRange[1], 'D MMM YY').format('YYYY-MM-DD');
+                        }
                     }
 
                     // Add sort by parameter
@@ -475,6 +480,8 @@ $(document).ready(function () {
 
         // Add event listener for date range picker
         $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+            // Mark that date filter is active
+            $('#reportrange').data('picked', true);
             $('#error-container').hide();
             scheduleTable.ajax.reload();
         });
@@ -819,12 +826,37 @@ $(document).ready(function () {
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Duration (seconds)</label>
+                                        <input type="number" class="form-control" name="edit_media_duration_seconds[]" min="1" max="86400" value="${media.duration_seconds || ''}" placeholder="e.g. 15">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Start At</label>
+                                        <input type="datetime-local" class="form-control" name="edit_media_start_date_time[]" value="${media.schedule_start_date_time ? (new Date(media.schedule_start_date_time)).toISOString().slice(0, 16) : ''}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">End At</label>
+                                        <input type="datetime-local" class="form-control" name="edit_media_end_date_time[]" value="${media.schedule_end_date_time ? (new Date(media.schedule_end_date_time)).toISOString().slice(0, 16) : ''}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-center">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" name="edit_media_play_forever[]" value="1" ${media.play_forever ? 'checked' : ''}>
+                                        <label class="form-check-label">Play Forever</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <label class="form-label">Media File</label>
-                                        <input type="file" class="form-control" name="edit_media_file[]"
-                                            accept="image/*,video/*,audio/*,.mp4,.png,.jpg,.pdf">
-                                        ${media.media_file ? `<small class="text-muted">Current: ${media.media_file}</small>` : ''}
+                                        <input type="file" class="form-control" name="edit_media_file[]" accept="image/*,video/*,audio/*,.mp4,.png,.jpg,.pdf">
+                                        ${media.media_file ? `<small class=\"text-muted\">Current: ${media.media_file}</small>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -833,22 +865,21 @@ $(document).ready(function () {
                     $container.append(mediaHtml);
                 });
             } else {
-                // Add one empty media item if no existing media
+                // Add one empty media item if no existing media (match dynamic template)
                 const mediaHtml = `
                     <div class="media-item border rounded p-3 mb-3">
+                        <input type="hidden" name="edit_media_id[]" value="">
                         <div class="row">
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">Media Title</label>
-                                    <input type="text" class="form-control" name="edit_media_title[]"
-                                        placeholder="Enter media title">
+                                    <input type="text" class="form-control" name="edit_media_title[]" placeholder="Enter media title">
                                 </div>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-3">
                                 <div class="mb-3">
                                     <label class="form-label">Media Type</label>
-                                    <select class="form-control select2" name="edit_media_type[]"
-                                        data-toggle="select2">
+                                    <select class="form-control select2" name="edit_media_type[]" data-toggle="select2">
                                         <option value="">Select type...</option>
                                         <option value="image">Image</option>
                                         <option value="video">Video</option>
@@ -857,6 +888,14 @@ $(document).ready(function () {
                                         <option value="png">PNG</option>
                                         <option value="jpg">JPG</option>
                                         <option value="pdf">PDF</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Screen</label>
+                                    <select class="form-control select2" name="edit_media_screen_id[]" data-toggle="select2">
+                                        <option value="">Select screen...</option>
                                     </select>
                                 </div>
                             </div>
@@ -870,11 +909,36 @@ $(document).ready(function () {
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Duration (seconds)</label>
+                                    <input type="number" class="form-control" name="edit_media_duration_seconds[]" min="1" max="86400" placeholder="e.g. 15">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Start At</label>
+                                    <input type="datetime-local" class="form-control" name="edit_media_start_date_time[]">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">End At</label>
+                                    <input type="datetime-local" class="form-control" name="edit_media_end_date_time[]">
+                                </div>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-center">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" name="edit_media_play_forever[]" value="1">
+                                    <label class="form-check-label">Play Forever</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
                                     <label class="form-label">Media File</label>
-                                    <input type="file" class="form-control" name="edit_media_file[]"
-                                        accept="image/*,video/*,audio/*,.mp4,.png,.jpg,.pdf">
+                                    <input type="file" class="form-control" name="edit_media_file[]" accept="image/*,video/*,audio/*,.mp4,.png,.jpg,.pdf">
                                 </div>
                             </div>
                         </div>
@@ -1168,8 +1232,8 @@ $(document).ready(function () {
                 // Load screens for the selected layout
                 loadScreensForMedia(deviceId, layoutId);
 
-                // Show notification about available screens
-                showLayoutScreensNotification(layoutName, layoutId);
+                // Disabled toast notification for layout selection per UI requirement
+                // showLayoutScreensNotification(layoutName, layoutId);
             } else if (deviceId) {
                 // If no layout selected, load all screens for the device
                 loadScreensForMedia(deviceId);
@@ -1186,8 +1250,8 @@ $(document).ready(function () {
                 // Load screens for the selected layout
                 loadScreensForEditMedia(deviceId, layoutId);
 
-                // Show notification about available screens
-                showLayoutScreensNotification(layoutName, layoutId);
+                // Disabled toast notification for layout selection per UI requirement
+                // showLayoutScreensNotification(layoutName, layoutId);
             } else if (deviceId) {
                 // If no layout selected, load all screens for the device
                 loadScreensForEditMedia(deviceId);
@@ -1297,16 +1361,28 @@ $(document).ready(function () {
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Duration (seconds)</label>
+                                <input type="number" class="form-control" name="media_duration_seconds[]" min="1" max="86400" placeholder="e.g. 15">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Start At</label>
                                 <input type="datetime-local" class="form-control" name="media_start_date_time[]">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">End At</label>
                                 <input type="datetime-local" class="form-control" name="media_end_date_time[]">
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-center">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" name="media_play_forever[]" value="1">
+                                <label class="form-check-label">Play Forever</label>
                             </div>
                         </div>
                     </div>
@@ -1380,16 +1456,28 @@ $(document).ready(function () {
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Duration (seconds)</label>
+                                <input type="number" class="form-control" name="edit_media_duration_seconds[]" min="1" max="86400" placeholder="e.g. 15">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Start At</label>
                                 <input type="datetime-local" class="form-control" name="edit_media_start_date_time[]">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">End At</label>
                                 <input type="datetime-local" class="form-control" name="edit_media_end_date_time[]">
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-center">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" name="edit_media_play_forever[]" value="1">
+                                <label class="form-check-label">Play Forever</label>
                             </div>
                         </div>
                     </div>

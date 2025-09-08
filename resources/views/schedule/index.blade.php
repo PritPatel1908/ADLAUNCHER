@@ -339,19 +339,6 @@
                                 </div>
                                 <div class="accordion-collapse collapse" id="media" data-bs-parent="#main_accordion">
                                     <div class="accordion-body border-top">
-                                        <div class="alert alert-info mb-3">
-                                            <i class="ti ti-info-circle me-2"></i>
-                                            <strong>Multi-Media Support:</strong> You can add multiple media files and
-                                            assign them to different screens.
-                                            When you select a layout, all screens from that layout will be available for
-                                            media assignment.
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-sm btn-outline-info"
-                                                    id="refresh-screens">
-                                                    <i class="ti ti-refresh me-1"></i>Refresh Screens
-                                                </button>
-                                            </div>
-                                        </div>
                                         <div id="media-container">
                                             <div class="media-item border rounded p-3 mb-3">
                                                 <div class="row">
@@ -387,6 +374,25 @@
                                                             </select>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-2">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">&nbsp;</label>
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm w-100 remove-media">
+                                                                <i class="ti ti-trash"></i> Remove
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Duration (seconds)</label>
+                                                            <input type="number" class="form-control"
+                                                                name="media_duration_seconds[]" min="1"
+                                                                max="86400" placeholder="e.g. 15">
+                                                        </div>
+                                                    </div>
                                                     <div class="col-md-3">
                                                         <div class="mb-3">
                                                             <label class="form-label">Start At</label>
@@ -406,15 +412,6 @@
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="media_play_forever[]" value="1">
                                                             <label class="form-check-label">Play Forever</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">&nbsp;</label>
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-sm w-100 remove-media">
-                                                                <i class="ti ti-trash"></i> Remove
-                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -531,27 +528,15 @@
                                         data-bs-toggle="collapse" data-bs-target="#edit_media">
                                         <span class="avatar avatar-md rounded me-1"><i class="ti ti-photo"></i></span>
                                         Schedule Media
-                                        <span class="badge badge-soft-info ms-2">Multiple Media Support</span>
+                                        {{-- <span class="badge badge-soft-info ms-2">Multiple Media Support</span> --}}
                                     </a>
                                 </div>
                                 <div class="accordion-collapse collapse" id="edit_media"
                                     data-bs-parent="#edit_main_accordion">
                                     <div class="accordion-body border-top">
-                                        <div class="alert alert-info mb-3">
-                                            <i class="ti ti-info-circle me-2"></i>
-                                            <strong>Multi-Media Support:</strong> You can add multiple media files and
-                                            assign them to different screens.
-                                            When you select a layout, all screens from that layout will be available for
-                                            media assignment.
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-sm btn-outline-info"
-                                                    id="refresh-screens">
-                                                    <i class="ti ti-refresh me-1"></i>Refresh Screens
-                                                </button>
-                                            </div>
-                                        </div>
                                         <div id="edit-media-container">
                                             <div class="media-item border rounded p-3 mb-3">
+                                                <input type="hidden" name="edit_media_id[]" value="">
                                                 <div class="row">
                                                     <div class="col-md-4">
                                                         <div class="mb-3">
@@ -592,6 +577,37 @@
                                                                 class="btn btn-danger btn-sm w-100 remove-media">
                                                                 <i class="ti ti-trash"></i> Remove
                                                             </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Duration (seconds)</label>
+                                                            <input type="number" class="form-control"
+                                                                name="edit_media_duration_seconds[]" min="1"
+                                                                max="86400" placeholder="e.g. 15">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Start At</label>
+                                                            <input type="datetime-local" class="form-control"
+                                                                name="edit_media_start_date_time[]">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">End At</label>
+                                                            <input type="datetime-local" class="form-control"
+                                                                name="edit_media_end_date_time[]">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 d-flex align-items-center">
+                                                        <div class="form-check mt-4">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="edit_media_play_forever[]" value="1">
+                                                            <label class="form-check-label">Play Forever</label>
                                                         </div>
                                                     </div>
                                                 </div>

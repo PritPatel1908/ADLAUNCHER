@@ -61,10 +61,15 @@ class DatabaseSeeder extends Seeder
         //     'updated_by' => 1,
         // ]);
 
-        // Seed companies, areas, and roles
-        // $this->call([
-        //     CompanySeeder::class,
-        //     AreaSeeder::class,
-        // ]);
+        // Seed minimal single records for setup
+        $this->call([
+            SingleLocationSeeder::class,
+            SingleCompanySeeder::class,
+            SingleAreaSeeder::class,
+            SingleRolePermissionSeeder::class,
+            SingleDeviceSeeder::class,
+            SingleScheduleSeeder::class,
+            DeviceScheduleRelationSeeder::class,
+        ]);
     }
 }

@@ -100,11 +100,44 @@ class DeviceLayoutController extends Controller
                     ->update(['status' => DeviceLayout::STATUS_INACTIVE]);
             }
 
+            $originalLayoutType = (int) $deviceLayout->layout_type;
+            $newLayoutType = (int) $request->layout_type;
+
             $deviceLayout->update([
                 'layout_name' => $request->layout_name,
-                'layout_type' => $request->layout_type,
+                'layout_type' => $newLayoutType,
                 'status' => $request->status,
             ]);
+
+            // If layout type reduced, prune extra screens keeping the first N by screen_no
+            $oldMax = match ($originalLayoutType) {
+                DeviceLayout::LAYOUT_TYPE_FULL_SCREEN => 1,
+                DeviceLayout::LAYOUT_TYPE_SPLIT_SCREEN => 2,
+                DeviceLayout::LAYOUT_TYPE_THREE_GRID_SCREEN => 3,
+                DeviceLayout::LAYOUT_TYPE_FOUR_GRID_SCREEN => 4,
+                default => 1,
+            };
+            $newMax = match ($newLayoutType) {
+                DeviceLayout::LAYOUT_TYPE_FULL_SCREEN => 1,
+                DeviceLayout::LAYOUT_TYPE_SPLIT_SCREEN => 2,
+                DeviceLayout::LAYOUT_TYPE_THREE_GRID_SCREEN => 3,
+                DeviceLayout::LAYOUT_TYPE_FOUR_GRID_SCREEN => 4,
+                default => 1,
+            };
+
+            if ($newMax < $oldMax) {
+                // Get screens ordered by screen_no; keep first $newMax, delete rest (and their media)
+                $screens = $deviceLayout->screens()->orderBy('screen_no')->get();
+                $idsToKeep = $screens->take($newMax)->pluck('id')->all();
+                $idsToDelete = $screens->skip($newMax)->pluck('id')->all();
+
+                if (!empty($idsToDelete)) {
+                    // Delete related schedule media first
+                    \App\Models\ScheduleMedia::whereIn('screen_id', $idsToDelete)->delete();
+                    // Delete the screens
+                    \App\Models\DeviceScreen::whereIn('id', $idsToDelete)->delete();
+                }
+            }
 
             DB::commit();
 

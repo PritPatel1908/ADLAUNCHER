@@ -490,6 +490,13 @@ $(document).ready(function () {
                     $('#layout-cancel-btn').hide();
                     $('#layout-form-title').text('Add New Layout');
                     loadDeviceLayouts();
+                    if (window.loadDeviceScreens) { window.loadDeviceScreens(); setTimeout(window.loadDeviceScreens, 800); }
+                    // If preview offcanvas is open, refresh preview as well
+                    if ($('#offcanvas_screen_preview').hasClass('show') && typeof window.screenPreviewData !== 'undefined') {
+                        // Clear cached data and trigger reload via existing button handler
+                        window.screenPreviewData = undefined;
+                        $('#refresh-preview-btn').trigger('click');
+                    }
 
                     // Close the offcanvas shortly after showing the message
                     setTimeout(function () {
@@ -560,6 +567,9 @@ $(document).ready(function () {
                     if (response.success) {
                         showAlert('success', response.message);
                         loadDeviceLayouts();
+                        if (window.loadDeviceScreens) { window.loadDeviceScreens(); setTimeout(window.loadDeviceScreens, 800); }
+                        // Also refresh device screens on the show page after layout deletion
+                        if (window.loadDeviceScreens) { window.loadDeviceScreens(); }
                     } else {
                         showAlert('danger', response.message);
                     }
@@ -958,8 +968,9 @@ $(document).ready(function () {
             if (!deviceId) return;
 
             $.ajax({
-                url: `/device/${deviceId}/screens`,
+                url: `/device/${deviceId}/screens?_ts=${Date.now()}`,
                 type: 'GET',
+                cache: false,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -1039,4 +1050,6 @@ $(document).ready(function () {
             console.error('Failed to load device screens:', e);
         }
     }
+    // Expose for other modules in this file
+    window.loadDeviceScreens = loadDeviceScreens;
 });

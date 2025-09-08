@@ -424,27 +424,27 @@ $(document).ready(function () {
                     "name": "action",
                     "render": function (data, type, row) {
                         let actions = [];
-                        
+
                         // Check permissions and add actions accordingly
                         if (window.devicePermissions && window.devicePermissions.view) {
                             actions.push(`<a class="dropdown-item" href="/device/${data}"><i class="ti ti-eye me-2"></i>View</a>`);
                         }
-                        
+
                         if (window.devicePermissions && window.devicePermissions.edit) {
                             actions.push(`<a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_edit" data-id="${data}"><i class="ti ti-edit text-blue"></i> Edit</a>`);
                             actions.push(`<a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_layout_management" data-device-id="${data}"><i class="ti ti-layout-grid me-2"></i>Manage Layouts</a>`);
                             actions.push(`<a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_screen_management" data-device-id="${data}"><i class="ti ti-device-desktop me-2"></i>Manage Screens</a>`);
                         }
-                        
+
                         if (window.devicePermissions && window.devicePermissions.delete) {
                             actions.push(`<a class="dropdown-item delete-device" href="javascript:void(0);" data-id="${data}"><i class="ti ti-trash me-2"></i>Delete</a>`);
                         }
-                        
+
                         // If no actions available, return empty
                         if (actions.length === 0) {
                             return '<span class="text-muted">No actions</span>';
                         }
-                        
+
                         return `
                                 <div class="dropdown dropdown-action">
                                     <a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></a>
@@ -1057,7 +1057,7 @@ $(document).ready(function () {
         // Submit screen form (create/update)
         $(document).on('submit', '#screen-form', function (e) {
             e.preventDefault();
-            
+
             // Frontend validation
             const screenHeight = $('#screen-height').val();
             const screenWidth = $('#screen-width').val();
@@ -1075,7 +1075,7 @@ $(document).ready(function () {
             if (!isEdit) {
                 const existingScreens = $('.screen-row');
                 let hasConflict = false;
-                existingScreens.each(function() {
+                existingScreens.each(function () {
                     const existingHeight = $(this).find('.screen-height').text();
                     const existingWidth = $(this).find('.screen-width').text();
                     if (existingHeight === screenHeight && existingWidth === screenWidth) {
@@ -1083,7 +1083,7 @@ $(document).ready(function () {
                         return false; // break loop
                     }
                 });
-                
+
                 if (hasConflict) {
                     showScreenAlert('danger', `Screen dimensions ${screenHeight}x${screenWidth} already exist. Please use different dimensions.`);
                     return;
@@ -1117,15 +1117,16 @@ $(document).ready(function () {
                         $('#screen-id').val('');
                         $('#screen-submit-btn').text('Add Screen');
                         $('#screen-cancel-btn').hide();
+                        $('#screen-form-title').text('Add New Screen');
                         loadDeviceScreensForIndex();
                         // Refresh main devices DataTable to update screens_count without full reload
                         if (window.dataTable) {
                             window.dataTable.ajax.reload(null, false);
                         }
+                        // Hide alert after a short delay but keep offcanvas open
                         setTimeout(function () {
-                            $('#offcanvas_screen_management').offcanvas('hide');
                             $alertWrap.hide().empty();
-                        }, 1200);
+                        }, 2000);
                     }
                 },
                 error: function (xhr) {
@@ -1578,6 +1579,7 @@ $(document).ready(function () {
                     $('#layout-id').val('');
                     $('#layout-submit-btn').text('Add Layout');
                     $('#layout-cancel-btn').hide();
+                    $('#layout-form-title').text('Add New Layout');
                     loadDeviceLayouts();
 
                     // refresh devices datatable to update counts
@@ -1585,11 +1587,10 @@ $(document).ready(function () {
                         window.dataTable.ajax.reload(null, false);
                     }
 
-                    // close the offcanvas after a short delay
+                    // Hide alert after a short delay but keep offcanvas open
                     setTimeout(function () {
-                        $('#offcanvas_layout_management').offcanvas('hide');
                         $alertWrap.hide().empty();
-                    }, 1200);
+                    }, 2000);
                 }
             },
             error: function (xhr) {

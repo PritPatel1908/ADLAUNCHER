@@ -33,23 +33,23 @@
                     </nav>
                 </div>
                 <div class="gap-2 d-flex align-items-center flex-wrap">
-                    @if(\App\Helpers\PermissionHelper::canExport('company'))
-                    <div class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
-                            data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <ul>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-pdf me-1"></i>Export as PDF</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item"><i
-                                            class="ti ti-file-type-xls me-1"></i>Export as Excel</a>
-                                </li>
-                            </ul>
+                    @if (\App\Helpers\PermissionHelper::canExport('company'))
+                        <div class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle btn btn-outline-primary px-2 shadow"
+                                data-bs-toggle="dropdown"><i class="ti ti-package-export me-2"></i>Export</a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <ul>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-pdf me-1"></i>Export as PDF</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item"><i
+                                                class="ti ti-file-type-xls me-1"></i>Export as Excel</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
                     @endif
                     <a href="javascript:void(0);" class="btn btn-icon btn-outline-info shadow" data-bs-toggle="tooltip"
                         data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh"><i
@@ -118,22 +118,22 @@
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center flex-wrap gap-2">
-                                    @if(\App\Helpers\PermissionHelper::canEdit('company'))
-                                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
-                                        data-bs-target="#offcanvas_edit">
-                                        <i class="ti ti-edit me-1"></i>Edit Company
-                                    </a>
+                                    @if (\App\Helpers\PermissionHelper::canEdit('company'))
+                                        <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvas_edit">
+                                            <i class="ti ti-edit me-1"></i>Edit Company
+                                        </a>
                                     @endif
-                                    @if(\App\Helpers\PermissionHelper::canDelete('company'))
-                                    <form action="{{ route('company.destroy', $company->id) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger"
-                                            onclick="return confirm('Are you sure you want to delete this company?')">
-                                            <i class="ti ti-trash me-1"></i>Delete
-                                        </button>
-                                    </form>
+                                    @if (\App\Helpers\PermissionHelper::canDelete('company'))
+                                        <form action="{{ route('company.destroy', $company->id) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger"
+                                                onclick="return confirm('Are you sure you want to delete this company?')">
+                                                <i class="ti ti-trash me-1"></i>Delete
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </div>

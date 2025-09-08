@@ -302,25 +302,25 @@ $(document).ready(function () {
                         "name": "action",
                         "render": function (data, type, row) {
                             let actions = [];
-                            
+
                             // Check permissions and add actions accordingly
                             if (window.areaPermissions && window.areaPermissions.view) {
                                 actions.push(`<a class="dropdown-item" href="/area/${data}"><i class="ti ti-eye me-2"></i>View</a>`);
                             }
-                            
+
                             if (window.areaPermissions && window.areaPermissions.edit) {
                                 actions.push(`<a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_edit" data-id="${data}"><i class="ti ti-edit text-blue"></i> Edit</a>`);
                             }
-                            
+
                             if (window.areaPermissions && window.areaPermissions.delete) {
                                 actions.push(`<a class="dropdown-item delete-area" href="javascript:void(0);" data-id="${data}"><i class="ti ti-trash me-2"></i>Delete</a>`);
                             }
-                            
+
                             // If no actions available, return empty
                             if (actions.length === 0) {
                                 return '<span class="text-muted">No actions</span>';
                             }
-                            
+
                             return `
                                 <div class="dropdown dropdown-action">
                                     <a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></a>

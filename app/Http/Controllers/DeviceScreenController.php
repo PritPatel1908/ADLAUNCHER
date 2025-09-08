@@ -60,14 +60,19 @@ class DeviceScreenController extends Controller
                 ], 422);
             }
 
-            // Check for dimension conflicts (same height and width in same device)
+            // Check for screen conflicts using enhanced validation
             $deviceScreen = new DeviceScreen();
-            if ($deviceScreen->hasDimensionConflict($request->screen_height, $request->screen_width, $request->device_id)) {
-                $conflictingScreens = $deviceScreen->getConflictingScreens($request->screen_height, $request->screen_width, $request->device_id);
-                $conflictInfo = $conflictingScreens->pluck('screen_no')->join(', ');
+            $conflictCheck = $deviceScreen->checkScreenAdditionConflict(
+                $request->screen_height,
+                $request->screen_width,
+                $request->device_id,
+                $request->layout_id
+            );
+
+            if (!$conflictCheck['valid']) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Screen dimensions ({$request->screen_height}x{$request->screen_width}) already exist for screen(s): {$conflictInfo}. Please use different dimensions."
+                    'message' => $conflictCheck['message']
                 ], 422);
             }
 
@@ -157,13 +162,19 @@ class DeviceScreenController extends Controller
                 ], 422);
             }
 
-            // Check for dimension conflicts (same height and width in same device, excluding current screen)
-            if ($deviceScreen->hasDimensionConflict($request->screen_height, $request->screen_width, $deviceScreen->device_id, $deviceScreen->id)) {
-                $conflictingScreens = $deviceScreen->getConflictingScreens($request->screen_height, $request->screen_width, $deviceScreen->device_id, $deviceScreen->id);
-                $conflictInfo = $conflictingScreens->pluck('screen_no')->join(', ');
+            // Check for screen conflicts using enhanced validation (excluding current screen)
+            $conflictCheck = $deviceScreen->checkScreenAdditionConflict(
+                $request->screen_height,
+                $request->screen_width,
+                $deviceScreen->device_id,
+                $request->layout_id,
+                $deviceScreen->id
+            );
+
+            if (!$conflictCheck['valid']) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Screen dimensions ({$request->screen_height}x{$request->screen_width}) already exist for screen(s): {$conflictInfo}. Please use different dimensions."
+                    'message' => $conflictCheck['message']
                 ], 422);
             }
 
@@ -280,6 +291,118 @@ class DeviceScreenController extends Controller
             'counts' => [
                 'total' => $screens->count(),
             ]
+        ]);
+    }
+
+    /**
+     * Validate screen configuration before adding
+     */
+    public function validateScreenConfiguration(Request $request)
+    {
+        $request->validate([
+            'screen_height' => 'required|integer|min:1',
+            'screen_width' => 'required|integer|min:1',
+            'device_id' => 'required|exists:devices,id',
+            'layout_id' => 'required|exists:device_layouts,id',
+            'screen_no' => 'required|integer|min:1|max:255',
+        ]);
+
+        $deviceScreen = new DeviceScreen();
+
+        // Check screen number uniqueness
+        $screenNoExists = DeviceScreen::where('device_id', $request->device_id)
+            ->where('screen_no', $request->screen_no)
+            ->exists();
+
+        if ($screenNoExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Screen number already exists for this device.'
+            ], 422);
+        }
+
+        // Check for conflicts
+        $conflictCheck = $deviceScreen->checkScreenAdditionConflict(
+            $request->screen_height,
+            $request->screen_width,
+            $request->device_id,
+            $request->layout_id
+        );
+
+        return response()->json([
+            'success' => $conflictCheck['valid'],
+            'message' => $conflictCheck['message'],
+            'validation_details' => [
+                'screen_height' => $request->screen_height,
+                'screen_width' => $request->screen_width,
+                'device_id' => $request->device_id,
+                'layout_id' => $request->layout_id,
+                'screen_no' => $request->screen_no,
+            ]
+        ]);
+    }
+
+    /**
+     * Get layout validation rules and constraints
+     */
+    public function getLayoutValidationRules(DeviceLayout $layout)
+    {
+        $rules = [
+            'layout_type' => $layout->layout_type,
+            'layout_type_name' => $layout->layout_type_name,
+            'max_screens' => $layout->max_screens,
+            'current_screens' => $layout->screens()->count(),
+            'remaining_slots' => $layout->remaining_screen_slots,
+        ];
+
+        // Add specific rules based on layout type
+        switch ($layout->layout_type) {
+            case DeviceLayout::LAYOUT_TYPE_FULL_SCREEN:
+                $rules['constraints'] = [
+                    'max_screens' => 1,
+                    'min_width' => 100,
+                    'min_height' => 50,
+                    'description' => 'Single full screen layout'
+                ];
+                break;
+
+            case DeviceLayout::LAYOUT_TYPE_SPLIT_SCREEN:
+                $rules['constraints'] = [
+                    'max_screens' => 2,
+                    'arrangement' => 'Any arrangement allowed',
+                    'requirements' => 'No dimension restrictions',
+                    'description' => 'Two screens with complete freedom'
+                ];
+                break;
+
+            case DeviceLayout::LAYOUT_TYPE_THREE_GRID_SCREEN:
+                $rules['constraints'] = [
+                    'max_screens' => 3,
+                    'arrangement' => 'Any arrangement allowed',
+                    'requirements' => 'No dimension restrictions',
+                    'description' => 'Three screens with complete freedom (e.g., 50x50, 50x50, 50x100)'
+                ];
+                break;
+
+            case DeviceLayout::LAYOUT_TYPE_FOUR_GRID_SCREEN:
+                $rules['constraints'] = [
+                    'max_screens' => 4,
+                    'arrangement' => 'Any arrangement allowed',
+                    'requirements' => 'No dimension restrictions',
+                    'description' => 'Four screens with complete freedom'
+                ];
+                break;
+
+            default:
+                $rules['constraints'] = [
+                    'description' => 'Unknown layout type'
+                ];
+                break;
+        }
+
+        return response()->json([
+            'success' => true,
+            'layout_rules' => $rules
         ]);
     }
 }

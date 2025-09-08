@@ -17,6 +17,7 @@ class ScheduleMedia extends Model
         'schedule_id',
         'media_type',
         'title',
+        'duration_seconds',
         'screen_id',
         'schedule_start_date_time',
         'schedule_end_date_time',
@@ -26,6 +27,7 @@ class ScheduleMedia extends Model
     protected $casts = [
         'schedule_id' => 'integer',
         'screen_id' => 'integer',
+        'duration_seconds' => 'integer',
         'schedule_start_date_time' => 'datetime',
         'schedule_end_date_time' => 'datetime',
         'play_forever' => 'boolean',

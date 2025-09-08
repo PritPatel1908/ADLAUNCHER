@@ -141,6 +141,8 @@ Route::get('/device-layout-stats', [DeviceLayoutController::class, 'getLayoutSta
 Route::resource('device-screen', DeviceScreenController::class)->middleware('auth');
 Route::get('/device/{device}/screens', [DeviceScreenController::class, 'getDeviceScreens'])->name('device.screens')->middleware('auth');
 Route::get('/layout/{layout}/screens', [DeviceScreenController::class, 'getLayoutScreens'])->name('layout.screens')->middleware('auth');
+Route::post('/device-screen/validate', [DeviceScreenController::class, 'validateScreenConfiguration'])->name('device-screen.validate')->middleware('auth');
+Route::get('/layout/{layout}/validation-rules', [DeviceScreenController::class, 'getLayoutValidationRules'])->name('layout.validation-rules')->middleware('auth');
 
 // Schedule Routes with individual permissions
 Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index')->middleware(['auth', 'permission:schedule,view']);

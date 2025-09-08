@@ -775,11 +775,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form id="delete-location-form" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+                    <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
                 </div>
             </div>
         </div>
