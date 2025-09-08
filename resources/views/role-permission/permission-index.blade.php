@@ -1,8 +1,8 @@
 @extends('Layout.main')
 
 @section('meta')
-<!-- CSRF Token -->
-<meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @push('css')
@@ -13,10 +13,10 @@
         <div class="container-fluid">
             <!-- Success Message -->
             @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
@@ -137,9 +137,8 @@
             <!-- card end -->
         </div>
     </div>
-
 @endsection
 
 @push('js')
-<script src="{{ asset('assets/js/datatable/permission-list.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/datatable/permission-list.js') }}" type="text/javascript"></script>
 @endpush

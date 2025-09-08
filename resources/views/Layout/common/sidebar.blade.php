@@ -107,79 +107,88 @@
                         </li> --}}
                     </ul>
                 </li>
-                @if(\App\Helpers\PermissionHelper::canView('location') || \App\Helpers\PermissionHelper::canView('company') || \App\Helpers\PermissionHelper::canView('area'))
-                <li class="menu-title"><span>Masters</span></li>
-                <li>
-                    <ul>
-                        @if(\App\Helpers\PermissionHelper::canView('location'))
-                        <li>
-                            <a href="{{ route('location.index') }}"
-                                class="{{ request()->routeIs('location.*') ? 'active' : '' }}"><i
-                                    class="ti ti-map-pin-pin"></i><span>Locations</span></a>
-                        </li>
-                        @endif
-                        @if(\App\Helpers\PermissionHelper::canView('company'))
-                        <li>
-                            <a href="{{ route('company.index') }}"
-                                class="{{ request()->routeIs('company.*') ? 'active' : '' }}"><i
-                                    class="ti ti-building-community"></i><span>Companies</span></a>
-                        </li>
-                        @endif
-                        @if(\App\Helpers\PermissionHelper::canView('area'))
-                        <li>
-                            <a href="{{ route('area.index') }}"
-                                class="{{ request()->routeIs('area.*') ? 'active' : '' }}"><i
-                                    class="ti ti-building-factory"></i><span>Areas</span></a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
+                @if (
+                    \App\Helpers\PermissionHelper::canView('location') ||
+                        \App\Helpers\PermissionHelper::canView('company') ||
+                        \App\Helpers\PermissionHelper::canView('area'))
+                    <li class="menu-title"><span>Masters</span></li>
+                    <li>
+                        <ul>
+                            @if (\App\Helpers\PermissionHelper::canView('location'))
+                                <li>
+                                    <a href="{{ route('location.index') }}"
+                                        class="{{ request()->routeIs('location.*') ? 'active' : '' }}"><i
+                                            class="ti ti-map-pin-pin"></i><span>Locations</span></a>
+                                </li>
+                            @endif
+                            @if (\App\Helpers\PermissionHelper::canView('company'))
+                                <li>
+                                    <a href="{{ route('company.index') }}"
+                                        class="{{ request()->routeIs('company.*') ? 'active' : '' }}"><i
+                                            class="ti ti-building-community"></i><span>Companies</span></a>
+                                </li>
+                            @endif
+                            @if (\App\Helpers\PermissionHelper::canView('area'))
+                                <li>
+                                    <a href="{{ route('area.index') }}"
+                                        class="{{ request()->routeIs('area.*') ? 'active' : '' }}"><i
+                                            class="ti ti-building-factory"></i><span>Areas</span></a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
                 @endif
-                @if(\App\Helpers\PermissionHelper::canView('user') || \App\Helpers\PermissionHelper::canView('role_permission'))
-                <li class="menu-title"><span>Users</span></li>
-                <li>
-                    <ul>
-                        @if(\App\Helpers\PermissionHelper::canView('role_permission'))
-                        <li class="submenu">
-                            <a href="javascript:void(0);" class="{{ request()->routeIs('role-permission.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'active subdrop' : '' }}">
-                                <i class="ti ti-user-shield"></i><span>Roles & Permissions</span><span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="{{ route('role-permission.index') }}" class="{{ request()->routeIs('role-permission.index') ? 'active' : '' }}">Manage Roles</a></li>
-                                <li><a href="{{ route('permissions.index') }}" class="{{ request()->routeIs('permissions.index') ? 'active' : '' }}">Manage Permissions</a></li>
-                            </ul>
-                        </li>
-                        @endif
-                        @if(\App\Helpers\PermissionHelper::canView('user'))
-                        <li>
-                            <a href="{{ route('user.index') }}"
-                                class="{{ request()->routeIs('user.*') ? 'active' : '' }}"><i
-                                    class="ti ti-user"></i><span>Users</span></a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
+                @if (\App\Helpers\PermissionHelper::canView('user') || \App\Helpers\PermissionHelper::canView('role_permission'))
+                    <li class="menu-title"><span>Users</span></li>
+                    <li>
+                        <ul>
+                            @if (\App\Helpers\PermissionHelper::canView('role_permission'))
+                                <li class="submenu">
+                                    <a href="javascript:void(0);"
+                                        class="{{ request()->routeIs('role-permission.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'active subdrop' : '' }}">
+                                        <i class="ti ti-user-shield"></i><span>Roles & Permissions</span><span
+                                            class="menu-arrow"></span>
+                                    </a>
+                                    <ul>
+                                        <li><a href="{{ route('role-permission.index') }}"
+                                                class="{{ request()->routeIs('role-permission.index') ? 'active' : '' }}">Manage
+                                                Roles</a></li>
+                                        <li><a href="{{ route('permissions.index') }}"
+                                                class="{{ request()->routeIs('permissions.index') ? 'active' : '' }}">Manage
+                                                Permissions</a></li>
+                                    </ul>
+                                </li>
+                            @endif
+                            @if (\App\Helpers\PermissionHelper::canView('user'))
+                                <li>
+                                    <a href="{{ route('user.index') }}"
+                                        class="{{ request()->routeIs('user.*') ? 'active' : '' }}"><i
+                                            class="ti ti-user"></i><span>Users</span></a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
                 @endif
-                @if(\App\Helpers\PermissionHelper::canView('device') || \App\Helpers\PermissionHelper::canView('schedule'))
-                <li class="menu-title"><span>Devices</span></li>
-                <li>
-                    <ul>
-                        @if(\App\Helpers\PermissionHelper::canView('device'))
-                        <li>
-                            <a href="{{ route('device.index') }}"
-                                class="{{ request()->routeIs('device.*') ? 'active' : '' }}"><i
-                                    class="ti ti-device-tablet-plus"></i><span>Devices</span></a>
-                        </li>
-                        @endif
-                        @if(\App\Helpers\PermissionHelper::canView('schedule'))
-                        <li>
-                            <a href="{{ route('schedule.index') }}"
-                                class="{{ request()->routeIs('schedule.*') ? 'active' : '' }}"><i
-                                    class="ti ti-calendar-event"></i><span>Schedules</span></a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
+                @if (\App\Helpers\PermissionHelper::canView('device') || \App\Helpers\PermissionHelper::canView('schedule'))
+                    <li class="menu-title"><span>Devices</span></li>
+                    <li>
+                        <ul>
+                            @if (\App\Helpers\PermissionHelper::canView('device'))
+                                <li>
+                                    <a href="{{ route('device.index') }}"
+                                        class="{{ request()->routeIs('device.*') ? 'active' : '' }}"><i
+                                            class="ti ti-device-tablet-plus"></i><span>Devices</span></a>
+                                </li>
+                            @endif
+                            @if (\App\Helpers\PermissionHelper::canView('schedule'))
+                                <li>
+                                    <a href="{{ route('schedule.index') }}"
+                                        class="{{ request()->routeIs('schedule.*') ? 'active' : '' }}"><i
+                                            class="ti ti-calendar-event"></i><span>Schedules</span></a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
                 @endif
                 {{-- <li class="menu-title"><span>Reports</span></li>
                 <li>

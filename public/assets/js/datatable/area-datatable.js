@@ -42,7 +42,7 @@ $(document).ready(function () {
     // Function to load column visibility preferences
     function loadColumnVisibility() {
         return $.ajax({
-            url: '/columns',
+            url: 'columns',
             type: 'GET',
             data: { table: 'areas' },
             headers: {
@@ -122,7 +122,7 @@ $(document).ready(function () {
 
         // Save to server
         $.ajax({
-            url: '/columns',
+            url: 'columns',
             type: 'POST',
             data: {
                 table: 'areas',

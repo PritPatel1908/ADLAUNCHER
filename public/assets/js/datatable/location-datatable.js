@@ -70,7 +70,7 @@ $(document).ready(function () {
     // Function to load column visibility preferences
     function loadColumnVisibility() {
         return $.ajax({
-            url: '/columns',
+            url: 'columns',
             type: 'GET',
             data: { table: 'locations' },
             headers: {
@@ -152,7 +152,7 @@ $(document).ready(function () {
 
         // Save to server
         $.ajax({
-            url: '/columns',
+            url: 'columns',
             type: 'POST',
             data: {
                 table: 'locations',
@@ -204,7 +204,7 @@ $(document).ready(function () {
                 "order": [[0, 'asc']], // Default order by first column ascending
                 "orderCellsTop": true, // Enable ordering on header cells
                 "ajax": {
-                    "url": "/locations/data",
+                    "url": "locations/data",
                     "type": "GET",
                     "headers": {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -619,7 +619,7 @@ $(document).ready(function () {
         $(this).prop('disabled', true).text('Deleting...');
 
         $.ajax({
-            url: '/location/' + locationId,
+            url: 'location/' + locationId,
             type: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -664,7 +664,7 @@ $(document).ready(function () {
 
         // Fetch location data via AJAX
         $.ajax({
-            url: '/location/' + locationId,
+            url: 'location/' + locationId,
             type: 'GET',
             dataType: 'json',
             success: function (response) {
