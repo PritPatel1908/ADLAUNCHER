@@ -1352,6 +1352,13 @@ $(document).ready(function () {
                 formData.set('device_id', editDeviceId);
             }
 
+            // Client-side validation for required fields
+            if (!editScheduleName || String(editScheduleName).trim() === '') {
+                alert('Please enter a schedule name');
+                submitBtn.html(originalBtnText).prop('disabled', false);
+                return;
+            }
+
             // Debug: Log form data
             console.log('Edit form data:');
             for (var pair of formData.entries()) {
