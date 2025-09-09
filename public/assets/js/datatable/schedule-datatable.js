@@ -1299,12 +1299,12 @@ $(document).ready(function () {
 
             // Ensure critical fields exist in FormData even if input lacks name attr
             // Some templates use only IDs for edit fields; backend expects these keys
-            var editScheduleName = $('#edit-schedule_name').val();
-            if (typeof editScheduleName !== 'undefined') {
+            var editScheduleName = ($('#edit-schedule_name').val() || '').trim();
+            if (editScheduleName !== '') {
                 formData.set('schedule_name', editScheduleName);
             }
-            var editDeviceId = $('#edit-device_id').val();
-            if (typeof editDeviceId !== 'undefined' && editDeviceId !== null) {
+            var editDeviceId = ($('#edit-device_id').val() || '').toString();
+            if (editDeviceId !== '') {
                 formData.set('device_id', editDeviceId);
             }
 
@@ -1333,8 +1333,7 @@ $(document).ready(function () {
                 contentType: false,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    // Ensure Laravel treats this as a PUT while keeping multipart POST
-                    'X-HTTP-Method-Override': 'PUT'
+                    'Accept': 'application/json'
                 },
                 xhr: function () {
                     var xhr = new window.XMLHttpRequest();
