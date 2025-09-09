@@ -1317,6 +1317,8 @@ $(document).ready(function () {
 
             // Use FormData for file uploads
             var formData = new FormData(this);
+            // Laravel requires method spoofing for file uploads with PUT/PATCH
+            formData.append('_method', 'PUT');
 
             // Debug: Log form data
             console.log('Edit form data:');
