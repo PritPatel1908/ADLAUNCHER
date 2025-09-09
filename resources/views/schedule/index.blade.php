@@ -276,7 +276,8 @@
         <div class="offcanvas-body">
             <div class="card">
                 <div class="card-body">
-                    <form id="create-schedule-form" method="POST" action="{{ route('schedule.store') }}">
+                    <form id="create-schedule-form" method="POST" action="{{ route('schedule.store') }}"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="accordion accordion-bordered" id="main_accordion">
                             <div class="accordion-item rounded mb-3">
@@ -321,6 +322,29 @@
                                                         data-toggle="select2">
                                                         <option value="">Select layout...</option>
                                                     </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Schedule Start</label>
+                                                    <input type="datetime-local" class="form-control"
+                                                        name="schedule_start_date_time">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Schedule End</label>
+                                                    <input type="datetime-local" class="form-control"
+                                                        name="schedule_end_date_time">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 d-flex align-items-center">
+                                                <div class="form-check mt-4">
+                                                    <input class="form-check-input" type="checkbox" name="play_forever"
+                                                        value="1" id="create-play_forever">
+                                                    <label class="form-check-label" for="create-play_forever">Play
+                                                        Forever</label>
                                                 </div>
                                             </div>
 
@@ -470,7 +494,7 @@
         <div class="offcanvas-body">
             <div class="card">
                 <div class="card-body">
-                    <form id="edit-schedule-form" method="POST">
+                    <form id="edit-schedule-form" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="accordion accordion-bordered" id="edit_main_accordion">
@@ -497,9 +521,10 @@
 
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Device</label>
+                                                    <label class="form-label">Device <span
+                                                            class="text-danger">*</span></label>
                                                     <select class="form-control select2" name="device_id"
-                                                        id="edit-device_id" data-toggle="select2">
+                                                        id="edit-device_id" data-toggle="select2" required>
                                                         <option value="">Select device...</option>
                                                         @foreach (\App\Models\Device::where('status', 1)->get() as $device)
                                                             <option value="{{ $device->id }}">{{ $device->name }} -
@@ -515,6 +540,30 @@
                                                         id="edit-layout_id" data-toggle="select2">
                                                         <option value="">Select layout...</option>
                                                     </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Schedule Start</label>
+                                                    <input type="datetime-local" class="form-control"
+                                                        name="schedule_start_date_time"
+                                                        id="edit-schedule_start_date_time">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Schedule End</label>
+                                                    <input type="datetime-local" class="form-control"
+                                                        name="schedule_end_date_time" id="edit-schedule_end_date_time">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 d-flex align-items-center">
+                                                <div class="form-check mt-4">
+                                                    <input class="form-check-input" type="checkbox" name="play_forever"
+                                                        value="1" id="edit-play_forever">
+                                                    <label class="form-check-label" for="edit-play_forever">Play
+                                                        Forever</label>
                                                 </div>
                                             </div>
 

@@ -1322,27 +1322,13 @@ $(document).ready(function () {
 
             // Ensure critical fields exist in FormData even if input lacks name attr
             // Some templates use only IDs for edit fields; backend expects these keys
-            var editScheduleName = ($('#edit-schedule_name').val() || '').trim();
-            var editDeviceId = ($('#edit-device_id').val() || '').toString();
-
-            // Basic client-side validation to prevent empty submits
-            if (!editScheduleName) {
-                alert('Please enter a schedule name');
-                submitBtn.html(originalBtnText).prop('disabled', false);
-                return;
+            var editScheduleName = $('#edit-schedule_name').val();
+            if (typeof editScheduleName !== 'undefined') {
+                formData.set('schedule_name', editScheduleName);
             }
-            if (!editDeviceId) {
-                alert('Please select a device');
-                submitBtn.html(originalBtnText).prop('disabled', false);
-                return;
-            }
-
-            formData.set('schedule_name', editScheduleName);
-            formData.set('device_id', editDeviceId);
-            // Also include layout when available
-            var editLayoutId = $('#edit-layout_id').val();
-            if (typeof editLayoutId !== 'undefined') {
-                formData.set('layout_id', editLayoutId || '');
+            var editDeviceId = $('#edit-device_id').val();
+            if (typeof editDeviceId !== 'undefined' && editDeviceId !== null) {
+                formData.set('device_id', editDeviceId);
             }
 
             // Debug: Log form data
