@@ -1324,8 +1324,15 @@ $(document).ready(function () {
             // Per-media progress removed; using only overall progress bar
 
             var editUploadStartTime = Date.now();
+            // Build a robust URL that also carries the method override for environments
+            // where bodies are stripped by proxies before Laravel sees _method.
+            var actionUrl = $(this).attr('action') || '';
+            var urlWithMethod = actionUrl.indexOf('?') === -1
+                ? actionUrl + '?_method=PUT'
+                : actionUrl + '&_method=PUT';
+
             $.ajax({
-                url: $(this).attr('action'),
+                url: urlWithMethod,
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
@@ -1333,7 +1340,9 @@ $(document).ready(function () {
                 contentType: false,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    // Extra safety for proxies that honor this header
+                    'X-HTTP-Method-Override': 'PUT'
                 },
                 xhr: function () {
                     var xhr = new window.XMLHttpRequest();
