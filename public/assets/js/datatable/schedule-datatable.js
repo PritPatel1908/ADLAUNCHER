@@ -1361,7 +1361,11 @@ $(document).ready(function () {
                 dataType: 'json',
                 processData: false,
                 contentType: false,
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    // Ensure Laravel treats this as a PUT while keeping multipart POST
+                    'X-HTTP-Method-Override': 'PUT'
+                },
                 xhr: function () {
                     var xhr = new window.XMLHttpRequest();
                     xhr.upload.addEventListener('progress', function (evt) {
