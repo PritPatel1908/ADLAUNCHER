@@ -27,15 +27,21 @@ $(document).ready(function () {
         const formData = new FormData(this);
         formData.append('_method', 'PUT');
         const actionUrl = $(this).attr('action');
+        const urlWithMethod = actionUrl.indexOf('?') === -1
+            ? actionUrl + '?_method=PUT'
+            : actionUrl + '&_method=PUT';
 
         var startTime = Date.now();
         $.ajax({
-            url: actionUrl,
+            url: urlWithMethod,
             type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'X-HTTP-Method-Override': 'PUT'
+            },
             xhr: function () {
                 var xhr = new window.XMLHttpRequest();
                 xhr.upload.addEventListener('progress', function (evt) {

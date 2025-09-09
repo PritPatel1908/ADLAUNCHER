@@ -1324,16 +1324,23 @@ $(document).ready(function () {
             // Per-media progress removed; using only overall progress bar
 
             var editUploadStartTime = Date.now();
+            // Prefer POST with method override because PHP handles file uploads on POST
+            var actionUrl = $(this).attr('action') || '';
+            var urlWithMethod = actionUrl.indexOf('?') === -1
+                ? actionUrl + '?_method=PUT'
+                : actionUrl + '&_method=PUT';
+
             $.ajax({
-                url: $(this).attr('action'),
-                type: 'PUT',
+                url: urlWithMethod,
+                type: 'POST',
                 data: formData,
                 dataType: 'json',
                 processData: false,
                 contentType: false,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-HTTP-Method-Override': 'PUT'
                 },
                 xhr: function () {
                     var xhr = new window.XMLHttpRequest();
