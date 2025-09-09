@@ -193,17 +193,16 @@ class DeviceApiController extends Controller
             return ['error' => 'No active layout found for device', 'status_code' => 404];
         }
 
-        // Group data by schedule
-        $schedules = [];
+        // Group data by screen first, then organize media by schedule within each screen
+        $screens = [];
 
         foreach ($deviceData as $row) {
             // Include entries that either have a start time, are marked to play forever, or at least have media
             if ($row->schedule_start_date_time || $row->play_forever || $row->media_file) {
-                $bucket = $row->play_forever ? 'forever' : ($row->schedule_start_date_time ?? 'unscheduled');
-                $scheduleKey = $bucket . '_' . ($row->screen_no ?? 'noscreen');
+                $screenKey = $row->screen_no ?? 'noscreen';
 
-                if (!isset($schedules[$scheduleKey])) {
-                    $schedules[$scheduleKey] = [
+                if (!isset($screens[$screenKey])) {
+                    $screens[$screenKey] = [
                         'device_unique_id' => $row->device_unique_id,
                         'layout_type' => $this->getLayoutTypeName((int) $row->layout_type),
                         'screen_no' => $row->screen_no,
@@ -216,7 +215,7 @@ class DeviceApiController extends Controller
                 // Add media if exists and screen matches (or media is for all screens)
                 $mediaAppliesToThisScreen = is_null($row->media_screen_id) || ($row->media_screen_id == $row->ds_id);
                 if ($row->media_file && $mediaAppliesToThisScreen) {
-                    $schedules[$scheduleKey]['medias'][] = [
+                    $screens[$screenKey]['medias'][] = [
                         'media_type' => $row->media_type,
                         'title' => $row->title,
                         'duration_seconds' => isset($row->duration_seconds) ? (int) $row->duration_seconds : null,
@@ -230,11 +229,11 @@ class DeviceApiController extends Controller
             }
         }
 
-        if (empty($schedules)) {
+        if (empty($screens)) {
             return ['error' => 'No schedules found for device', 'status_code' => 404];
         }
 
-        return array_values($schedules);
+        return array_values($screens);
     }
 
     /**
