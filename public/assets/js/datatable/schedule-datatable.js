@@ -587,6 +587,106 @@ $(document).ready(function () {
                 }
             });
 
+            // Build upload progress UI state and helpers
+            var uploadState = {
+                files: [],
+                totalSize: 0,
+                container: null,
+                overallBar: null,
+                overallText: null,
+                fileBars: []
+            };
+
+            (function collectFiles() {
+                var cumulative = 0;
+                $('input[name="media_file[]"]').each(function () {
+                    var f = this.files && this.files[0] ? this.files[0] : null;
+                    if (f) {
+                        uploadState.files.push({
+                            name: f.name,
+                            size: f.size,
+                            startOffset: cumulative,
+                            endOffset: cumulative + f.size
+                        });
+                        cumulative += f.size;
+                    }
+                });
+                uploadState.totalSize = cumulative;
+            })();
+
+            function createUploadUI() {
+                var $form = $('#create-schedule-form');
+                var $existing = $form.find('.upload-progress-wrap');
+                if ($existing.length) { $existing.remove(); }
+
+                var overall = '' +
+                    '<div class="mb-3">' +
+                    '<div class="d-flex justify-content-between small mb-1">' +
+                    '<span>Overall upload</span>' +
+                    '<span class="overall-text">0%</span>' +
+                    '</div>' +
+                    '<div class="progress" style="height: 8px;">' +
+                    '<div class="progress-bar" role="progressbar" style="width:0%" aria-valuemin="0" aria-valuemax="100"></div>' +
+                    '</div>' +
+                    '</div>';
+
+                var filesHtml = '';
+                if (uploadState.files.length > 0) {
+                    filesHtml += '<div class="mb-2 small text-muted">Files</div>';
+                    uploadState.files.forEach(function (f, idx) {
+                        filesHtml += '' +
+                            '<div class="mb-2 file-item" data-index="' + idx + '">' +
+                            '<div class="d-flex justify-content-between small mb-1">' +
+                            '<span>' + $('<div>').text(f.name).html() + '</span>' +
+                            '<span class="file-text">0%</span>' +
+                            '</div>' +
+                            '<div class="progress" style="height: 6px;">' +
+                            '<div class="progress-bar" role="progressbar" style="width:0%" aria-valuemin="0" aria-valuemax="100"></div>' +
+                            '</div>' +
+                            '</div>';
+                    });
+                }
+
+                var $wrap = $('<div class="upload-progress-wrap border rounded p-3 bg-light"></div>');
+                $wrap.append(overall);
+                if (filesHtml) { $wrap.append(filesHtml); }
+
+                var $alertWrap = $('#create-form-alert');
+                if ($alertWrap.length) { $wrap.insertAfter($alertWrap); } else { $form.prepend($wrap); }
+
+                uploadState.container = $wrap;
+                uploadState.overallBar = $wrap.find('.progress-bar').first();
+                uploadState.overallText = $wrap.find('.overall-text');
+                uploadState.fileBars = [];
+                $wrap.find('.file-item').each(function () {
+                    uploadState.fileBars.push({
+                        bar: $(this).find('.progress-bar'),
+                        text: $(this).find('.file-text')
+                    });
+                });
+            }
+
+            function updateUploadProgress(totalLoaded, totalBytes) {
+                var denom = totalBytes || uploadState.totalSize || 1;
+                var overallPct = Math.min(100, Math.max(0, (totalLoaded / denom) * 100));
+                if (uploadState.overallBar) {
+                    uploadState.overallBar.css('width', overallPct + '%');
+                }
+                if (uploadState.overallText) {
+                    uploadState.overallText.text(overallPct.toFixed(0) + '%');
+                }
+                if (uploadState.files.length && uploadState.fileBars.length) {
+                    uploadState.files.forEach(function (f, idx) {
+                        var loadedForFile = Math.min(Math.max(totalLoaded - f.startOffset, 0), f.size);
+                        var pct = f.size ? (loadedForFile / f.size) * 100 : 100;
+                        var barEl = uploadState.fileBars[idx] && uploadState.fileBars[idx].bar;
+                        var textEl = uploadState.fileBars[idx] && uploadState.fileBars[idx].text;
+                        if (barEl) barEl.css('width', Math.min(100, Math.max(0, pct)) + '%');
+                        if (textEl) textEl.text(Math.min(100, Math.max(0, pct)).toFixed(0) + '%');
+                    });
+                }
+            }
+
             $.ajax({
                 url: '/schedule',
                 type: 'POST',
@@ -598,12 +698,14 @@ $(document).ready(function () {
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 beforeSend: function () {
                     console.log('AJAX request being sent to /schedule');
+                    createUploadUI();
                 },
                 xhr: function () {
                     var xhr = new window.XMLHttpRequest();
                     xhr.upload.addEventListener("progress", function (evt) {
                         if (evt.lengthComputable) {
                             var percentComplete = evt.loaded / evt.total * 100;
+                            updateUploadProgress(evt.loaded, evt.total);
                             console.log('Upload progress: ' + percentComplete + '%');
                         }
                     }, false);
@@ -656,6 +758,12 @@ $(document).ready(function () {
                 complete: function (xhr, status) {
                     console.log('AJAX request completed with status:', status);
                     submitBtn.html(originalBtnText).prop('disabled', false);
+                    try {
+                        updateUploadProgress(uploadState.totalSize, uploadState.totalSize || 1);
+                    } catch (e) { }
+                    if (uploadState.container) {
+                        setTimeout(function () { uploadState.container.fadeOut(200, function () { $(this).remove(); }); }, 800);
+                    }
                 }
             });
         });
