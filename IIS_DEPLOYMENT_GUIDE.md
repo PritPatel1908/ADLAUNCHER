@@ -9,9 +9,9 @@ This guide addresses the issue where AJAX POST and GET method routes fail when t
 ### 1. Updated web.config
 
 -   Enhanced URL rewriting rules for better Laravel route handling
--   Added proper handling for Authorization and X-XSRF-Token headers
 -   Added CORS headers for AJAX requests
--   Added MIME types for JSON and font files
+-   Removed duplicate MIME type entries that cause IIS errors
+-   Simplified configuration to avoid common IIS issues
 
 ### 2. Enhanced AJAX Setup
 
@@ -138,6 +138,11 @@ Test your AJAX routes by:
 
 -   **Cause**: Cross-origin request issues
 -   **Solution**: Verify CORS headers in web.config and middleware
+
+#### Issue: HTTP Error 500.19 - Duplicate MIME Type
+
+-   **Cause**: Duplicate MIME type entries in web.config (e.g., .json already defined by IIS)
+-   **Solution**: Remove duplicate MIME type entries from web.config. IIS already handles common types like .json
 
 ## Debugging Tips
 
