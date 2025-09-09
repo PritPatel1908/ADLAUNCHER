@@ -1320,6 +1320,17 @@ $(document).ready(function () {
             // Laravel requires method spoofing for file uploads with PUT/PATCH
             formData.append('_method', 'PUT');
 
+            // Ensure critical fields exist in FormData even if input lacks name attr
+            // Some templates use only IDs for edit fields; backend expects these keys
+            var editScheduleName = $('#edit-schedule_name').val();
+            if (typeof editScheduleName !== 'undefined') {
+                formData.set('schedule_name', editScheduleName);
+            }
+            var editDeviceId = $('#edit-device_id').val();
+            if (typeof editDeviceId !== 'undefined' && editDeviceId !== null) {
+                formData.set('device_id', editDeviceId);
+            }
+
             // Debug: Log form data
             console.log('Edit form data:');
             for (var pair of formData.entries()) {
