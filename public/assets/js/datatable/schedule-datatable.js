@@ -587,34 +587,7 @@ $(document).ready(function () {
                 }
             });
 
-            // Prepare per-media progress UI (create form)
-            var createMediaFiles = [];
-            var createCumulativeSizes = [];
-            var createTotalSize = 0;
-            $('input[name="media_file[]"]').each(function () {
-                var fileInput = this;
-                if (fileInput.files && fileInput.files[0]) {
-                    var file = fileInput.files[0];
-                    var $mediaItem = $(fileInput).closest('.media-item');
-                    // Ensure a progress bar exists
-                    var $progressWrap = $mediaItem.find('.upload-progress-wrap');
-                    if ($progressWrap.length === 0) {
-                        $progressWrap = $('<div class="upload-progress-wrap mt-2">\
-                            <div class="progress" style="height: 8px;">\
-                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>\
-                            </div>\
-                            <small class="text-muted d-block mt-1 upload-progress-text">0%</small>\
-                        </div>');
-                        $mediaItem.append($progressWrap);
-                    }
-                    $progressWrap.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0);
-                    $progressWrap.find('.upload-progress-text').text('0%');
-
-                    createMediaFiles.push({ file: file, $wrap: $progressWrap });
-                    createCumulativeSizes.push(createTotalSize);
-                    createTotalSize += file.size;
-                }
-            });
+            // Per-media progress removed; using only overall progress bar
 
             var createUploadStartTime = Date.now();
             $.ajax({
@@ -655,24 +628,7 @@ $(document).ready(function () {
                                 );
                             }
 
-                            // Update per-media bars using proportional mapping by file sizes
-                            if (createTotalSize > 0 && createMediaFiles.length > 0) {
-                                var loadedAcrossFiles = Math.min(loaded, total);
-                                // Map loaded bytes to files in order
-                                for (var i = 0; i < createMediaFiles.length; i++) {
-                                    var fileSize = createMediaFiles[i].file.size;
-                                    var start = createCumulativeSizes[i];
-                                    var end = start + fileSize;
-                                    var fileLoaded = Math.max(0, Math.min(loadedAcrossFiles - start, fileSize));
-                                    var filePercent = fileSize > 0 ? (fileLoaded / fileSize) * 100 : 100;
-                                    filePercent = Math.max(0, Math.min(100, filePercent));
-                                    createMediaFiles[i].$wrap.find('.progress-bar')
-                                        .css('width', filePercent.toFixed(0) + '%')
-                                        .attr('aria-valuenow', filePercent.toFixed(0));
-                                    createMediaFiles[i].$wrap.find('.upload-progress-text')
-                                        .text(filePercent.toFixed(0) + '%');
-                                }
-                            }
+                            // Per-media progress removed
                         }
                     }, false);
                     return xhr;
@@ -1365,33 +1321,7 @@ $(document).ready(function () {
                 console.log(pair[0] + ': ' + pair[1]);
             }
 
-            // Prepare per-media progress UI (edit form)
-            var editMediaFiles = [];
-            var editCumulativeSizes = [];
-            var editTotalSize = 0;
-            $('#edit-schedule-form input[name="edit_media_file[]"]').each(function () {
-                var fileInput = this;
-                if (fileInput.files && fileInput.files[0]) {
-                    var file = fileInput.files[0];
-                    var $mediaItem = $(fileInput).closest('.media-item');
-                    var $progressWrap = $mediaItem.find('.upload-progress-wrap');
-                    if ($progressWrap.length === 0) {
-                        $progressWrap = $('<div class="upload-progress-wrap mt-2">\
-                            <div class="progress" style="height: 8px;">\
-                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>\
-                            </div>\
-                            <small class="text-muted d-block mt-1 upload-progress-text">0%</small>\
-                        </div>');
-                        $mediaItem.append($progressWrap);
-                    }
-                    $progressWrap.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0);
-                    $progressWrap.find('.upload-progress-text').text('0%');
-
-                    editMediaFiles.push({ file: file, $wrap: $progressWrap });
-                    editCumulativeSizes.push(editTotalSize);
-                    editTotalSize += file.size;
-                }
-            });
+            // Per-media progress removed; using only overall progress bar
 
             var editUploadStartTime = Date.now();
             $.ajax({
@@ -1429,22 +1359,7 @@ $(document).ready(function () {
                                 );
                             }
 
-                            if (editTotalSize > 0 && editMediaFiles.length > 0) {
-                                var loadedAcrossFiles = Math.min(loaded, total);
-                                for (var i = 0; i < editMediaFiles.length; i++) {
-                                    var fileSize = editMediaFiles[i].file.size;
-                                    var start = editCumulativeSizes[i];
-                                    var end = start + fileSize;
-                                    var fileLoaded = Math.max(0, Math.min(loadedAcrossFiles - start, fileSize));
-                                    var filePercent = fileSize > 0 ? (fileLoaded / fileSize) * 100 : 100;
-                                    filePercent = Math.max(0, Math.min(100, filePercent));
-                                    editMediaFiles[i].$wrap.find('.progress-bar')
-                                        .css('width', filePercent.toFixed(0) + '%')
-                                        .attr('aria-valuenow', filePercent.toFixed(0));
-                                    editMediaFiles[i].$wrap.find('.upload-progress-text')
-                                        .text(filePercent.toFixed(0) + '%');
-                                }
-                            }
+                            // Per-media progress removed
                         }
                     }, false);
                     return xhr;
