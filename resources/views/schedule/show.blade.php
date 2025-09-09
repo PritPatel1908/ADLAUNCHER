@@ -548,6 +548,13 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="show-edit-overall-upload" class="mt-2" style="display: none;">
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="text-muted d-block mt-1 overall-progress-text">0%</small>
+                        </div>
                         <div class="d-flex align-items-center justify-content-end">
                             <button type="button" data-bs-dismiss="offcanvas"
                                 class="btn btn-sm btn-light me-2">Cancel</button>

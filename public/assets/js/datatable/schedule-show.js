@@ -28,6 +28,7 @@ $(document).ready(function () {
         formData.append('_method', 'PUT');
         const actionUrl = $(this).attr('action');
 
+        var startTime = Date.now();
         $.ajax({
             url: actionUrl,
             type: 'POST',
@@ -35,6 +36,29 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function (evt) {
+                    if (evt.lengthComputable) {
+                        var loaded = evt.loaded;
+                        var total = evt.total;
+                        var percent = (loaded / total) * 100;
+                        var $overall = $('#show-edit-overall-upload');
+                        if ($overall.length) {
+                            var elapsedSec = Math.max(0.001, (Date.now() - startTime) / 1000);
+                            var speed = loaded / elapsedSec;
+                            var remaining = Math.max(0, total - loaded);
+                            var etaSec = speed > 0 ? remaining / speed : 0;
+                            $overall.show();
+                            $overall.find('.progress-bar').css('width', percent.toFixed(0) + '%').attr('aria-valuenow', percent.toFixed(0));
+                            $overall.find('.overall-progress-text').text(
+                                formatBytes(loaded) + ' / ' + formatBytes(total) + ' • ' + formatBytes(speed) + '/s • ETA ' + formatDuration(etaSec)
+                            );
+                        }
+                    }
+                }, false);
+                return xhr;
+            },
             success: function (response) {
                 if (response.success) {
                     // Show success message
@@ -69,6 +93,8 @@ $(document).ready(function () {
             },
             complete: function () {
                 submitBtn.html(originalBtnText).prop('disabled', false);
+                var $overall = $('#show-edit-overall-upload');
+                if ($overall.length) { $overall.hide(); $overall.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0); $overall.find('.overall-progress-text').text('0%'); }
             }
         });
     });
@@ -318,5 +344,27 @@ $(document).ready(function () {
         $('#mediaPreviewModal').modal('show');
     });
 });
+
+// Helpers (duplicated minimal to keep file standalone on details page)
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    var k = 1024;
+    var sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    var val = bytes / Math.pow(k, i);
+    return val.toFixed(val >= 100 ? 0 : val >= 10 ? 1 : 2) + ' ' + sizes[i];
+}
+
+function formatDuration(seconds) {
+    seconds = Math.max(0, Math.round(seconds));
+    var h = Math.floor(seconds / 3600);
+    var m = Math.floor((seconds % 3600) / 60);
+    var s = seconds % 60;
+    var parts = [];
+    if (h) parts.push(h + 'h');
+    if (m || h) parts.push(m + 'm');
+    parts.push(s + 's');
+    return parts.join(' ');
+}
 
 

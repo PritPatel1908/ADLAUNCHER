@@ -616,6 +616,7 @@ $(document).ready(function () {
                 }
             });
 
+            var createUploadStartTime = Date.now();
             $.ajax({
                 url: '/schedule',
                 type: 'POST',
@@ -627,6 +628,10 @@ $(document).ready(function () {
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 beforeSend: function () {
                     console.log('AJAX request being sent to /schedule');
+                    // show overall progress UI
+                    var $overall = $('#overall-upload');
+                    if ($overall.length) { $overall.show(); $overall.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0); $overall.find('.overall-progress-text').text('0%'); }
+                    createUploadStartTime = Date.now();
                 },
                 xhr: function () {
                     var xhr = new window.XMLHttpRequest();
@@ -636,6 +641,19 @@ $(document).ready(function () {
                             var total = evt.total;
                             var overallPercent = (loaded / total) * 100;
                             console.log('Upload progress: ' + overallPercent + '%');
+
+                            // Update overall progress bar
+                            var $overall = $('#overall-upload');
+                            if ($overall.length) {
+                                var elapsedSec = Math.max(0.001, (Date.now() - createUploadStartTime) / 1000);
+                                var speed = loaded / elapsedSec; // bytes/s
+                                var remaining = Math.max(0, total - loaded);
+                                var etaSec = speed > 0 ? remaining / speed : 0;
+                                $overall.find('.progress-bar').css('width', overallPercent.toFixed(0) + '%').attr('aria-valuenow', overallPercent.toFixed(0));
+                                $overall.find('.overall-progress-text').text(
+                                    formatBytes(loaded) + ' / ' + formatBytes(total) + ' • ' + formatBytes(speed) + '/s • ETA ' + formatDuration(etaSec)
+                                );
+                            }
 
                             // Update per-media bars using proportional mapping by file sizes
                             if (createTotalSize > 0 && createMediaFiles.length > 0) {
@@ -705,6 +723,9 @@ $(document).ready(function () {
                 },
                 complete: function (xhr, status) {
                     console.log('AJAX request completed with status:', status);
+                    // hide/reset overall progress UI
+                    var $overall = $('#overall-upload');
+                    if ($overall.length) { $overall.hide(); $overall.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0); $overall.find('.overall-progress-text').text('0%'); }
                     submitBtn.html(originalBtnText).prop('disabled', false);
                 }
             });
@@ -1365,6 +1386,7 @@ $(document).ready(function () {
                 }
             });
 
+            var editUploadStartTime = Date.now();
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'POST',
@@ -1385,6 +1407,20 @@ $(document).ready(function () {
                             var total = evt.total;
                             var overallPercent = (loaded / total) * 100;
                             console.log('Edit upload progress: ' + overallPercent + '%');
+
+                            // overall progress
+                            var $overall = $('#edit-overall-upload');
+                            if ($overall.length) {
+                                var elapsedSec = Math.max(0.001, (Date.now() - editUploadStartTime) / 1000);
+                                var speed = loaded / elapsedSec;
+                                var remaining = Math.max(0, total - loaded);
+                                var etaSec = speed > 0 ? remaining / speed : 0;
+                                $overall.show();
+                                $overall.find('.progress-bar').css('width', overallPercent.toFixed(0) + '%').attr('aria-valuenow', overallPercent.toFixed(0));
+                                $overall.find('.overall-progress-text').text(
+                                    formatBytes(loaded) + ' / ' + formatBytes(total) + ' • ' + formatBytes(speed) + '/s • ETA ' + formatDuration(etaSec)
+                                );
+                            }
 
                             if (editTotalSize > 0 && editMediaFiles.length > 0) {
                                 var loadedAcrossFiles = Math.min(loaded, total);
@@ -1434,7 +1470,11 @@ $(document).ready(function () {
                     }
                     alert(msg);
                 },
-                complete: function () { submitBtn.html(originalBtnText).prop('disabled', false); }
+                complete: function () {
+                    submitBtn.html(originalBtnText).prop('disabled', false);
+                    var $overall = $('#edit-overall-upload');
+                    if ($overall.length) { $overall.hide(); $overall.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0); $overall.find('.overall-progress-text').text('0%'); }
+                }
             });
         });
 
@@ -1697,5 +1737,27 @@ $(document).ready(function () {
         });
     }
 });
+
+// Helpers
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    var k = 1024;
+    var sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    var val = bytes / Math.pow(k, i);
+    return val.toFixed(val >= 100 ? 0 : val >= 10 ? 1 : 2) + ' ' + sizes[i];
+}
+
+function formatDuration(seconds) {
+    seconds = Math.max(0, Math.round(seconds));
+    var h = Math.floor(seconds / 3600);
+    var m = Math.floor((seconds % 3600) / 60);
+    var s = seconds % 60;
+    var parts = [];
+    if (h) parts.push(h + 'h');
+    if (m || h) parts.push(m + 'm');
+    parts.push(s + 's');
+    return parts.join(' ');
+}
 
 

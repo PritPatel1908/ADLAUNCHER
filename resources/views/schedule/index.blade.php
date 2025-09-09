@@ -276,8 +276,7 @@
         <div class="offcanvas-body">
             <div class="card">
                 <div class="card-body">
-                    <form id="create-schedule-form" method="POST" action="{{ route('schedule.store') }}"
-                        enctype="multipart/form-data">
+                    <form id="create-schedule-form" method="POST" action="{{ route('schedule.store') }}">
                         @csrf
                         <div class="accordion accordion-bordered" id="main_accordion">
                             <div class="accordion-item rounded mb-3">
@@ -322,29 +321,6 @@
                                                         data-toggle="select2">
                                                         <option value="">Select layout...</option>
                                                     </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Schedule Start</label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_start_date_time">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Schedule End</label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_end_date_time">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 d-flex align-items-center">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="play_forever"
-                                                        value="1" id="create-play_forever">
-                                                    <label class="form-check-label" for="create-play_forever">Play
-                                                        Forever</label>
                                                 </div>
                                             </div>
 
@@ -471,6 +447,12 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="overall-upload" class="mt-2" style="display: none;">
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="text-muted d-block mt-1 overall-progress-text">0%</small>
+                        </div>
                         <div class="d-flex align-items-center justify-content-end">
                             <button type="button" data-bs-dismiss="offcanvas"
                                 class="btn btn-sm btn-light me-2">Cancel</button>
@@ -494,7 +476,7 @@
         <div class="offcanvas-body">
             <div class="card">
                 <div class="card-body">
-                    <form id="edit-schedule-form" method="POST" enctype="multipart/form-data">
+                    <form id="edit-schedule-form" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="accordion accordion-bordered" id="edit_main_accordion">
@@ -521,10 +503,9 @@
 
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Device <span
-                                                            class="text-danger">*</span></label>
+                                                    <label class="form-label">Device</label>
                                                     <select class="form-control select2" name="device_id"
-                                                        id="edit-device_id" data-toggle="select2" required>
+                                                        id="edit-device_id" data-toggle="select2">
                                                         <option value="">Select device...</option>
                                                         @foreach (\App\Models\Device::where('status', 1)->get() as $device)
                                                             <option value="{{ $device->id }}">{{ $device->name }} -
@@ -540,30 +521,6 @@
                                                         id="edit-layout_id" data-toggle="select2">
                                                         <option value="">Select layout...</option>
                                                     </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Schedule Start</label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_start_date_time"
-                                                        id="edit-schedule_start_date_time">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Schedule End</label>
-                                                    <input type="datetime-local" class="form-control"
-                                                        name="schedule_end_date_time" id="edit-schedule_end_date_time">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 d-flex align-items-center">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="play_forever"
-                                                        value="1" id="edit-play_forever">
-                                                    <label class="form-check-label" for="edit-play_forever">Play
-                                                        Forever</label>
                                                 </div>
                                             </div>
 
@@ -691,6 +648,12 @@
                                         aria-label="Close"></button>
                                 </div>
                             </div>
+                        </div>
+                        <div id="edit-overall-upload" class="mt-2" style="display: none;">
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="text-muted d-block mt-1 overall-progress-text">0%</small>
                         </div>
                         <div class="d-flex align-items-center justify-content-end">
                             <button type="button" data-bs-dismiss="offcanvas"
