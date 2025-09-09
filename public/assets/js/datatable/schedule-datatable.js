@@ -587,105 +587,34 @@ $(document).ready(function () {
                 }
             });
 
-            // Build upload progress UI state and helpers
-            var uploadState = {
-                files: [],
-                totalSize: 0,
-                container: null,
-                overallBar: null,
-                overallText: null,
-                fileBars: []
-            };
-
-            (function collectFiles() {
-                var cumulative = 0;
-                $('input[name="media_file[]"]').each(function () {
-                    var f = this.files && this.files[0] ? this.files[0] : null;
-                    if (f) {
-                        uploadState.files.push({
-                            name: f.name,
-                            size: f.size,
-                            startOffset: cumulative,
-                            endOffset: cumulative + f.size
-                        });
-                        cumulative += f.size;
+            // Prepare per-media progress UI (create form)
+            var createMediaFiles = [];
+            var createCumulativeSizes = [];
+            var createTotalSize = 0;
+            $('input[name="media_file[]"]').each(function () {
+                var fileInput = this;
+                if (fileInput.files && fileInput.files[0]) {
+                    var file = fileInput.files[0];
+                    var $mediaItem = $(fileInput).closest('.media-item');
+                    // Ensure a progress bar exists
+                    var $progressWrap = $mediaItem.find('.upload-progress-wrap');
+                    if ($progressWrap.length === 0) {
+                        $progressWrap = $('<div class="upload-progress-wrap mt-2">\
+                            <div class="progress" style="height: 8px;">\
+                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>\
+                            </div>\
+                            <small class="text-muted d-block mt-1 upload-progress-text">0%</small>\
+                        </div>');
+                        $mediaItem.append($progressWrap);
                     }
-                });
-                uploadState.totalSize = cumulative;
-            })();
+                    $progressWrap.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0);
+                    $progressWrap.find('.upload-progress-text').text('0%');
 
-            function createUploadUI() {
-                var $form = $('#create-schedule-form');
-                var $existing = $form.find('.upload-progress-wrap');
-                if ($existing.length) { $existing.remove(); }
-
-                var overall = '' +
-                    '<div class="mb-3">' +
-                    '<div class="d-flex justify-content-between small mb-1">' +
-                    '<span>Overall upload</span>' +
-                    '<span class="overall-text">0%</span>' +
-                    '</div>' +
-                    '<div class="progress" style="height: 8px;">' +
-                    '<div class="progress-bar" role="progressbar" style="width:0%" aria-valuemin="0" aria-valuemax="100"></div>' +
-                    '</div>' +
-                    '</div>';
-
-                var filesHtml = '';
-                if (uploadState.files.length > 0) {
-                    filesHtml += '<div class="mb-2 small text-muted">Files</div>';
-                    uploadState.files.forEach(function (f, idx) {
-                        filesHtml += '' +
-                            '<div class="mb-2 file-item" data-index="' + idx + '">' +
-                            '<div class="d-flex justify-content-between small mb-1">' +
-                            '<span>' + $('<div>').text(f.name).html() + '</span>' +
-                            '<span class="file-text">0%</span>' +
-                            '</div>' +
-                            '<div class="progress" style="height: 6px;">' +
-                            '<div class="progress-bar" role="progressbar" style="width:0%" aria-valuemin="0" aria-valuemax="100"></div>' +
-                            '</div>' +
-                            '</div>';
-                    });
+                    createMediaFiles.push({ file: file, $wrap: $progressWrap });
+                    createCumulativeSizes.push(createTotalSize);
+                    createTotalSize += file.size;
                 }
-
-                var $wrap = $('<div class="upload-progress-wrap border rounded p-3 bg-light"></div>');
-                $wrap.append(overall);
-                if (filesHtml) { $wrap.append(filesHtml); }
-
-                var $alertWrap = $('#create-form-alert');
-                if ($alertWrap.length) { $wrap.insertAfter($alertWrap); } else { $form.prepend($wrap); }
-
-                uploadState.container = $wrap;
-                uploadState.overallBar = $wrap.find('.progress-bar').first();
-                uploadState.overallText = $wrap.find('.overall-text');
-                uploadState.fileBars = [];
-                $wrap.find('.file-item').each(function () {
-                    uploadState.fileBars.push({
-                        bar: $(this).find('.progress-bar'),
-                        text: $(this).find('.file-text')
-                    });
-                });
-            }
-
-            function updateUploadProgress(totalLoaded, totalBytes) {
-                var denom = totalBytes || uploadState.totalSize || 1;
-                var overallPct = Math.min(100, Math.max(0, (totalLoaded / denom) * 100));
-                if (uploadState.overallBar) {
-                    uploadState.overallBar.css('width', overallPct + '%');
-                }
-                if (uploadState.overallText) {
-                    uploadState.overallText.text(overallPct.toFixed(0) + '%');
-                }
-                if (uploadState.files.length && uploadState.fileBars.length) {
-                    uploadState.files.forEach(function (f, idx) {
-                        var loadedForFile = Math.min(Math.max(totalLoaded - f.startOffset, 0), f.size);
-                        var pct = f.size ? (loadedForFile / f.size) * 100 : 100;
-                        var barEl = uploadState.fileBars[idx] && uploadState.fileBars[idx].bar;
-                        var textEl = uploadState.fileBars[idx] && uploadState.fileBars[idx].text;
-                        if (barEl) barEl.css('width', Math.min(100, Math.max(0, pct)) + '%');
-                        if (textEl) textEl.text(Math.min(100, Math.max(0, pct)).toFixed(0) + '%');
-                    });
-                }
-            }
+            });
 
             $.ajax({
                 url: '/schedule',
@@ -698,15 +627,34 @@ $(document).ready(function () {
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 beforeSend: function () {
                     console.log('AJAX request being sent to /schedule');
-                    createUploadUI();
                 },
                 xhr: function () {
                     var xhr = new window.XMLHttpRequest();
                     xhr.upload.addEventListener("progress", function (evt) {
                         if (evt.lengthComputable) {
-                            var percentComplete = evt.loaded / evt.total * 100;
-                            updateUploadProgress(evt.loaded, evt.total);
-                            console.log('Upload progress: ' + percentComplete + '%');
+                            var loaded = evt.loaded;
+                            var total = evt.total;
+                            var overallPercent = (loaded / total) * 100;
+                            console.log('Upload progress: ' + overallPercent + '%');
+
+                            // Update per-media bars using proportional mapping by file sizes
+                            if (createTotalSize > 0 && createMediaFiles.length > 0) {
+                                var loadedAcrossFiles = Math.min(loaded, total);
+                                // Map loaded bytes to files in order
+                                for (var i = 0; i < createMediaFiles.length; i++) {
+                                    var fileSize = createMediaFiles[i].file.size;
+                                    var start = createCumulativeSizes[i];
+                                    var end = start + fileSize;
+                                    var fileLoaded = Math.max(0, Math.min(loadedAcrossFiles - start, fileSize));
+                                    var filePercent = fileSize > 0 ? (fileLoaded / fileSize) * 100 : 100;
+                                    filePercent = Math.max(0, Math.min(100, filePercent));
+                                    createMediaFiles[i].$wrap.find('.progress-bar')
+                                        .css('width', filePercent.toFixed(0) + '%')
+                                        .attr('aria-valuenow', filePercent.toFixed(0));
+                                    createMediaFiles[i].$wrap.find('.upload-progress-text')
+                                        .text(filePercent.toFixed(0) + '%');
+                                }
+                            }
                         }
                     }, false);
                     return xhr;
@@ -758,12 +706,6 @@ $(document).ready(function () {
                 complete: function (xhr, status) {
                     console.log('AJAX request completed with status:', status);
                     submitBtn.html(originalBtnText).prop('disabled', false);
-                    try {
-                        updateUploadProgress(uploadState.totalSize, uploadState.totalSize || 1);
-                    } catch (e) { }
-                    if (uploadState.container) {
-                        setTimeout(function () { uploadState.container.fadeOut(200, function () { $(this).remove(); }); }, 800);
-                    }
                 }
             });
         });
@@ -1382,6 +1324,34 @@ $(document).ready(function () {
                 console.log(pair[0] + ': ' + pair[1]);
             }
 
+            // Prepare per-media progress UI (edit form)
+            var editMediaFiles = [];
+            var editCumulativeSizes = [];
+            var editTotalSize = 0;
+            $('#edit-schedule-form input[name="edit_media_file[]"]').each(function () {
+                var fileInput = this;
+                if (fileInput.files && fileInput.files[0]) {
+                    var file = fileInput.files[0];
+                    var $mediaItem = $(fileInput).closest('.media-item');
+                    var $progressWrap = $mediaItem.find('.upload-progress-wrap');
+                    if ($progressWrap.length === 0) {
+                        $progressWrap = $('<div class="upload-progress-wrap mt-2">\
+                            <div class="progress" style="height: 8px;">\
+                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>\
+                            </div>\
+                            <small class="text-muted d-block mt-1 upload-progress-text">0%</small>\
+                        </div>');
+                        $mediaItem.append($progressWrap);
+                    }
+                    $progressWrap.find('.progress-bar').css('width', '0%').attr('aria-valuenow', 0);
+                    $progressWrap.find('.upload-progress-text').text('0%');
+
+                    editMediaFiles.push({ file: file, $wrap: $progressWrap });
+                    editCumulativeSizes.push(editTotalSize);
+                    editTotalSize += file.size;
+                }
+            });
+
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'POST',
@@ -1390,6 +1360,35 @@ $(document).ready(function () {
                 processData: false,
                 contentType: false,
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', function (evt) {
+                        if (evt.lengthComputable) {
+                            var loaded = evt.loaded;
+                            var total = evt.total;
+                            var overallPercent = (loaded / total) * 100;
+                            console.log('Edit upload progress: ' + overallPercent + '%');
+
+                            if (editTotalSize > 0 && editMediaFiles.length > 0) {
+                                var loadedAcrossFiles = Math.min(loaded, total);
+                                for (var i = 0; i < editMediaFiles.length; i++) {
+                                    var fileSize = editMediaFiles[i].file.size;
+                                    var start = editCumulativeSizes[i];
+                                    var end = start + fileSize;
+                                    var fileLoaded = Math.max(0, Math.min(loadedAcrossFiles - start, fileSize));
+                                    var filePercent = fileSize > 0 ? (fileLoaded / fileSize) * 100 : 100;
+                                    filePercent = Math.max(0, Math.min(100, filePercent));
+                                    editMediaFiles[i].$wrap.find('.progress-bar')
+                                        .css('width', filePercent.toFixed(0) + '%')
+                                        .attr('aria-valuenow', filePercent.toFixed(0));
+                                    editMediaFiles[i].$wrap.find('.upload-progress-text')
+                                        .text(filePercent.toFixed(0) + '%');
+                                }
+                            }
+                        }
+                    }, false);
+                    return xhr;
+                },
                 success: function (response) {
                     if (response.success) {
                         var $wrap = $('#edit-form-alert');
