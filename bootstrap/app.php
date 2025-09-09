@@ -14,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'device.api.rate.limit' => \App\Http\Middleware\DeviceApiRateLimit::class,
+            'iis.ajax' => \App\Http\Middleware\IisAjaxMiddleware::class,
+        ]);
+
+        // Add global middleware for IIS AJAX support
+        $middleware->web(append: [
+            \App\Http\Middleware\IisAjaxMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
