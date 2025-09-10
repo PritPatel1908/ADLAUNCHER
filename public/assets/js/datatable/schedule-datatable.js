@@ -1307,6 +1307,10 @@ $(document).ready(function () {
             if (editDeviceId !== '') {
                 formData.set('device_id', editDeviceId);
             }
+            var editLayoutId = ($('#edit-layout_id').val() || '').toString();
+            if (editLayoutId !== '') {
+                formData.set('layout_id', editLayoutId);
+            }
 
             // Client-side validation for required fields
             if (!editScheduleName || String(editScheduleName).trim() === '') {

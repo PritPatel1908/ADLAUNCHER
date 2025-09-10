@@ -14,22 +14,183 @@ $(document).ready(function () {
     }
 
     initializeSelect2();
-    $(document).on('shown.bs.offcanvas', function () { setTimeout(initializeSelect2, 100); });
+    $(document).on('shown.bs.offcanvas', function () {
+        setTimeout(initializeSelect2, 100);
+
+        // Debug: Check if form fields are properly populated when offcanvas opens
+        setTimeout(function () {
+            console.log('Form fields after offcanvas shown:');
+            console.log('Schedule Name:', $('#edit-schedule_name').val());
+            console.log('Device ID:', $('#edit-device_id').val());
+            console.log('Layout ID:', $('#edit-layout_id').val());
+        }, 200);
+    });
 
     // Edit schedule form submission
     $('#edit-schedule-form').on('submit', function (e) {
         e.preventDefault();
+        e.stopPropagation();
+
+        console.log('Edit form submission triggered');
+
         var submitBtn = $(this).find('button[type="submit"]');
+
+        // Prevent multiple submissions
+        if (submitBtn.prop('disabled')) {
+            console.log('Form submission already in progress, ignoring duplicate submission');
+            return false;
+        }
+
         var originalBtnText = submitBtn.html();
         submitBtn.html('Updating...').prop('disabled', true);
+
+        // Client-side validation for required fields
+        var scheduleName = $('#edit-schedule_name').val();
+        console.log('Schedule name validation - Raw value:', scheduleName);
+        console.log('Schedule name validation - Trimmed value:', scheduleName ? scheduleName.trim() : '');
+
+        if (!scheduleName || String(scheduleName).trim() === '') {
+            console.error('Schedule name validation failed - empty or null value');
+            alert('Please enter a schedule name');
+            submitBtn.html(originalBtnText).prop('disabled', false);
+            return;
+        }
 
         // Use FormData for file uploads
         const formData = new FormData(this);
         formData.append('_method', 'PUT');
+
+        // Ensure critical fields exist in FormData even if input lacks name attr
+        var editScheduleName = ($('#edit-schedule_name').val() || '').trim();
+        console.log('FormData preparation - Schedule name:', editScheduleName);
+
+        if (editScheduleName !== '') {
+            formData.set('schedule_name', editScheduleName);
+            console.log('Schedule name set in FormData:', editScheduleName);
+        } else {
+            // If the field is empty, explicitly set it to empty string to avoid undefined
+            formData.set('schedule_name', '');
+            console.log('Schedule name set to empty string in FormData');
+        }
+        var editDeviceId = ($('#edit-device_id').val() || '').toString();
+        if (editDeviceId !== '') {
+            formData.set('device_id', editDeviceId);
+        }
+        var editLayoutId = ($('#edit-layout_id').val() || '').toString();
+        if (editLayoutId !== '') {
+            formData.set('layout_id', editLayoutId);
+        }
+
+        // Double-check that schedule_name is properly set
+        if (!formData.has('schedule_name') || formData.get('schedule_name') === '') {
+            console.error('Schedule name is missing or empty in form data');
+            console.error('FormData contents:');
+            for (var pair of formData.entries()) {
+                console.error('  ' + pair[0] + ': ' + pair[1]);
+            }
+            alert('Schedule name is required');
+            submitBtn.html(originalBtnText).prop('disabled', false);
+            return;
+        }
+
+        // Final validation before sending
+        var finalScheduleName = formData.get('schedule_name');
+        console.log('Final schedule name being sent:', finalScheduleName);
+        if (!finalScheduleName || finalScheduleName.trim() === '') {
+            console.error('Final validation failed - schedule name is empty');
+            alert('Schedule name is required');
+            submitBtn.html(originalBtnText).prop('disabled', false);
+            return;
+        }
+
+        // Additional validation to ensure all required fields are present
+        if (!formData.has('device_id') || formData.get('device_id') === '') {
+            console.error('Device ID is missing in form data');
+            alert('Please select a device');
+            submitBtn.html(originalBtnText).prop('disabled', false);
+            return;
+        }
+
         const actionUrl = $(this).attr('action');
         const urlWithMethod = actionUrl.indexOf('?') === -1
             ? actionUrl + '?_method=PUT'
             : actionUrl + '&_method=PUT';
+
+        // Debug: Log form data
+        console.log('Edit form data:');
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
+        // Debug: Check if all required fields are present
+        console.log('Required fields check:');
+        console.log('  schedule_name:', formData.has('schedule_name') ? formData.get('schedule_name') : 'MISSING');
+        console.log('  device_id:', formData.has('device_id') ? formData.get('device_id') : 'MISSING');
+        console.log('  layout_id:', formData.has('layout_id') ? formData.get('layout_id') : 'MISSING');
+
+        // Debug: Check form field attributes
+        var scheduleNameField = $('#edit-schedule_name');
+        console.log('Form field attributes:');
+        console.log('  ID:', scheduleNameField.attr('id'));
+        console.log('  Name:', scheduleNameField.attr('name'));
+        console.log('  Value:', scheduleNameField.val());
+        console.log('  Required:', scheduleNameField.attr('required'));
+
+        // Debug: Check specific field values
+        console.log('Schedule Name Value:', $('#edit-schedule_name').val());
+        console.log('Device ID Value:', $('#edit-device_id').val());
+        console.log('Layout ID Value:', $('#edit-layout_id').val());
+
+        // Debug: Check if form field exists and is accessible
+        var scheduleNameField = $('#edit-schedule_name');
+        console.log('Schedule name field exists:', scheduleNameField.length > 0);
+        console.log('Schedule name field value:', scheduleNameField.val());
+        console.log('Schedule name field name attribute:', scheduleNameField.attr('name'));
+
+        // Debug: Check if form is properly constructed
+        console.log('Form element:', this);
+        console.log('Form action:', $(this).attr('action'));
+        console.log('Form method:', $(this).attr('method'));
+
+        // Debug: Check if form data is properly constructed
+        console.log('FormData size:', formData.entries().length);
+        console.log('FormData keys:');
+        for (var key of formData.keys()) {
+            console.log('  ' + key);
+        }
+
+        // Debug: Check if form data contains the required fields
+        console.log('FormData validation:');
+        console.log('  Has schedule_name:', formData.has('schedule_name'));
+        console.log('  Has device_id:', formData.has('device_id'));
+        console.log('  Has layout_id:', formData.has('layout_id'));
+        console.log('  Has _method:', formData.has('_method'));
+
+        // Debug: Check if form data values are correct
+        console.log('FormData values:');
+        console.log('  schedule_name value:', formData.get('schedule_name'));
+        console.log('  device_id value:', formData.get('device_id'));
+        console.log('  layout_id value:', formData.get('layout_id'));
+        console.log('  _method value:', formData.get('_method'));
+
+        // Debug: Check if form data is properly constructed
+        console.log('FormData construction check:');
+        console.log('  FormData constructor:', formData.constructor.name);
+        console.log('  FormData entries count:', Array.from(formData.entries()).length);
+        console.log('  FormData keys count:', Array.from(formData.keys()).length);
+
+        // Debug: Check if form data is properly constructed
+        console.log('FormData final validation:');
+        console.log('  schedule_name exists and not empty:', formData.has('schedule_name') && formData.get('schedule_name') !== '');
+        console.log('  device_id exists and not empty:', formData.has('device_id') && formData.get('device_id') !== '');
+        console.log('  layout_id exists:', formData.has('layout_id'));
+        console.log('  _method exists:', formData.has('_method'));
+
+        // Debug: Check if form data is properly constructed
+        console.log('FormData final validation details:');
+        console.log('  schedule_name value type:', typeof formData.get('schedule_name'));
+        console.log('  schedule_name value length:', formData.get('schedule_name') ? formData.get('schedule_name').length : 'N/A');
+        console.log('  schedule_name value trimmed:', formData.get('schedule_name') ? formData.get('schedule_name').trim() : 'N/A');
 
         var startTime = Date.now();
         $.ajax({
@@ -92,9 +253,15 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
+                console.error('Schedule update error:', xhr);
                 const res = xhr.responseJSON;
                 let msg = 'Failed to update schedule.';
-                if (res && res.errors) { msg = Object.values(res.errors)[0][0]; }
+                if (res && res.errors) {
+                    console.error('Validation errors:', res.errors);
+                    msg = Object.values(res.errors)[0][0];
+                } else if (res && res.message) {
+                    msg = res.message;
+                }
                 showError(msg);
             },
             complete: function () {
