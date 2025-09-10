@@ -1297,17 +1297,14 @@ $(document).ready(function () {
             // Laravel requires method spoofing for file uploads with PUT/PATCH
             formData.append('_method', 'PUT');
 
-            // Ensure critical fields exist in FormData even if input lacks name attr
-            // Some templates use only IDs for edit fields; backend expects these keys
+            // Ensure critical fields exist in FormData - explicitly set required fields
             var editScheduleName = ($('#edit-schedule_name').val() || '').trim();
-            if (editScheduleName !== '') {
-                formData.set('schedule_name', editScheduleName);
-            }
             var editDeviceId = ($('#edit-device_id').val() || '').toString();
-            if (editDeviceId !== '') {
-                formData.set('device_id', editDeviceId);
-            }
             var editLayoutId = ($('#edit-layout_id').val() || '').toString();
+
+            // Always set the required fields in FormData
+            formData.set('schedule_name', editScheduleName);
+            formData.set('device_id', editDeviceId);
             if (editLayoutId !== '') {
                 formData.set('layout_id', editLayoutId);
             }
@@ -1315,6 +1312,12 @@ $(document).ready(function () {
             // Client-side validation for required fields
             if (!editScheduleName || String(editScheduleName).trim() === '') {
                 alert('Please enter a schedule name');
+                submitBtn.html(originalBtnText).prop('disabled', false);
+                return;
+            }
+
+            if (!editDeviceId || editDeviceId === '') {
+                alert('Please select a device');
                 submitBtn.html(originalBtnText).prop('disabled', false);
                 return;
             }
